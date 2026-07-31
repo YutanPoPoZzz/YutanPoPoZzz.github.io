@@ -9,6 +9,8 @@ const photos = defineCollection({
     category: z.enum(['portrait', 'commercial', 'event', 'photocontest']),
     date: z.coerce.date(),
     thumb: z.string(),
+    /** 画像の縦横比(width/height)。取り込み時に確定させる */
+    aspect: z.number().optional(),
     caption: z.string().optional(),
     client: z.string().optional(),
     featured: z.boolean().default(false),

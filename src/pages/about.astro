@@ -76,7 +76,9 @@ const splitGrade = (t: string) => {
             return (
               <li>
                 <span class="year">{a.year}</span>
-                <span class="ttl">{g.base}</span>
+                <span class="ttl">
+                  {a.href ? <a href={`${base}${a.href}`}>{g.base}</a> : g.base}
+                </span>
                 {g.grade && (
                   <span class:list={['grade', { top: g.grade === '最優秀賞' }]}>{g.grade}</span>
                 )}
@@ -219,6 +221,16 @@ const splitGrade = (t: string) => {
     /* 「優秀賞」等が途中で割れる汚い改行を防ぐ(折り返しは語の区切りだけ) */
     word-break: keep-all;
     overflow-wrap: anywhere;
+  }
+  /* 詳細ページがある実績はリンクにする */
+  .ach .ttl a {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    transition: color 0.3s, border-color 0.3s, text-shadow 0.3s;
+  }
+  .ach .ttl a:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 40%, transparent);
   }
   /* 賞グレードのバッジ: 最優秀賞=金ベタ / 優秀賞=金ヘアライン */
   .grade {

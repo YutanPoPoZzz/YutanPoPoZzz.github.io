@@ -2,7 +2,7 @@
 title: 'VRchatterへ「レタッチは難しくない」'
 summary: '露光量のスライダーひとつで写真は見違える。レタッチの心理的ハードルを下げるための入門記事です。'
 date: 2025-06-24
-category: '執筆活動'
+category: '写真講評・執筆'
 color: '#ff9ecb'
 thumb: '/works/note-retouch-card.jpg'
 full: '/works/note-retouch-full.jpg'

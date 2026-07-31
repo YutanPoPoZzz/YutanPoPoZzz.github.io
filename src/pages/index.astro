@@ -31,9 +31,10 @@ const splitGrade = (t: string) => {
   return m ? { base: m[1], grade: m[2] } : { base: t, grade: null };
 };
 // 本棚カルーセル: 中央の1枚は元比率で表示するためアスペクト比を持たせる
-const shelfItems = await Promise.all(
-  photos.slice(0, 12).map(async (p) => ({ p, aspect: await photoAspect(p.data.thumb) }))
-);
+const shelfItems = [];
+for (const p of photos.slice(0, 12)) {
+  shelfItems.push({ p, aspect: p.data.aspect ?? (await photoAspect(p.data.thumb)) });
+}
 ---
 
 <Base>
@@ -135,7 +136,9 @@ const shelfItems = await Promise.all(
           return (
             <li>
               <span class="year">{a.year}</span>
-              <span class="ttl">{g.base}</span>
+              <span class="ttl">
+                {a.href ? <a href={`${base}${a.href}`}>{g.base}</a> : g.base}
+              </span>
               {g.grade && (
                 <span class:list={['grade', { top: g.grade === '最優秀賞' }]}>{g.grade}</span>
               )}
@@ -590,6 +593,15 @@ const shelfItems = await Promise.all(
     font-weight: 500;
     word-break: keep-all;
     overflow-wrap: anywhere;
+  }
+  .award-list .ttl a {
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    transition: color 0.3s, border-color 0.3s, text-shadow 0.3s;
+  }
+  .award-list .ttl a:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 40%, transparent);
   }
   .award-list .note {
     font-size: 0.72rem;

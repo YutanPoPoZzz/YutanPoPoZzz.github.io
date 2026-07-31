@@ -18,8 +18,9 @@ export async function photoAspect(thumb: string): Promise<number> {
   try {
     const { width, height } = await imageSizeFromFile(path.join(publicDir, thumb));
     if (width && height) aspect = width / height;
-  } catch {
-    /* プレースホルダーSVG等は既定値に落とす */
+  } catch (e) {
+    // 握り潰すと全部3:4で表示される事故になるので必ず知らせる
+    console.warn(`[photo-aspect] ${thumb} の寸法を読めず3:4で表示します:`, e);
   }
   cache.set(thumb, aspect);
   return aspect;

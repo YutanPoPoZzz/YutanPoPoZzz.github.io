@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 import WorkCard from '../components/WorkCard.astro';
 import { minimaSeriesCard } from '../data/minima-series-card';
 import { workCategories } from '../data/work-categories';
+import { services } from '../data/services';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const works = (await getCollection('works')).sort(
@@ -17,15 +18,6 @@ const records = otherWorks;
 // その他: minimaシリーズ
 const misc = [minimaSeriesCard];
 
-// しごとについて: 受けられる依頼の一覧
-const services = [
-  { title: 'ポートレート撮影', desc: 'アバターの宣材・記念撮影。世界観に合わせたロケーション選びから' },
-  { title: '商品・プロモーション撮影', desc: 'アバター・衣装・ギミックなどの販売用ビジュアル' },
-  { title: 'イベント記録・風景撮影', desc: 'イベント当日の空気感を残す記録写真' },
-  { title: 'ポスター・告知ビジュアル制作', desc: 'イベント告知やSNS用の文字入れ込みビジュアル' },
-  { title: '写真教室・撮影講習', desc: '初心者向けからステップアップまで、内容は相談で' },
-  { title: '写真講評・執筆', desc: '作品への講評、VR写真についての記事執筆・寄稿' },
-];
 ---
 
 <Base title="WORKS" description="画像制作・執筆活動・講演/教室の3本柱と、受けられるお仕事のご紹介">
@@ -75,8 +67,8 @@ const services = [
       <h3>しごとについて<span class="en">SERVICES</span></h3>
       <ul class="services">
         {services.map((s) => (
-          <li>
-            <p class="sv-title">{s.title}</p>
+          <li style={`--sv: ${s.color}`}>
+            <p class="sv-title"><span class="sv-dot" aria-hidden="true"></span>{s.name}</p>
             <p class="sv-desc">{s.desc}</p>
           </li>
         ))}
@@ -236,17 +228,29 @@ const services = [
     gap: 14px;
   }
   .services li {
-    border: 1px solid var(--line);
+    border: 1px solid color-mix(in srgb, var(--sv) 32%, transparent);
+    background: color-mix(in srgb, var(--sv) 7%, transparent);
     padding: 0.9rem 1.1rem;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
   .services li:hover {
-    border-color: rgba(255, 255, 255, 0.35);
+    border-color: color-mix(in srgb, var(--sv) 70%, transparent);
+    box-shadow: 0 0 26px color-mix(in srgb, var(--sv) 20%, transparent);
   }
   .sv-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
     font-size: 0.88rem;
     font-weight: 700;
     letter-spacing: 0.04em;
+  }
+  .sv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sv);
+    flex: none;
   }
   .sv-desc {
     margin-top: 0.25rem;

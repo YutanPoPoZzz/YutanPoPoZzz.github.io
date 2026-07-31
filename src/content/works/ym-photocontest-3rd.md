@@ -2,7 +2,7 @@
 title: '第3回 YOYOGIMORIアバターフォトコンテスト 告知ポスター'
 summary: 'テーマ「其々の心情」。アバターの表情を主役に据えた、あたたかいトーンの告知ポスターです。'
 date: 2026-01-18
-category: '画像制作'
+category: 'ポスター・告知ビジュアル制作'
 color: '#c9a06a'
 thumb: '/works/ym3-card.jpg'
 full: '/works/ym3-full.jpg'

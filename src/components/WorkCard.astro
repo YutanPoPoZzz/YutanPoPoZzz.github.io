@@ -1,16 +1,19 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { serviceColor } from '../data/services';
 
 interface Props {
   work: CollectionEntry<'works'>;
 }
 const { work } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// タグ(=しごとの6項目)の色を差し色にする。該当なしはfrontmatterの色
+const accent = serviceColor(work.data.category, work.data.color);
 const d = work.data.date;
 const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 ---
 
-<a class="entry-item" href={`${base}/works/${work.id}/`} style={`--c: ${work.data.color}`}>
+<a class="entry-item" href={`${base}/works/${work.id}/`} style={`--c: ${accent}`}>
   <span class="entry-cat">{work.data.category}</span>
   {work.data.status && <span class="entry-status">{work.data.status}</span>}
   <figure class="entry-bg">

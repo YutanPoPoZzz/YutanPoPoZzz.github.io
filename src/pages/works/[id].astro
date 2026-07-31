@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Crumbs from '../../components/Crumbs.astro';
 import BackFab from '../../components/BackFab.astro';
+import { serviceColor } from '../../data/services';
 
 export async function getStaticPaths() {
   const works = await getCollection('works');
@@ -26,7 +27,7 @@ const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0'
 ---
 
 <Base title={work.data.title} description={work.data.summary}>
-  <main class="container article" style={`--c: ${work.data.color}`}>
+  <main class="container article" style={`--c: ${serviceColor(work.data.category, work.data.color)}`}>
     <Crumbs items={crumbs} />
     <header class="article-head">
       <div class="meta">

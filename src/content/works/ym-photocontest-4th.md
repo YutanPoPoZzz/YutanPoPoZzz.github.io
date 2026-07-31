@@ -2,7 +2,7 @@
 title: '第4回 YOYOGIMORIアバターフォトコンテスト 告知ポスター'
 summary: 'テーマ「邂逅」。運命的な出会いを、抜けのよい空と光で描いた告知ポスターです。'
 date: 2026-05-22
-category: '画像制作'
+category: 'ポスター・告知ビジュアル制作'
 color: '#7ec8ff'
 thumb: '/works/ym4-card.jpg'
 full: '/works/ym4-full.jpg'

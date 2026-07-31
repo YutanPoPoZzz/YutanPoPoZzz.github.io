@@ -4,6 +4,8 @@ export type Achievement = {
   year: string;
   title: string;
   note?: string;
+  /** 詳細ページへのリンク(サイト内はベースURLからの相対パス、外部は絶対URL) */
+  href?: string;
 };
 
 export const awards: Achievement[] = [
@@ -29,11 +31,12 @@ export const exhibitions: Achievement[] = [
     year: '2026.06',
     title: 'Virtual Photography Showcase 2026 招待作家',
     note: '金沢21世紀美術館',
+    href: '/works/vps-2026/',
   },
 ];
 
 export const activities: Achievement[] = [
-  { year: '2025.03〜', title: 'DJイベント「RoofTopJunction」主催', note: '企画・会場ワールド制作・ポスター・運営・撮影' },
+  { year: '2025.03〜', title: 'DJイベント「Roof Top Junction」主催', note: '企画・会場ワールド制作・ポスター・運営・撮影', href: '/events/roof-top-junction/' },
   { year: '2025.10〜', title: 'VRChat写真教室' },
   { year: '—', title: '撮影講習', note: '2回実施' },
 ];

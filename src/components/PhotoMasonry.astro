@@ -7,9 +7,11 @@ interface Props {
   photos: CollectionEntry<'photos'>[];
 }
 const { photos } = Astro.props;
-const items = await Promise.all(
-  photos.map(async (p) => ({ photo: p, aspect: await photoAspect(p.data.thumb) }))
-);
+// 比率はfrontmatterに確定済み。無い場合だけ画像から読む(取り込み漏れの保険)
+const items = [];
+for (const p of photos) {
+  items.push({ photo: p, aspect: p.data.aspect ?? (await photoAspect(p.data.thumb)) });
+}
 ---
 
 <div class="photo-grid" data-masonry>
