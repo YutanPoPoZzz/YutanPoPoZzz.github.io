@@ -1,0 +1,167 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import WorkCard from '../../../components/WorkCard.astro';
+import Crumbs from '../../../components/Crumbs.astro';
+import BackFab from '../../../components/BackFab.astro';
+import { services } from '../../../data/services';
+
+export async function getStaticPaths() {
+  const works = (await getCollection('works')).sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime()
+  );
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: {
+      service,
+      items: works.filter((w) => w.data.category === service.name),
+    },
+  }));
+}
+
+const { service, items } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<Base title={service.name} description={`${service.name}の制作実績 — ${service.desc}`}>
+  <main class="container tagpage" style={`--sv: ${service.color}`}>
+    <Crumbs
+      items={[
+        { label: 'ポートフォリオ', href: `${base}/works/` },
+        { label: service.name },
+      ]}
+    />
+
+    <div class="blockttl">
+      <h2><span class="dot" aria-hidden="true"></span>{service.name}</h2>
+      <span class="sub">SELECTED WORKS</span>
+    </div>
+    <p class="lead">{service.desc}</p>
+
+    {items.length > 0 ? (
+      <div class="grid">
+        {items.map((w) => <WorkCard work={w} />)}
+      </div>
+    ) : (
+      <p class="empty">この分野の実績ページを準備中です。順次追加していきます。</p>
+    )}
+
+    <nav class="other-tags" aria-label="ほかのしごと">
+      <span class="ot-label">ほかのしごと</span>
+      {services
+        .filter((s) => s.slug !== service.slug)
+        .map((s) => (
+          <a href={`${base}/works/tag/${s.slug}/`} style={`--sv: ${s.color}`}>
+            <span class="ot-dot" aria-hidden="true"></span>{s.name}
+          </a>
+        ))}
+    </nav>
+
+    <p class="back"><a href={`${base}/works/`}>← ポートフォリオ一覧にもどる</a></p>
+  </main>
+
+  <BackFab href={`${base}/works/`} label="ポートフォリオ" />
+</Base>
+
+<style>
+  .blockttl h2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--sv);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--sv) 60%, transparent);
+    flex: none;
+  }
+  .lead {
+    text-align: center;
+    margin: -1.4rem 0 2.6rem;
+    font-size: 0.86rem;
+    color: var(--text-weak);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 34px 30px;
+  }
+  .empty {
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--text-weak);
+    border: 1px dashed color-mix(in srgb, var(--sv) 35%, transparent);
+    background: color-mix(in srgb, var(--sv) 6%, transparent);
+    padding: 2rem 1.2rem;
+    text-align: center;
+  }
+
+  .other-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 3.4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+  }
+  .ot-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--text-weak);
+    margin-right: 0.3rem;
+  }
+  .other-tags a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    padding: 0.32rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--sv) 32%, transparent);
+    background: color-mix(in srgb, var(--sv) 7%, transparent);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .other-tags a:hover {
+    border-color: color-mix(in srgb, var(--sv) 70%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--sv) 20%, transparent);
+  }
+  .ot-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--sv);
+    flex: none;
+  }
+
+  .back {
+    margin-top: 2.6rem;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .back a {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--gold) 85%, white);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .back a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+</style>

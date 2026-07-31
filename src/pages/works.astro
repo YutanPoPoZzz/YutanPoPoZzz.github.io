@@ -68,8 +68,11 @@ const misc = [minimaSeriesCard];
       <ul class="services">
         {services.map((s) => (
           <li style={`--sv: ${s.color}`}>
-            <p class="sv-title"><span class="sv-dot" aria-hidden="true"></span>{s.name}</p>
-            <p class="sv-desc">{s.desc}</p>
+            <a href={`${base}/works/tag/${s.slug}/`}>
+              <span class="sv-title"><span class="sv-dot" aria-hidden="true"></span>{s.name}</span>
+              <span class="sv-desc">{s.desc}</span>
+              <span class="sv-arrow" aria-hidden="true">→</span>
+            </a>
           </li>
         ))}
       </ul>
@@ -230,12 +233,20 @@ const misc = [minimaSeriesCard];
   .services li {
     border: 1px solid color-mix(in srgb, var(--sv) 32%, transparent);
     background: color-mix(in srgb, var(--sv) 7%, transparent);
-    padding: 0.9rem 1.1rem;
     transition: border-color 0.3s, box-shadow 0.3s;
   }
   .services li:hover {
     border-color: color-mix(in srgb, var(--sv) 70%, transparent);
     box-shadow: 0 0 26px color-mix(in srgb, var(--sv) 20%, transparent);
+  }
+  .services a {
+    position: relative;
+    display: block;
+    padding: 0.9rem 2.2rem 0.9rem 1.1rem;
+  }
+  .services a:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 2px;
   }
   .sv-title {
     display: flex;
@@ -253,9 +264,22 @@ const misc = [minimaSeriesCard];
     flex: none;
   }
   .sv-desc {
+    display: block;
     margin-top: 0.25rem;
     font-size: 0.76rem;
     color: var(--text-weak);
+  }
+  .sv-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    translate: 0 -50%;
+    font-size: 0.85rem;
+    color: color-mix(in srgb, var(--sv) 70%, white);
+    transition: transform 0.3s ease;
+  }
+  .services li:hover .sv-arrow {
+    transform: translateX(4px);
   }
 
   .empty {
