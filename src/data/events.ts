@@ -10,8 +10,6 @@ export type EventEntry = {
   color: string;
   /** public/events/ 配下のパス */
   image?: string;
-  /** true のとき画像枠だけを表示する(未設定なら画像枠自体を出さない) */
-  imagePending?: boolean;
   summary: string[];
   roles: string;
   tasks: string;
