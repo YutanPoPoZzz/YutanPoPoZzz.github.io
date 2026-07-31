@@ -14,7 +14,7 @@ export const services: Service[] = [
   {
     name: 'ポートレート撮影',
     slug: 'portrait',
-    desc: 'アバターの宣材・記念撮影。世界観に合わせたロケーション選びから',
+    desc: 'バーチャル宣材写真・記念撮影。世界観に合わせたロケーション選びから',
     color: '#ff9ecb',
   },
   {
@@ -36,15 +36,15 @@ export const services: Service[] = [
     color: '#ffb04d',
   },
   {
-    name: '写真教室・撮影講習',
-    slug: 'lecture',
-    desc: '初心者向けからステップアップまで、内容は相談で',
+    name: '展示物制作',
+    slug: 'exhibition',
+    desc: '展示に向けた作品制作。プリント・レコードなど実物の設計から設営まで',
     color: '#b98cff',
   },
   {
-    name: '写真講評・執筆',
+    name: '執筆・イベント出演',
     slug: 'writing',
-    desc: '作品への講評、VR写真についての記事執筆・寄稿',
+    desc: 'VR写真についての記事執筆・寄稿、写真教室や講評などの登壇',
     color: '#ffe08a',
   },
 ];
