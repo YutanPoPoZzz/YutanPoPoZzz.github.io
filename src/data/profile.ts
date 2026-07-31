@@ -25,7 +25,11 @@ export const sponsors: Achievement[] = [
 ];
 
 export const exhibitions: Achievement[] = [
-  { year: '2026.06', title: 'Virtual Photography Showcase 2026『Gather on the rooftop』' },
+  {
+    year: '2026.06',
+    title: 'Virtual Photography Showcase 2026 招待作家',
+    note: '金沢21世紀美術館',
+  },
 ];
 
 export const activities: Achievement[] = [

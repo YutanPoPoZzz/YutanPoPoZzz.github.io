@@ -5,7 +5,8 @@ export type EventLink = { label: string; url: string };
 export type EventEntry = {
   name: string;
   genre: string;
-  status: 'ongoing' | 'past';
+  /** 関わり方でセクション分けする */
+  status: 'host' | 'organizer' | 'staff' | 'past';
   /** イベントごとの差し色 */
   color: string;
   /** public/events/ 配下のパス */
@@ -26,7 +27,7 @@ export const events: EventEntry[] = [
   {
     name: 'Roof Top Junction',
     genre: 'DJイベント',
-    status: 'ongoing',
+    status: 'host',
     color: '#ff4da6',
     image: '/events/roof-top-junction.jpg',
     page: '/events/roof-top-junction/',
@@ -48,7 +49,7 @@ export const events: EventEntry[] = [
   {
     name: 'Gallery & fan cafe Kittens',
     genre: '複合イベント',
-    status: 'ongoing',
+    status: 'organizer',
     color: '#d9a679',
     image: '/events/fancafe-kittens.jpg',
     summary: [
@@ -67,7 +68,7 @@ export const events: EventEntry[] = [
   {
     name: 'VRC貴族部 Eleganttique',
     genre: '会員制コミュニティイベント',
-    status: 'ongoing',
+    status: 'staff',
     color: '#ffb04d',
     image: '/events/eleganttique.jpg',
     summary: [
@@ -130,5 +131,6 @@ export const events: EventEntry[] = [
     ],
   },
 ];
+
 
 

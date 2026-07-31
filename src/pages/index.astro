@@ -13,7 +13,9 @@ const photos = (await getCollection('photos')).sort(
 
 // EVENTSダイジェスト: Roof Top Junctionをメイン、右側は参加中の2イベントを要約カードで
 const mainEvent = events.find((e) => e.name === 'Roof Top Junction') ?? events[0];
-const subEvents = events.filter((e) => e !== mainEvent && e.status === 'ongoing');
+const subEvents = events.filter(
+  (e) => e !== mainEvent && (e.status === 'organizer' || e.status === 'staff')
+);
 // HOME用の一行紹介(詳細はEVENTSページに任せて、ここでは雰囲気だけ伝える)
 const evTagline: Record<string, string> = {
   'Gallery & fan cafe Kittens':

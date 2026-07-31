@@ -6,9 +6,11 @@ import { events } from '../data/events';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const groups = [
-  { key: 'ONGOING', jp: '参加中のイベント', items: events.filter((e) => e.status === 'ongoing') },
+  { key: 'HOSTED', jp: '主催イベント', items: events.filter((e) => e.status === 'host') },
+  { key: 'ORGANIZING', jp: '運営参加イベント', items: events.filter((e) => e.status === 'organizer') },
+  { key: 'STAFF', jp: 'スタッフ参加イベント', items: events.filter((e) => e.status === 'staff') },
   { key: 'PAST', jp: '過去携わったイベント', items: events.filter((e) => e.status === 'past') },
-];
+].filter((g) => g.items.length > 0);
 ---
 
 <Base

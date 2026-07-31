@@ -12,13 +12,10 @@ const works = (await getCollection('works')).sort(
 // minima各機はシリーズカード1枠に集約するため一覧からは除外
 const otherWorks = works.filter((w) => !w.id.startsWith('minima-'));
 
-// 制作実績: 3本柱カテゴリに一致するもの(現状は空。mdを置くと並ぶ)
-const records = otherWorks.filter((w) =>
-  workCategories.some((c) => c.jp === w.data.category)
-);
-const recordIds = new Set(records.map((r) => r.id));
-// その他: 3本柱に入らないもの+minimaシリーズ
-const misc = [...otherWorks.filter((w) => !recordIds.has(w.id)), minimaSeriesCard];
+// 制作実績: minima以外のすべて(カテゴリはカードのチップに出る)
+const records = otherWorks;
+// その他: minimaシリーズ
+const misc = [minimaSeriesCard];
 
 // しごとについて: 受けられる依頼の一覧
 const services = [
