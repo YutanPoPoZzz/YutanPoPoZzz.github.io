@@ -1,0 +1,272 @@
+---
+import Base from '../layouts/Base.astro';
+import { awards, clientWorks, sponsors, exhibitions, activities } from '../data/profile';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const sections = [
+  { key: 'AWARDS', jp: '受賞', items: awards },
+  { key: 'CLIENT WORKS', jp: 'クライアントワーク', items: clientWorks },
+  { key: 'SPONSOR', jp: 'スポンサー', items: sponsors },
+  { key: 'EXHIBITIONS', jp: '展示・掲載', items: exhibitions },
+  { key: 'PROJECTS', jp: '企画・活動', items: activities },
+];
+
+// タイトル末尾の賞グレードをバッジとして分離する(該当なしはそのまま)
+const splitGrade = (t: string) => {
+  const m = t.match(/^(.*?)\s*(最優秀賞|優秀賞|入賞|審査員賞)$/);
+  return m ? { base: m[1], grade: m[2] } : { base: t, grade: null };
+};
+---
+
+<Base title="ABOUT" description="YutanpopoZzz — VRChatを中心に活動するバーチャルフォトグラファー">
+  <main class="container about">
+    <div class="blockttl">
+      <h2>じぶんのこと</h2>
+      <span class="sub">ABOUT</span>
+    </div>
+    <div class="body-wrap">
+    <div class="body">
+      <p class="name-line">
+        <strong>YutanpopoZzz</strong>
+        <span class="role">Virtual Photographer / Visual Creator</span>
+      </p>
+      <p>
+        VRChatを中心に、ポートレートや商品・イベントのプロモーション撮影、ビジュアル制作を行っています。
+        得意なのは、キャラクター性を強く引き出すポートレート。クールでストリートな空気をまとわせながら、
+        一枚から物語が想像できる画面をつくります。その持ち味を活かして、ポスターや告知ビジュアルの制作も手がけています。
+      </p>
+      <p>
+        なぜVRで撮るのか。ここには重力や天候といった現実の制約がなく、構図・光・キャラクターと、
+        どこまでも純粋に向き合えるからです。そしてVRChatは、会話だけでなく「空間を共有する」SNSでもあります。
+        同じ場所に立つことで生まれる風景や関係性には、現実を超えた魅力がある——
+        ここにしか写せない本質があると、私は考えています。
+      </p>
+      <p>
+        ただ、その魅力はまだ外の世界からは見えにくいままです。だから、写真で残して、伝える。
+        同じ思いで、VRChatについての文章の執筆や、写真文化を広げるための撮影講習も続けています。
+      </p>
+      <ul class="sns">
+        <li><a href="https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed" target="_blank" rel="noopener noreferrer">VRChat ↗</a></li>
+        <li><a href="https://x.com/YutanpopoZzz" target="_blank" rel="noopener noreferrer">X ↗</a></li>
+        <li><a href={`${base}/works/`}>WORKS →</a></li>
+      </ul>
+    </div>
+    <figure class="me">
+      <img
+        src={`${base}/about/portrait.jpg`}
+        alt="YutanpopoZzz のポートレート"
+        width="1200"
+        height="1600"
+        loading="lazy"
+      />
+    </figure>
+    </div>
+
+    <div class="blockttl">
+      <h2>実績</h2>
+      <span class="sub">ACHIEVEMENTS</span>
+    </div>
+    {sections.map((s) => (
+      <section class="ach">
+        <h3>{s.jp}<span class="en">{s.key}</span></h3>
+        <ul>
+          {s.items.map((a) => {
+            const g = splitGrade(a.title);
+            return (
+              <li>
+                <span class="year">{a.year}</span>
+                <span class="ttl">{g.base}</span>
+                {g.grade && (
+                  <span class:list={['grade', { top: g.grade === '最優秀賞' }]}>{g.grade}</span>
+                )}
+                {a.note && <span class="note">{a.note}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))}
+    <p class="events-link"><a href={`${base}/events/`}>イベント運営の実績をくわしく見る →</a></p>
+    <p class="disclaimer">※ 実績の詳細名・クライアント名は順次追記します</p>
+  </main>
+</Base>
+
+<style>
+  .about {
+    max-width: 960px;
+  }
+  /* 自己紹介: 左=ポートレート / 右=文章(写真は文章の高さに対して中央) */
+  .body-wrap {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2.6rem;
+    align-items: center;
+  }
+  .body {
+    font-size: 0.92rem;
+    min-width: 0;
+  }
+  .me {
+    order: -1;
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .me img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  @media (max-width: 700px) {
+    .body-wrap {
+      grid-template-columns: 1fr;
+    }
+    .me {
+      max-width: 340px;
+      margin: 0 auto;
+    }
+  }
+  /* 実績リストは読みやすい幅に留める(長いタイトル+主催表記が1行に収まる幅) */
+  .about .ach,
+  .about .events-link,
+  .about .disclaimer {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .name-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-bottom: 1.4rem;
+  }
+  .name-line strong {
+    font-family: var(--font-en);
+    font-size: 1.15rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+  .role {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    color: var(--text-weak);
+  }
+  .body p {
+    margin: 1rem 0;
+  }
+  .sns {
+    list-style: none;
+    display: flex;
+    gap: 1.6rem;
+    margin-top: 2rem;
+  }
+  .sns a {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.3s;
+  }
+  .sns a:hover {
+    border-color: var(--text);
+  }
+
+  .ach {
+    margin-bottom: 2.2rem;
+  }
+  .ach h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 0.5rem;
+  }
+  .ach h3 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: color-mix(in srgb, var(--gold) 70%, transparent);
+  }
+  .ach ul {
+    list-style: none;
+  }
+  .ach li {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.45rem 0.2rem;
+    font-size: 0.87rem;
+  }
+  .ach .year {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    min-width: 6.2em;
+    font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+  .ach .ttl {
+    /* 「優秀賞」等が途中で割れる汚い改行を防ぐ(折り返しは語の区切りだけ) */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  /* 賞グレードのバッジ: 最優秀賞=金ベタ / 優秀賞=金ヘアライン */
+  .grade {
+    flex: none;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+    padding: 0.05rem 0.55rem;
+    white-space: nowrap;
+  }
+  .grade.top {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+    font-weight: 700;
+  }
+  .ach .note {
+    font-size: 0.72rem;
+    color: var(--text-weak);
+    margin-left: auto;
+    text-align: right;
+    flex: none;
+  }
+  @media (max-width: 560px) {
+    .ach li {
+      flex-wrap: wrap;
+    }
+    .ach .note {
+      flex-basis: 100%;
+      margin-left: calc(6.2em + 1rem);
+      text-align: left;
+    }
+  }
+  .events-link {
+    margin: 0.4rem 0 1.6rem;
+    font-size: 0.85rem;
+  }
+  .events-link a {
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.3s;
+  }
+  .events-link a:hover {
+    border-color: var(--text);
+  }
+  .disclaimer {
+    font-size: 0.72rem;
+    color: var(--text-weak);
+  }
+</style>

@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+
+const items = [
+  'お名前（活動名）',
+  'ご連絡先（XのDM / メールアドレス）',
+  '依頼内容（ポートレート / 商品撮影 / イベント撮影 / ビジュアル制作 など）',
+  '希望納期',
+  '使用目的・掲載先',
+  '商用利用の有無',
+  '希望する写真の枚数',
+  'ご予算',
+  '参考資料（イメージに近い写真やワールドなど）',
+];
+
+// メールリンク: 宛先・件名・依頼フォーマット入りの本文を最初から入れておく
+const MAIL_TO = 'yutanpopozch@gmail.com';
+const mailSubject = '撮影・ビジュアル制作のご依頼／ご相談';
+const mailBody = [
+  'YutanpopoZzz さま',
+  '',
+  '撮影（ビジュアル制作）についてご相談させてください。',
+  '',
+  '─────────────',
+  ...items.map((item) => `${item.replace(/（.*）$/, '')}：`),
+  '─────────────',
+  '',
+  '（ご自由にご記入ください）',
+  '',
+].join('\n');
+const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+---
+
+<Base title="CONTACT" description="撮影・ビジュアル制作のご依頼はこちら">
+  <main class="container contact">
+    <div class="blockttl">
+      <h2>ご依頼・お問い合わせ</h2>
+      <span class="sub">CONTACT</span>
+    </div>
+    <div class="body">
+      <p>
+        VRChatでのポートレート撮影、アバター・衣装・商品のプロモーション撮影、イベント記録、
+        ポスターやSNS告知などのビジュアル制作のご依頼を受け付けています。
+        ご相談だけでも大丈夫ですので、遠慮なくご連絡ください。
+      </p>
+      <p>
+        ご依頼の際は、以下の項目を添えていただけると、確認のやり取りが少なくスムーズです。
+      </p>
+      <ol class="items">
+        {items.map((item) => <li>{item}</li>)}
+      </ol>
+
+      <div class="channels">
+        <a href="https://x.com/YutanpopoZzz" target="_blank" rel="noopener noreferrer">X のDMで相談する ↗</a>
+        <a href={mailHref}>メールで相談する ↗</a>
+      </div>
+
+      <div class="notes">
+        <h3>ご依頼にあたって</h3>
+        <ul>
+          <li>写真の使用範囲・クレジット表記は事前にご相談のうえ取り決めます</li>
+          <li>商用利用はご相談ください</li>
+          <li>撮影に使用するVRChatワールドやアセットの利用規約は、双方で確認のうえ進めます</li>
+          <li>修正回数・納期の目安は依頼内容に応じてお見積もりします</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</Base>
+
+<style>
+  .contact {
+    max-width: 640px;
+  }
+  .body {
+    font-size: 0.92rem;
+  }
+  .body p {
+    margin: 1rem 0;
+  }
+  .items {
+    margin: 1.4rem 0;
+    padding-left: 1.6rem;
+  }
+  .items li {
+    margin: 0.4rem 0;
+    font-size: 0.88rem;
+  }
+  .channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 2.2rem 0;
+  }
+  .channels a {
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    border: 1px solid var(--line);
+    padding: 0.55rem 1.4rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .channels a:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+  }
+  .notes {
+    border-top: 1px solid var(--line);
+    padding-top: 1.6rem;
+  }
+  .notes h3 {
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.6rem;
+  }
+  .notes ul {
+    padding-left: 1.4rem;
+  }
+  .notes li {
+    margin: 0.35rem 0;
+    font-size: 0.85rem;
+    color: var(--text-weak);
+  }
+  .note {
+    margin-top: 2.4rem;
+    font-size: 0.74rem;
+    color: var(--text-weak);
+  }
+</style>

@@ -1,0 +1,431 @@
+---
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import EventLinks from '../../components/EventLinks.astro';
+import BackFab from '../../components/BackFab.astro';
+import { events } from '../../data/events';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const ev = events.find((e) => e.name === 'Roof Top Junction')!;
+// 各回の告知ポスター(すべて自作)
+const posters = [
+  { slug: 'omohide', label: '思い出ボード' },
+  { slug: 'vol6', label: 'vol.6' },
+  { slug: 'vol5', label: 'vol.5' },
+  { slug: 'vol4', label: 'vol.4' },
+  { slug: 'vol3', label: 'vol.3' },
+  { slug: 'vol2', label: 'vol.2' },
+  { slug: 'vol1', label: 'vol.1' },
+];
+---
+
+<Base
+  title="Roof Top Junction"
+  description="VRChatのDJイベント Roof Top Junction — 初心者でも音楽を楽しめる場づくりを軸にした、屋上の音楽イベント(主催)"
+>
+  <main class="container rtj" style={`--ev: ${ev.color}`}>
+    <Crumbs items={[{ label: 'イベント運営', href: `${base}/events/` }, { label: ev.name }]} />
+
+    <header class="head">
+      <h1>{ev.name}</h1>
+      <p class="genre"><span class="dot" aria-hidden="true"></span>{ev.genre}・主催</p>
+    </header>
+
+    {ev.image && (
+      <figure class="hero">
+        <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} />
+      </figure>
+    )}
+
+    <section class="body">
+      {ev.summary.map((p) => <p>{p}</p>)}
+    </section>
+
+    <section class="meta-block">
+      <h2>イベント概要<span class="en">OVERVIEW</span></h2>
+      <dl class="meta">
+        <div>
+          <dt>主な役割</dt>
+          <dd>{ev.roles}</dd>
+        </div>
+        <div>
+          <dt>担当業務</dt>
+          <dd>{ev.tasks}</dd>
+        </div>
+        <div>
+          <dt>イベント規模</dt>
+          <dd>{ev.scale.join(' ／ ')}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="posters">
+      <h2>ポスターアーカイブ<span class="en">POSTERS</span></h2>
+      <p class="posters-lead">
+        各回の告知ポスターは自分で制作しています。写真・レイアウト・文字組みまで一貫して担当。
+      </p>
+      <div class="poster-grid">
+        {posters.map((p) => (
+          <button class="poster" type="button" data-poster={`${base}/events/rtj/${p.slug}.jpg`} data-label={p.label}>
+            <img src={`${base}/events/rtj/${p.slug}.jpg`} alt={`Roof Top Junction ${p.label} ポスター`} loading="lazy" />
+            <span class="poster-label">{p.label}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <div class="foot">
+      <EventLinks links={ev.links} />
+      {ev.credits && (
+        <div class="credits">
+          {ev.credits.map((c) => (
+            <span>
+              {c.role} :{' '}
+              {c.url ? (
+                <a href={c.url} target="_blank" rel="noopener noreferrer">{c.name} ↗</a>
+              ) : (
+                c.name
+              )}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <p class="back"><a href={`${base}/events/`}>← イベント運営にもどる</a></p>
+  </main>
+
+  <BackFab href={`${base}/events/`} label="イベント運営" />
+
+  <!-- ポスター拡大表示 -->
+  <div class="lightbox" id="lightbox" hidden>
+    <figure>
+      <img id="lb-img" src="" alt="" draggable="false" />
+      <figcaption>
+        <span class="lb-title" id="lb-title"></span>
+        <span class="lb-note">※ サイト掲載用にリサイズした画像です</span>
+      </figcaption>
+    </figure>
+  </div>
+</Base>
+
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement | null;
+  const lbTitle = document.getElementById('lb-title');
+  const grid = document.querySelector('.poster-grid');
+
+  if (lightbox && lbImg && lbTitle && grid) {
+    const close = () => {
+      lightbox.hidden = true;
+      lightbox.classList.remove('zoomed');
+      lbImg.src = '';
+      document.body.style.overflow = '';
+    };
+
+    grid.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('.poster');
+      if (!btn?.dataset.poster) return;
+      lbImg.src = btn.dataset.poster;
+      lbImg.alt = `Roof Top Junction ${btn.dataset.label} ポスター`;
+      lbTitle.textContent = `Roof Top Junction ${btn.dataset.label}`;
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    });
+
+    // 写真タップで等倍ズーム、もう一度で戻る。外側タップ/Escで閉じる
+    lbImg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (lightbox.classList.contains('zoomed')) {
+        lightbox.classList.remove('zoomed');
+        lightbox.scrollTo(0, 0);
+      } else {
+        const r = lbImg.getBoundingClientRect();
+        const rx = (e.clientX - r.left) / r.width;
+        const ry = (e.clientY - r.top) / r.height;
+        lightbox.classList.add('zoomed');
+        lightbox.scrollTo(
+          lbImg.naturalWidth * rx - lightbox.clientWidth / 2,
+          lbImg.naturalHeight * ry - lightbox.clientHeight / 2
+        );
+      }
+    });
+    lightbox.addEventListener('click', close);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lightbox.hidden) close();
+    });
+  }
+</script>
+
+<style>
+  .rtj {
+    max-width: 760px;
+  }
+  .head {
+    text-align: center;
+    margin-top: 2.6rem;
+  }
+  .head h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .genre {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.7rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--ev) 65%, white);
+    background: var(--bg-soft);
+    border: 1px solid color-mix(in srgb, var(--ev) 40%, transparent);
+    padding: 0.2rem 0.8rem;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ev);
+    flex: none;
+  }
+  .hero {
+    margin-top: 1.8rem;
+    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
+    box-shadow: 0 0 60px color-mix(in srgb, var(--ev) 12%, transparent);
+  }
+  .hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .body {
+    margin-top: 2.4rem;
+    font-size: 0.92rem;
+  }
+  .body p {
+    margin: 1rem 0;
+    line-height: 1.9;
+  }
+  .meta-block {
+    margin-top: 2.6rem;
+  }
+  .meta-block h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 0.8rem;
+  }
+  .meta-block h2 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: var(--text-weak);
+  }
+  .meta > div {
+    display: flex;
+    gap: 1.2rem;
+    padding: 0.35rem 0;
+    font-size: 0.87rem;
+  }
+  .meta dt {
+    min-width: 6.5em;
+    color: var(--text-weak);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .meta dd {
+    flex: 1;
+  }
+  /* ポスターアーカイブ */
+  .posters {
+    margin-top: 2.8rem;
+  }
+  .posters h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 0.8rem;
+  }
+  .posters h2 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: var(--text-weak);
+  }
+  .posters-lead {
+    font-size: 0.84rem;
+    color: var(--text-weak);
+    margin-bottom: 1.4rem;
+  }
+  .poster-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .poster {
+    position: relative;
+    display: block;
+    padding: 0;
+    background: none;
+    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
+    cursor: zoom-in;
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .poster img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .poster:hover {
+    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
+    box-shadow: 0 0 28px color-mix(in srgb, var(--ev) 25%, transparent);
+  }
+  .poster:hover img {
+    transform: scale(1.03);
+  }
+  .poster-label {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 0.2rem 0.6rem;
+    font-family: var(--font-en);
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    color: var(--text);
+    background: rgba(10, 10, 12, 0.75);
+  }
+  .poster:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 3px;
+  }
+
+  /* 拡大表示(GALLERYと同じ挙動) */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    background: rgba(10, 10, 12, 0.94);
+    cursor: zoom-out;
+  }
+  .lightbox[hidden] {
+    display: none;
+  }
+  .lightbox figure {
+    text-align: center;
+    max-width: 100%;
+  }
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 76vh;
+    width: auto;
+    height: auto;
+    border: 1px solid var(--line);
+    cursor: zoom-in;
+  }
+  /* 画像が画面より小さいときは中央、大きいときは左上基準(safe centering) */
+  .lightbox.zoomed {
+    align-items: safe center;
+    justify-content: safe center;
+    overflow: auto;
+    padding: 0;
+  }
+  .lightbox.zoomed figure {
+    max-width: none;
+  }
+  .lightbox.zoomed img {
+    max-width: none;
+    max-height: none;
+    cursor: zoom-out;
+    border: none;
+  }
+  .lightbox.zoomed figcaption {
+    display: none;
+  }
+  .lightbox figcaption {
+    margin-top: 0.9rem;
+  }
+  .lb-title {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .lb-note {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+    opacity: 0.75;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.8rem 1.6rem;
+    margin-top: 1.8rem;
+  }
+  .credits {
+    margin-left: auto;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+  }
+  .credits a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .credits a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+  .back {
+    margin-top: 3.4rem;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .back a {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--gold) 85%, white);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .back a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  @media (max-width: 560px) {
+    .meta > div {
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .head h1 {
+      font-size: 1.4rem;
+    }
+    .poster-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+  }
+</style>

@@ -1,0 +1,156 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import WorkCard from '../../components/WorkCard.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import BackFab from '../../components/BackFab.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const minima = (await getCollection('works'))
+  .filter((w) => w.id.startsWith('minima-'))
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+---
+
+<Base
+  title="minima series"
+  description="ブラウザで鳴らせる自作の音楽アプリ全10機。漆黒×1色、1機=1ジャンル×1シーンの設計思想"
+>
+  <main class="container series">
+    <Crumbs items={[{ label: 'ワークス', href: `${base}/works/` }, { label: 'minimaシリーズ' }]} />
+    <div class="blockttl">
+      <h2>minima series</h2>
+      <span class="sub">MUSIC APPS</span>
+    </div>
+    <p class="lead">
+      ブラウザで鳴らせる、小さな音楽アプリのシリーズ。全10機。
+    </p>
+
+    <section class="philosophy">
+      <h3>設計思想<span class="en">CONCEPT</span></h3>
+      <dl>
+        <div>
+          <dt>1機 = 1ジャンル × 1シーン × 1色</dt>
+          <dd>
+            各機は音楽ジャンルをひとつだけ背負い、画面はそのジャンルの情景そのものになります。
+            テクノなら星空、ダブテクノなら夜の峠、ディープハウスなら水中——
+            シーケンサーのトラックやプレイヘッドは、その情景の登場人物として振る舞います。
+          </dd>
+        </div>
+        <div>
+          <dt>画材は共通、構図は毎回ゼロから</dt>
+          <dd>
+            全機に共通するのは「漆黒の地・グレイン・白い線画・操作したときだけの発光」という画材と、
+            白黒+テーマカラー1色の配色だけ。構図の骨格は機体ごとにユニークで、テンプレートの使い回しはしません。
+            ——このサイトの見た目も、同じ画材でできています。
+          </dd>
+        </div>
+        <div>
+          <dt>音も自作</dt>
+          <dd>
+            サンプル頼みにせず、キックもハットもベースもAudioWorkletのDSPで合成しています。
+            ブラウザだけで、インストールなしに鳴ります。
+          </dd>
+        </div>
+        <div>
+          <dt>単体でも、束ねても</dt>
+          <dd>
+            各機はそれぞれ独立した楽器として完結しつつ、「minima rack」に載せると全機が同じクロックを共有して
+            同時演奏できます。ポケットオペレーター的な、小さい機体を並べて遊ぶ楽しさを目指しています。
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="lineup">
+      <h3>ラインナップ<span class="en">LINEUP</span></h3>
+      <div class="grid">
+        {minima.map((w) => <WorkCard work={w} />)}
+      </div>
+    </section>
+
+    <p class="back"><a href={`${base}/works/`}>← ポートフォリオ一覧にもどる</a></p>
+  </main>
+
+  <BackFab href={`${base}/works/`} label="ポートフォリオ" />
+</Base>
+
+<style>
+  .series :global(.blockttl) {
+    margin-top: 1rem;
+  }
+  .lead {
+    text-align: center;
+    margin: -1.2rem 0 3rem;
+    font-size: 0.84rem;
+    color: var(--text-weak);
+  }
+  .philosophy {
+    max-width: 700px;
+    margin: 0 auto 3.6rem;
+  }
+  .philosophy h3,
+  .lineup h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 1.4rem;
+  }
+  .philosophy h3 .en,
+  .lineup h3 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: var(--text-weak);
+  }
+  .philosophy dl > div {
+    margin-bottom: 1.6rem;
+  }
+  .philosophy dt {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+  }
+  .philosophy dd {
+    font-size: 0.87rem;
+    line-height: 1.85;
+    color: var(--text);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 34px 30px;
+  }
+  .back {
+    margin-top: 3.6rem;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .back a {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--gold) 85%, white);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .back a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+</style>

@@ -1,0 +1,73 @@
+---
+// スクロールしても消えない「戻る」ボタン(左下固定)
+interface Props {
+  href: string;
+  label: string;
+}
+const { href, label } = Astro.props;
+---
+
+<a class="back-fab" href={href}>
+  <span class="arrow" aria-hidden="true">←</span>
+  <span class="label">{label}</span>
+</a>
+
+<style>
+  .back-fab {
+    /* ヘッダー直下・本文コンテナの左外側。視線移動が最小で本文にも被らない */
+    position: fixed;
+    left: 18px;
+    top: 122px;
+    z-index: 400;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--gold) 80%, white);
+    background: color-mix(in srgb, var(--gold) 16%, rgba(10, 10, 12, 0.88));
+    border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 18%, transparent);
+    backdrop-filter: blur(8px);
+    transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s,
+      transform 0.3s ease;
+  }
+  .back-fab:hover {
+    color: var(--bg);
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 34px color-mix(in srgb, var(--gold) 45%, transparent);
+    transform: translateY(-3px);
+  }
+  .back-fab:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 3px;
+  }
+  .arrow {
+    transition: transform 0.3s ease;
+  }
+  .back-fab:hover .arrow {
+    transform: translateX(-4px);
+  }
+  /* 本文と重なる幅では左下へ逃がす(本文は最大960px+左右余白) */
+  @media (max-width: 1200px) {
+    .back-fab {
+      top: auto;
+      bottom: 18px;
+    }
+  }
+  @media (max-width: 560px) {
+    .back-fab {
+      left: 12px;
+      bottom: 12px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.72rem;
+    }
+    /* 狭い画面ではラベルを省いて矢印だけに */
+    .back-fab .label {
+      display: none;
+    }
+  }
+</style>

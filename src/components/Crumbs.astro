@@ -1,0 +1,41 @@
+---
+// ページ左上に置く現在地パンくず(例: ワークス → minimaシリーズ)
+interface Props {
+  items: { label: string; href?: string }[];
+}
+const { items } = Astro.props;
+---
+
+<nav class="crumbs" aria-label="現在地">
+  {items.map((it, i) => (
+    <Fragment>
+      {i > 0 && <span class="sep" aria-hidden="true">→</span>}
+      {it.href ? <a href={it.href}>{it.label}</a> : <span class="cur">{it.label}</span>}
+    </Fragment>
+  ))}
+</nav>
+
+<style>
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin: 2.2rem 0 1.2rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+  }
+  .crumbs a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .crumbs a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+  .cur {
+    color: var(--text);
+  }
+</style>

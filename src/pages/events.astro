@@ -1,0 +1,322 @@
+---
+import Base from '../layouts/Base.astro';
+import EventLinks from '../components/EventLinks.astro';
+import { events } from '../data/events';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const groups = [
+  { key: 'ONGOING', jp: '参加中のイベント', items: events.filter((e) => e.status === 'ongoing') },
+  { key: 'PAST', jp: '過去携わったイベント', items: events.filter((e) => e.status === 'past') },
+];
+---
+
+<Base
+  title="EVENTS"
+  description="VRChat内でのイベント運営 — DJイベントRoof Top Junction主催ほか、企画・広報・会場運営の実績"
+>
+  <main class="container events">
+    <div class="blockttl">
+      <h2>イベント運営</h2>
+      <span class="sub">EVENTS</span>
+    </div>
+    <p class="lead">
+      撮影やビジュアル制作のほかに、VRChat内のイベント運営にも携わっています。
+      主催・企画から広報、会場運営まで——「場をつくる」側の仕事の記録です。
+    </p>
+
+    {groups.map((g) => (
+      <section class="group">
+        <h3>{g.jp}<span class="en">{g.key}</span></h3>
+        {g.items.map((ev) => (
+          <article class="event" style={`--ev: ${ev.color}`}>
+            <header>
+              <h4>
+                {ev.page ? (
+                  <a href={`${base}${ev.page}`}>{ev.name}</a>
+                ) : (
+                  ev.name
+                )}
+              </h4>
+              <span class="genre"><span class="dot" aria-hidden="true"></span>{ev.genre}</span>
+            </header>
+
+            {/* imagePending のイベントは枠だけ表示する */}
+            {ev.image && (
+              <div class:list={['img-frame', { linked: !!ev.page }]}>
+                {ev.page ? (
+                  <a href={`${base}${ev.page}`} aria-label={`${ev.name} の紹介ページへ`}>
+                    <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} loading="lazy" />
+                  </a>
+                ) : (
+                  <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} loading="lazy" />
+                )}
+              </div>
+            )}
+            {!ev.image && ev.imagePending && (
+              <div class="img-placeholder" aria-hidden="true">
+                <span>IMAGE — 差し替え待ち</span>
+              </div>
+            )}
+
+            {ev.summary.map((p) => <p class="summary">{p}</p>)}
+
+            <dl class="meta">
+              <div>
+                <dt>主な役割</dt>
+                <dd>{ev.roles}</dd>
+              </div>
+              <div>
+                <dt>担当業務</dt>
+                <dd>{ev.tasks}</dd>
+              </div>
+              <div>
+                <dt>イベント規模</dt>
+                <dd>{ev.scale.join(' ／ ')}</dd>
+              </div>
+              {ev.related && (
+                <div>
+                  <dt>関連イベント</dt>
+                  <dd>
+                    <ul class="related">
+                      {ev.related.map((r) => (
+                        <li>
+                          {r.name} — {r.scale}
+                          {r.links?.map((l) => (
+                            <a class="rel-link" href={l.url} target="_blank" rel="noopener noreferrer">{l.label} ↗</a>
+                          ))}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
+
+            {(ev.links.length > 0 || ev.credits) && (
+              <div class="foot">
+                <EventLinks links={ev.links} />
+                {ev.credits && (
+                  <div class="credits">
+                    {ev.credits.map((c) => (
+                      <span>
+                        {c.role} :{' '}
+                        {c.url ? (
+                          <a href={c.url} target="_blank" rel="noopener noreferrer">{c.name} ↗</a>
+                        ) : (
+                          c.name
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </article>
+        ))}
+      </section>
+    ))}
+  </main>
+</Base>
+
+<style>
+  .events {
+    max-width: 760px;
+  }
+  .lead {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-weak);
+    margin: -0.8rem 0 3rem;
+  }
+
+  .group {
+    margin-bottom: 3.6rem;
+  }
+  .group h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 1.6rem;
+  }
+  .group h3 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: var(--text-weak);
+  }
+
+  .event {
+    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
+    padding: 1.8rem 1.8rem 1.6rem;
+    margin-bottom: 1.8rem;
+    /* イベントごとの色地+色ヘアライン(常時発光はしない)。
+       カード自体はリンクではないのでhoverでは光らせない(光るのはリンク要素だけ) */
+    background: color-mix(in srgb, var(--ev) 12%, transparent);
+  }
+  .event header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.8rem;
+    margin-bottom: 1.1rem;
+  }
+  .genre {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--ev) 65%, white);
+    background: var(--bg-soft);
+    border: 1px solid color-mix(in srgb, var(--ev) 40%, transparent);
+    padding: 0.2rem 0.7rem;
+    white-space: nowrap;
+  }
+  .genre .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ev);
+    flex: none;
+  }
+  .event h4 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .event h4 a {
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .event h4 a:hover {
+    color: color-mix(in srgb, var(--ev) 60%, white);
+    text-shadow: 0 0 18px color-mix(in srgb, var(--ev) 40%, transparent);
+  }
+
+  .img-frame {
+    border: 1px solid var(--line);
+    margin-bottom: 1.2rem;
+  }
+  .img-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  /* 個別ページを持つイベントは画像がリンクボタン: hoverでその色に発光 */
+  .img-frame.linked {
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .img-frame.linked img {
+    transition: transform 0.4s ease;
+  }
+  .img-frame.linked:hover {
+    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
+    box-shadow: 0 0 36px color-mix(in srgb, var(--ev) 30%, transparent);
+  }
+  .img-frame.linked:hover img {
+    transform: scale(1.02);
+  }
+  .img-placeholder {
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    aspect-ratio: 16 / 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+  }
+  .img-placeholder span {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.3em;
+    color: var(--text-weak);
+  }
+
+  .summary {
+    font-size: 0.88rem;
+    margin: 0.8rem 0;
+  }
+
+  .meta {
+    margin: 1.4rem 0 0;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+  .meta > div {
+    display: flex;
+    gap: 1.2rem;
+    padding: 0.35rem 0;
+    font-size: 0.84rem;
+  }
+  .meta dt {
+    min-width: 6.5em;
+    color: var(--text-weak);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .meta dd {
+    flex: 1;
+  }
+  .related {
+    list-style: none;
+  }
+  .related li {
+    margin: 0.15rem 0;
+  }
+  .rel-link {
+    margin-left: 0.8em;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.78em;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+    white-space: nowrap;
+  }
+  .rel-link:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.8rem 1.6rem;
+    margin-top: 1.3rem;
+  }
+  .credits {
+    margin-left: auto;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+  }
+  .credits a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .credits a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  @media (max-width: 560px) {
+    .event {
+      padding: 1.3rem 1.1rem 1.2rem;
+    }
+    .meta > div {
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+  }
+</style>

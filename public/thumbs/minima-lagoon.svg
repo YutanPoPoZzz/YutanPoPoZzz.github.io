@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="42%" r="70%">
+      <stop offset="0%" stop-color="#4da6ff" stop-opacity="0.28"/>
+      <stop offset="45%" stop-color="#4da6ff" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#4da6ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="500" fill="#0a0a0c"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <circle cx="400" cy="205" r="86" fill="none" stroke="#4da6ff" stroke-width="1.5" opacity="0.9"/>
+  <circle cx="400" cy="205" r="86" fill="#4da6ff" opacity="0.06"/>
+  <polygon points="388,190 388,220 416,205" fill="#ffffff" opacity="0.92"/>
+  <line x1="120" y1="330" x2="680" y2="330" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="400" y="368" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="34" font-weight="300" letter-spacing="10">minima <tspan font-weight="700" fill="#4da6ff">lagoon</tspan></text>
+  <text x="400" y="80" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" letter-spacing="6">DEEP HOUSE 122</text>
+  <circle cx="120.0" cy="418" r="5" fill="#4da6ff" opacity="0.95"/>
+    <circle cx="157.3" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="194.7" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="232.0" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="269.3" cy="418" r="5" fill="#4da6ff" opacity="0.95"/>
+    <circle cx="306.7" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="344.0" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="381.3" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="418.7" cy="418" r="5" fill="#4da6ff" opacity="0.95"/>
+    <circle cx="456.0" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="493.3" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="530.7" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="568.0" cy="418" r="5" fill="#4da6ff" opacity="0.95"/>
+    <circle cx="605.3" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="642.7" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+    <circle cx="680.0" cy="418" r="3" fill="rgba(255,255,255,0.35)"/>
+</svg>

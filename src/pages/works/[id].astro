@@ -1,0 +1,231 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Crumbs from '../../components/Crumbs.astro';
+import BackFab from '../../components/BackFab.astro';
+
+export async function getStaticPaths() {
+  const works = await getCollection('works');
+  return works.map((work) => ({
+    params: { id: work.id },
+    props: { work },
+  }));
+}
+
+const { work } = Astro.props;
+const { Content } = await render(work);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const isMinima = work.id.startsWith('minima-');
+const crumbs = [
+  { label: 'ワークス', href: `${base}/works/` },
+  ...(isMinima ? [{ label: 'minimaシリーズ', href: `${base}/works/minima-series/` }] : []),
+  { label: work.data.title },
+];
+const d = work.data.date;
+const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<Base title={work.data.title} description={work.data.summary}>
+  <main class="container article" style={`--c: ${work.data.color}`}>
+    <Crumbs items={crumbs} />
+    <header class="article-head">
+      <div class="meta">
+        <span class="category">{work.data.category}</span>
+        <time datetime={d.toISOString()}>{dateLabel}</time>
+        {work.data.status && <span class="status">{work.data.status}</span>}
+      </div>
+      <h1>{work.data.title}</h1>
+      <p class="lead">{work.data.summary}</p>
+    </header>
+
+    <figure class="hero-thumb">
+      <img src={`${base}${work.data.full ?? work.data.thumb}`} alt={work.data.title} />
+    </figure>
+
+    {(work.data.client || work.data.role) && (
+      <dl class="credit">
+        {work.data.client && (
+          <div>
+            <dt>クライアント</dt>
+            <dd>{work.data.client}</dd>
+          </div>
+        )}
+        {work.data.role && (
+          <div>
+            <dt>担当</dt>
+            <dd>{work.data.role}</dd>
+          </div>
+        )}
+      </dl>
+    )}
+
+    {work.data.links.length > 0 && (
+      <div class="links">
+        {work.data.links.map((l) => (
+          <a href={l.url} target="_blank" rel="noopener noreferrer">
+            {l.label} ↗
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div class="body">
+      <Content />
+    </div>
+
+    <p class="back">
+      {isMinima ? (
+        <a href={`${base}/works/minima-series/`}>← minimaシリーズにもどる</a>
+      ) : (
+        <a href={`${base}/works/`}>← ポートフォリオ一覧にもどる</a>
+      )}
+    </p>
+  </main>
+
+  <BackFab
+    href={isMinima ? `${base}/works/minima-series/` : `${base}/works/`}
+    label={isMinima ? 'minimaシリーズ' : 'ポートフォリオ'}
+  />
+</Base>
+
+<style>
+  .article {
+    max-width: 760px;
+    padding-top: 3.5rem;
+  }
+  .article-head {
+    text-align: center;
+  }
+  .meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.74rem;
+    color: var(--text-weak);
+  }
+  .category {
+    position: relative;
+    padding-left: 0.9rem;
+    letter-spacing: 0.1em;
+  }
+  .category::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    translate: 0 -50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+  time {
+    font-family: var(--font-en);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+  }
+  .status {
+    border: 1px solid var(--line);
+    padding: 0.02rem 0.6rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+  }
+  h1 {
+    margin-top: 0.9rem;
+    font-size: 1.55rem;
+    line-height: 1.6;
+    letter-spacing: 0.06em;
+  }
+  .lead {
+    margin-top: 0.7rem;
+    font-size: 0.86rem;
+    color: var(--text-weak);
+  }
+  .hero-thumb {
+    margin: 2.4rem auto 0;
+    max-width: 620px;
+    border: 1px solid var(--line);
+    box-shadow: 0 0 60px color-mix(in srgb, var(--c) 12%, transparent);
+  }
+  .hero-thumb img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .credit {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem 2.2rem;
+    margin-top: 1.4rem;
+    font-size: 0.82rem;
+  }
+  .credit > div {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+  .credit dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--text-weak);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 1.8rem;
+  }
+  .links a {
+    border: 1px solid var(--line);
+    padding: 0.4rem 1.2rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+    transition: border-color 0.3s, box-shadow 0.3s, color 0.3s;
+  }
+  .links a:hover,
+  .links a:focus-visible {
+    border-color: color-mix(in srgb, var(--c) 60%, transparent);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--c) 25%, transparent);
+    color: color-mix(in srgb, var(--c) 55%, white);
+  }
+  .body {
+    margin-top: 2.8rem;
+    font-size: 0.92rem;
+  }
+  .body :global(h2) {
+    margin: 2.6rem 0 0.9rem;
+    padding-bottom: 0.45rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    border-bottom: 1px solid var(--line);
+  }
+  .body :global(p) {
+    margin: 0.9rem 0;
+  }
+  .body :global(ul) {
+    margin: 0.9rem 0;
+    padding-left: 1.4rem;
+  }
+  .body :global(li) {
+    margin: 0.3rem 0;
+  }
+  .back {
+    margin-top: 3.6rem;
+    text-align: center;
+    font-size: 0.88rem;
+  }
+  .back a {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--gold) 85%, white);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .back a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
+  }
+</style>

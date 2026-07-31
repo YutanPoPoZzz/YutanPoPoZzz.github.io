@@ -1,0 +1,692 @@
+﻿---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { awards } from '../data/profile';
+import { events } from '../data/events';
+import { photoAspect } from '../lib/photo-aspect';
+import { workCategories } from '../data/work-categories';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const photos = (await getCollection('photos')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// EVENTSダイジェスト: Roof Top Junctionをメイン、右側は参加中の2イベントを要約カードで
+const mainEvent = events.find((e) => e.name === 'Roof Top Junction') ?? events[0];
+const subEvents = events.filter((e) => e !== mainEvent && e.status === 'ongoing');
+// HOME用の一行紹介(詳細はEVENTSページに任せて、ここでは雰囲気だけ伝える)
+const evTagline: Record<string, string> = {
+  'Gallery & fan cafe Kittens':
+    'アバター「Undone Kittens」をテーマにした、ギャラリー併設のファンメイドカフェ',
+  'VRC貴族部 Eleganttique':
+    '「エレガント」をテーマに、礼節と美意識を大切にする会員制コミュニティ',
+};
+const mainRoleNote =
+  '主催として、企画からチームマネジメント、広報・ポスター制作、会場ワールドの整備までを担当しています。';
+// タイトル末尾の賞グレードをバッジとして分離する(ABOUTと同じ見せ方)
+const splitGrade = (t: string) => {
+  const m = t.match(/^(.*?)\s*(最優秀賞|優秀賞|入賞|審査員賞)$/);
+  return m ? { base: m[1], grade: m[2] } : { base: t, grade: null };
+};
+// 本棚カルーセル: 中央の1枚は元比率で表示するためアスペクト比を持たせる
+const shelfItems = await Promise.all(
+  photos.slice(0, 12).map(async (p) => ({ p, aspect: await photoAspect(p.data.thumb) }))
+);
+---
+
+<Base>
+  <main class="container">
+    <section class="intro">
+      <h1 class="intro-name">YutanpopoZzz</h1>
+      <p class="intro-role">Virtual Photographer / Visual Creator</p>
+      <p class="intro-copy">バーチャルの中に存在する文化や感情を、写真と言葉で外の世界へ運ぶ。</p>
+    </section>
+
+    <!-- GALLERY ダイジェスト -->
+    <section class="digest">
+      <div class="blockttl">
+        <h2><a href={`${base}/gallery/`}>ギャラリー</a></h2>
+        <span class="sub">GALLERY</span>
+      </div>
+      <!-- 本棚カルーセル: 写真が本のように奥へ刺さり、真ん中の1枚が抜き出されて正面を向く -->
+      <div class="shelf" data-shelf>
+        {shelfItems.map(({ p, aspect }) => (
+          <a class="shelf-item" href={`${base}/gallery/`} style={`--ar: ${aspect.toFixed(4)}`}>
+            <img src={`${base}${p.data.thumb}`} alt={p.data.title} loading="lazy" />
+          </a>
+        ))}
+        <button class="shelf-nav prev" type="button" aria-label="前の写真">‹</button>
+        <button class="shelf-nav next" type="button" aria-label="次の写真">›</button>
+      </div>
+      <p class="more"><a href={`${base}/gallery/`}>写真をぜんぶ見る →</a></p>
+    </section>
+
+    <!-- WORKS ダイジェスト -->
+    <section class="digest">
+      <div class="blockttl">
+        <h2><a href={`${base}/works/`}>ポートフォリオ</a></h2>
+        <span class="sub">WORKS</span>
+      </div>
+      <div class="w-grid">
+        {workCategories.map((cat) => (
+          <a class="wc-card" href={`${base}/works/#${cat.slug}`}>
+            <span class="wc-frame" aria-hidden="true">
+              {cat.thumb ? (
+                <img src={`${base}${cat.thumb}`} alt="" loading="lazy" />
+              ) : (
+                <span class="wc-en">{cat.en}</span>
+              )}
+            </span>
+            <span class="wc-name">{cat.jp}</span>
+            <span class="wc-desc">{cat.desc}</span>
+          </a>
+        ))}
+      </div>
+      <p class="more"><a href={`${base}/works/`}>制作物をすべて見る →</a></p>
+    </section>
+
+    <!-- EVENTS ダイジェスト -->
+    <section class="digest">
+      <div class="blockttl">
+        <h2><a href={`${base}/events/`}>イベント運営</a></h2>
+        <span class="sub">EVENTS</span>
+      </div>
+      <div class="ev-split">
+        <a class="ev-main" href={`${base}${mainEvent.page ?? '/events/'}`} style={`--ev: ${mainEvent.color}`}>
+          {mainEvent.image && (
+            <span class="ev-main-img">
+              <img src={`${base}${mainEvent.image}`} alt={`${mainEvent.name} キービジュアル`} loading="lazy" />
+            </span>
+          )}
+          <span class="ev-main-head">
+            <span class="ev-main-name">{mainEvent.name}</span>
+            <span class="ev-genre">{mainEvent.genre}</span>
+          </span>
+          <span class="ev-main-desc">{mainEvent.summary[0]}</span>
+          <span class="ev-main-role">{mainRoleNote}</span>
+        </a>
+        <div class="ev-side">
+          {subEvents.map((ev) => (
+            <a class="ev-sub" href={`${base}/events/`} style={`--ev: ${ev.color}`}>
+              <span class="ev-sub-name">{ev.name}</span>
+              <span class="ev-sub-genre">
+                <span class="ev-dot" aria-hidden="true"></span>
+                {ev.genre}
+              </span>
+              <span class="ev-sub-line">{evTagline[ev.name]}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <p class="more"><a href={`${base}/events/`}>イベント運営の実績をくわしく →</a></p>
+    </section>
+
+    <!-- ABOUT ダイジェスト(受賞歴) -->
+    <section class="digest">
+      <div class="blockttl">
+        <h2><a href={`${base}/about/`}>受賞歴</a></h2>
+        <span class="sub">ABOUT</span>
+      </div>
+      <ul class="award-list">
+        {awards.map((a) => {
+          const g = splitGrade(a.title);
+          return (
+            <li>
+              <span class="year">{a.year}</span>
+              <span class="ttl">{g.base}</span>
+              {g.grade && (
+                <span class:list={['grade', { top: g.grade === '最優秀賞' }]}>{g.grade}</span>
+              )}
+              {a.note && <span class="note">{a.note}</span>}
+            </li>
+          );
+        })}
+      </ul>
+      <p class="more"><a href={`${base}/about/`}>プロフィールと実績の全量 →</a></p>
+    </section>
+
+    <!-- CONTACT 帯 -->
+    <a class="contact-band" href={`${base}/contact/`}>
+      <span class="cb-label">CONTACT</span>
+      <span class="cb-body">撮影・ビジュアル制作のご依頼、ご相談だけでも歓迎です</span>
+      <span class="cb-arrow">→</span>
+    </a>
+  </main>
+</Base>
+
+<script>
+  // 本棚カルーセル: オフセットに応じて各写真を円弧状に3D配置し、中央だけ正面へ抜き出す
+  const shelf = document.querySelector<HTMLElement>('[data-shelf]');
+  if (shelf) {
+    const items = Array.from(shelf.querySelectorAll<HTMLElement>('.shelf-item'));
+    const n = items.length;
+    let cur = 0;
+
+    const VISIBLE = 5; // 中央の左右に見せる冊数
+    const frontWidth = (i: number) => {
+      // CSSの .is-front サイズ計算と同じ式(高さ×元比率、上限vw)
+      const ar = parseFloat(items[i].style.getPropertyValue('--ar')) || 0.75;
+      const mobile = window.innerWidth <= 640;
+      return Math.min((mobile ? 225 : 330) * ar, (mobile ? 0.88 : 0.62) * window.innerWidth);
+    };
+    const apply = () => {
+      // コンテナ幅いっぱいに本を広げる(端の本が見切れない範囲で等間隔)。
+      // 中央が横長のときは覆われないよう左右の本を外側へ押し出す
+      const W = shelf.clientWidth;
+      const maxX = Math.max(220, W / 2 - 120);
+      // 0.6 = 半分×translateZ(190)の投影拡大(約1.19倍)ぶん
+      const baseX = Math.max(Math.min(190, maxX * 0.4), frontWidth(cur) * 0.6 + 70);
+      const step = Math.max(36, (Math.max(maxX, baseX + 80) - baseX) / (VISIBLE - 1));
+      items.forEach((el, i) => {
+        let d = (((i - cur) % n) + n) % n;
+        if (d > n / 2) d -= n;
+        const s = Math.sign(d);
+        const ad = Math.abs(d);
+        if (d === 0) {
+          el.style.transform = 'translate(-50%, -50%) translateZ(190px)';
+          el.style.zIndex = '100';
+          el.style.opacity = '1';
+        } else {
+          const x = s * (baseX + (ad - 1) * step);
+          const tz = -50 - ad * 50;
+          el.style.transform = `translate(-50%, -50%) translateX(${x}px) translateZ(${tz}px) rotateY(${-s * 72}deg)`;
+          el.style.zIndex = String(50 - ad);
+          el.style.opacity = ad > VISIBLE ? '0' : '1';
+        }
+        el.classList.toggle('is-front', d === 0);
+        el.tabIndex = d === 0 ? 0 : -1;
+      });
+    };
+    window.addEventListener('resize', apply);
+
+    items.forEach((el, i) => {
+      el.addEventListener('click', (e) => {
+        if (!el.classList.contains('is-front')) {
+          e.preventDefault(); // 脇の本はまず手前に抜き出す
+          cur = i;
+          apply();
+        }
+      });
+    });
+
+    const go = (dir: number) => {
+      cur = (cur + dir + n) % n;
+      apply();
+    };
+    shelf.querySelector('.shelf-nav.prev')?.addEventListener('click', () => go(-1));
+    shelf.querySelector('.shelf-nav.next')?.addEventListener('click', () => go(1));
+
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const start = () => {
+      if (reduced || timer) return;
+      timer = setInterval(() => {
+        cur = (cur + 1) % n;
+        apply();
+      }, 3400);
+    };
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = undefined;
+    };
+    shelf.addEventListener('mouseenter', stop);
+    shelf.addEventListener('mouseleave', start);
+    apply();
+    start();
+  }
+</script>
+
+<style>
+  .intro {
+    text-align: center;
+    padding: 3.4rem 0 1.4rem;
+  }
+  .intro-name {
+    font-family: var(--font-en);
+    font-size: 1.7rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+  }
+  .intro-role {
+    margin-top: 0.35rem;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: var(--text-weak);
+  }
+  .intro-copy {
+    margin-top: 0.9rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+  }
+
+  .digest {
+    margin-bottom: 1.2rem;
+  }
+  /* 大見出しは該当ページへのリンク(hoverで金) */
+  .blockttl h2 a {
+    color: inherit;
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .blockttl h2 a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 16px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .more {
+    margin-top: 1.6rem;
+    text-align: center;
+  }
+  .more a {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--text-weak);
+    transition: color 0.3s;
+  }
+  .more a:hover {
+    color: var(--text);
+  }
+
+  /* GALLERY: 本棚カルーセル(3D) */
+  .shelf {
+    position: relative;
+    height: 400px;
+    perspective: 1200px;
+    overflow: hidden;
+  }
+  .shelf-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 267px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    transition: transform 0.7s ease, opacity 0.5s ease, box-shadow 0.4s ease,
+      width 0.7s ease, height 0.7s ease;
+    will-change: transform;
+  }
+  .shelf-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    backface-visibility: hidden;
+    /* 棚に刺さっている本は暗く沈める */
+    filter: brightness(0.4);
+    transition: filter 0.5s ease;
+  }
+  .shelf-item.is-front {
+    /* 抜き出した1枚は元の比率で気持ち大きめに */
+    height: 330px;
+    width: min(calc(330px * var(--ar, 0.75)), 62vw);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+  }
+  .shelf-item.is-front img {
+    filter: brightness(1);
+  }
+  .shelf-nav {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 200;
+    width: 40px;
+    height: 56px;
+    font-family: var(--font-en);
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--text-weak);
+    background: rgba(10, 10, 12, 0.55);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .shelf-nav:hover {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .shelf-nav:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 2px;
+  }
+  .shelf-nav.prev {
+    left: 6px;
+  }
+  .shelf-nav.next {
+    right: 6px;
+  }
+  @media (max-width: 640px) {
+    .shelf {
+      height: 300px;
+    }
+    .shelf-item {
+      width: 140px;
+      height: 187px;
+    }
+    .shelf-item.is-front {
+      height: 225px;
+      width: min(calc(225px * var(--ar, 0.75)), 88vw);
+    }
+  }
+
+  /* WORKS: 3本柱のカテゴリカード(作品画像はまだないので空フレーム) */
+  .w-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 34px 30px;
+  }
+  .wc-card {
+    display: block;
+  }
+  .wc-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .wc-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .wc-card:hover .wc-frame img {
+    transform: scale(1.03);
+  }
+  .wc-en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.3em;
+    color: var(--text-weak);
+  }
+  .wc-name {
+    display: block;
+    margin-top: 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .wc-desc {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.76rem;
+    line-height: 1.75;
+    color: var(--text-weak);
+  }
+  .wc-card:hover .wc-frame {
+    border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--gold) 16%, transparent);
+  }
+  .wc-card:hover .wc-name {
+    color: color-mix(in srgb, var(--gold) 65%, white);
+  }
+
+  /* EVENTS: 左=Roof Top Junctionメイン、右=他イベントのサブリスト */
+  .ev-split {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 2.2rem;
+    align-items: start;
+  }
+  .ev-main {
+    display: block;
+    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
+    background: color-mix(in srgb, var(--ev) 10%, transparent);
+    padding: 1.2rem;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .ev-main:hover {
+    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
+    box-shadow: 0 0 38px color-mix(in srgb, var(--ev) 25%, transparent);
+  }
+  .ev-main-img {
+    display: block;
+    border: 1px solid var(--line);
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .ev-main-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .ev-main:hover .ev-main-img img {
+    transform: scale(1.02);
+  }
+  .ev-main-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .ev-main-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .ev-main-desc {
+    display: block;
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  .ev-main-role {
+    display: block;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid color-mix(in srgb, var(--ev) 25%, transparent);
+    font-size: 0.8rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--ev) 30%, white);
+  }
+  /* 右側: 参加中2イベントのコンパクトカード(画像なし・色地・一行紹介) */
+  .ev-side {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .ev-sub {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
+    background: color-mix(in srgb, var(--ev) 10%, transparent);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .ev-sub:hover {
+    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
+    box-shadow: 0 0 32px color-mix(in srgb, var(--ev) 25%, transparent);
+  }
+  .ev-sub-name {
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+  .ev-sub-genre {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--text-weak);
+  }
+  .ev-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ev);
+    flex: none;
+  }
+  .ev-sub-line {
+    font-size: 0.76rem;
+    line-height: 1.7;
+    color: var(--text-weak);
+  }
+  .ev-genre {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--text-weak);
+    white-space: nowrap;
+  }
+
+  /* ABOUT: 受賞歴リスト */
+  .award-list {
+    list-style: none;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .award-list li {
+    display: flex;
+    align-items: baseline;
+    gap: 1.1rem;
+    padding: 0.7rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+  .award-list li:first-child {
+    border-top: 1px solid var(--line);
+  }
+  .award-list .year {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    min-width: 6.2em;
+    font-variant-numeric: tabular-nums;
+    flex: none;
+  }
+  .award-list .grade {
+    flex: none;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
+    padding: 0.05rem 0.55rem;
+    white-space: nowrap;
+  }
+  .award-list .grade.top {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+    font-weight: 700;
+  }
+  .award-list .ttl {
+    font-weight: 500;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .award-list .note {
+    font-size: 0.72rem;
+    color: var(--text-weak);
+    margin-left: auto;
+    text-align: right;
+    flex: none;
+  }
+  @media (max-width: 560px) {
+    .award-list li {
+      flex-wrap: wrap;
+    }
+    .award-list .note {
+      flex-basis: 100%;
+      margin-left: calc(6.2em + 1.1rem);
+      text-align: left;
+    }
+  }
+
+  /* CONTACT帯: 一列レイアウト。lagoon配色(青の地×暖金の差し色)で目立たせる */
+  .contact-band {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    max-width: 760px;
+    margin: 4.5rem auto 0;
+    padding: 1.5rem 1.7rem;
+    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
+    /* 待機中からしっかり発光(外側の広がり+枠に沿った内側の光) */
+    box-shadow:
+      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
+      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
+      background 0.4s ease;
+  }
+  .contact-band:hover {
+    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    border-color: var(--cta-blue);
+    box-shadow:
+      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
+      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    transform: translateY(-4px);
+  }
+  .cb-label {
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.3em;
+    color: var(--cta-warm);
+    white-space: nowrap;
+  }
+  .cb-body {
+    flex: 1;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .cb-arrow {
+    color: var(--cta-warm);
+    transition: transform 0.3s ease;
+  }
+  .contact-band:hover .cb-arrow {
+    transform: translateX(8px);
+  }
+  @media (max-width: 560px) {
+    .contact-band {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .w-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .ev-split {
+      grid-template-columns: 1fr;
+      gap: 1.4rem;
+    }
+  }
+  @media (max-width: 560px) {
+    .g-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .w-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .ev-scale {
+      display: none;
+    }
+    .intro-name {
+      font-size: 1.35rem;
+    }
+    .contact-band {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+</style>

@@ -1,0 +1,357 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { minimaSeriesCard } from '../data/minima-series-card';
+import { workCategories } from '../data/work-categories';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const works = (await getCollection('works')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+// minima各機はシリーズカード1枠に集約するため一覧からは除外
+const otherWorks = works.filter((w) => !w.id.startsWith('minima-'));
+
+// 制作実績: 3本柱カテゴリに一致するもの(現状は空。mdを置くと並ぶ)
+const records = otherWorks.filter((w) =>
+  workCategories.some((c) => c.jp === w.data.category)
+);
+const recordIds = new Set(records.map((r) => r.id));
+// その他: 3本柱に入らないもの+minimaシリーズ
+const misc = [...otherWorks.filter((w) => !recordIds.has(w.id)), minimaSeriesCard];
+
+// しごとについて: 受けられる依頼の一覧
+const services = [
+  { title: 'ポートレート撮影', desc: 'アバターの宣材・記念撮影。世界観に合わせたロケーション選びから' },
+  { title: '商品・プロモーション撮影', desc: 'アバター・衣装・ギミックなどの販売用ビジュアル' },
+  { title: 'イベント記録・風景撮影', desc: 'イベント当日の空気感を残す記録写真' },
+  { title: 'ポスター・告知ビジュアル制作', desc: 'イベント告知やSNS用の文字入れ込みビジュアル' },
+  { title: '写真教室・撮影講習', desc: '初心者向けからステップアップまで、内容は相談で' },
+  { title: '写真講評・執筆', desc: '作品への講評、VR写真についての記事執筆・寄稿' },
+];
+---
+
+<Base title="WORKS" description="画像制作・執筆活動・講演/教室の3本柱と、受けられるお仕事のご紹介">
+  <main class="container works">
+    <div class="blockttl">
+      <h2>ポートフォリオ</h2>
+      <span class="sub">WORKS</span>
+    </div>
+
+    {/* ページ冒頭のプロフィール帯 */}
+    <section class="profile">
+      <img class="pf-icon" src={`${base}/icon.png`} alt="" width="150" height="150" />
+      <div class="pf-body">
+        <p class="pf-name">
+          YutanpopoZzz
+          <span class="pf-roles">Virtual Photographer / Visual Creator</span>
+        </p>
+        <p class="pf-catch">「ここには人がいて、物語がある。」</p>
+        <p class="pf-bio">
+          <span>VRChatを中心に、3DモデルやVTuber、VRイベントのプロモーション撮影・ビジュアル制作を行っています。</span>
+          <span>撮影の時間そのものと人の温度を大切に、瞬間ごとの空気を写真に残します。</span>
+          <span>作家として、自分の世界観を形にする作品制作も。</span>
+        </p>
+        <p class="pf-link"><a href={`${base}/about/`}>くわしいプロフィールと実績 →</a></p>
+      </div>
+    </section>
+
+    <!-- なにをしているのか: 3本柱 -->
+    <section class="block">
+      <h3>なにをしているのか<span class="en">WHAT I DO</span></h3>
+      <div class="pillars">
+        {workCategories.map((cat) => (
+          <div class="pillar" id={cat.slug}>
+            {/* thumb 未設定のカテゴリは空フレームになる */}
+            <span class="pillar-frame" aria-hidden="true">
+              {cat.thumb && <img src={`${base}${cat.thumb}`} alt="" loading="lazy" />}
+            </span>
+            <p class="pillar-name">{cat.jp}</p>
+            <p class="pillar-desc">{cat.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- しごとについて: 受けられる依頼 -->
+    <section class="block">
+      <h3>しごとについて<span class="en">SERVICES</span></h3>
+      <ul class="services">
+        {services.map((s) => (
+          <li>
+            <p class="sv-title">{s.title}</p>
+            <p class="sv-desc">{s.desc}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 制作実績(まだ空。作品mdを置くとここに並ぶ) -->
+    <section class="block" id="records">
+      <h3>制作実績<span class="en">SELECTED WORKS</span></h3>
+      {records.length > 0 ? (
+        <div class="grid">
+          {records.map((w) => <WorkCard work={w} />)}
+        </div>
+      ) : (
+        <p class="empty">実績ページを準備中です。順次追加していきます。</p>
+      )}
+    </section>
+
+    <!-- その他のつくりもの -->
+    <section class="block" id="others">
+      <h3>その他のつくりもの<span class="en">OTHERS</span></h3>
+      <div class="grid">
+        {misc.map((w) => <WorkCard work={w} />)}
+      </div>
+    </section>
+
+    <!-- 依頼CTA -->
+    <a class="cta" href={`${base}/contact/`}>
+      <span class="cta-label">CONTACT</span>
+      <span class="cta-body">お仕事のご依頼・ご相談はこちら</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </main>
+</Base>
+
+<style>
+  /* プロフィール帯 */
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+    max-width: 760px;
+    margin: 0 auto 3.4rem;
+    border: 1px solid var(--line);
+    padding: 1.5rem 1.7rem;
+  }
+  .pf-icon {
+    flex: none;
+    width: 150px;
+    height: 150px;
+  }
+  .pf-name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-family: var(--font-en);
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+  .pf-roles {
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    color: var(--text-weak);
+  }
+  .pf-catch {
+    margin-top: 0.9rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.5;
+  }
+  .pf-bio {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.85;
+    color: var(--text-weak);
+  }
+  .pf-bio span {
+    display: block;
+  }
+  .pf-link {
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+  }
+  .pf-link a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .pf-link a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  /* セクション共通見出し */
+  .block {
+    margin-bottom: 3.4rem;
+  }
+  .block h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 1.4rem;
+  }
+  .block h3 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: var(--text-weak);
+  }
+
+  /* なにをしているのか: 3本柱(画像は空フレーム) */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  .pillar-frame {
+    display: block;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    overflow: hidden;
+  }
+  .pillar-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .pillar-name {
+    margin-top: 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .pillar-desc {
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--text-weak);
+  }
+
+  /* しごとについて */
+  .services {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .services li {
+    border: 1px solid var(--line);
+    padding: 0.9rem 1.1rem;
+    transition: border-color 0.3s;
+  }
+  .services li:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  .sv-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .sv-desc {
+    margin-top: 0.25rem;
+    font-size: 0.76rem;
+    color: var(--text-weak);
+  }
+
+  .empty {
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--text-weak);
+    border: 1px dashed var(--line);
+    padding: 1.4rem 1.2rem;
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 34px 30px;
+  }
+
+  /* 依頼CTA(HOMEのCONTACT帯と同じ一列レイアウト・lagoon配色) */
+  .cta {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    max-width: 760px;
+    margin: 4.5rem auto 0;
+    padding: 1.5rem 1.7rem;
+    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
+    /* 待機中からしっかり発光(外側の広がり+枠に沿った内側の光) */
+    box-shadow:
+      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
+      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
+      background 0.4s ease;
+  }
+  .cta:hover {
+    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    border-color: var(--cta-blue);
+    box-shadow:
+      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
+      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    transform: translateY(-4px);
+  }
+  .cta-label {
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.3em;
+    color: var(--cta-warm);
+    white-space: nowrap;
+  }
+  .cta-body {
+    flex: 1;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .cta-arrow {
+    color: var(--cta-warm);
+    transition: transform 0.3s ease;
+  }
+  .cta:hover .cta-arrow {
+    transform: translateX(8px);
+  }
+  @media (max-width: 560px) {
+    .cta {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .pillars,
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .profile {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+    .pf-name {
+      justify-content: center;
+    }
+  }
+  @media (max-width: 560px) {
+    .pillars,
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+    .services {
+      grid-template-columns: 1fr;
+    }
+    .cta {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+</style>

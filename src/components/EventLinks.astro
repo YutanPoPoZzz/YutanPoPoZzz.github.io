@@ -1,0 +1,77 @@
+---
+// イベントの外部リンクをアイコン付きチップで並べる
+// (親要素の --ev をアクセント色として使う)
+import type { EventLink } from '../data/events';
+
+interface Props {
+  links: EventLink[];
+}
+const { links } = Astro.props;
+
+const iconOf = (l: EventLink) => {
+  if (l.url.includes('vrc.group') || l.url.includes('vrchat.com')) return 'vrchat';
+  if (l.url.includes('x.com') || l.url.includes('twitter.com')) return 'x';
+  return 'external';
+};
+---
+
+<div class="ev-links">
+  {links.map((l) => (
+    <a class="chip" href={l.url} target="_blank" rel="noopener noreferrer">
+      {iconOf(l) === 'vrchat' && (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="2.5" y="7" width="19" height="10" rx="2" />
+          <path d="M9.5 17c.6 1.2 1.4 2 2.5 2s1.9-.8 2.5-2" />
+          <circle cx="7.5" cy="12" r="1.6" />
+          <circle cx="16.5" cy="12" r="1.6" />
+        </svg>
+      )}
+      {iconOf(l) === 'x' && (
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z" />
+        </svg>
+      )}
+      {iconOf(l) === 'external' && (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <path d="M14 4h6v6M20 4l-9 9M18 13v6H5V6h6" />
+        </svg>
+      )}
+      <span>{l.label}</span>
+      <span class="ext" aria-hidden="true">↗</span>
+    </a>
+  ))}
+</div>
+
+<style>
+  .ev-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.38rem 0.85rem;
+    border: 1px solid var(--line);
+    background: rgba(10, 10, 12, 0.35);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    transition: border-color 0.3s, box-shadow 0.3s, color 0.3s;
+  }
+  .chip svg {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    opacity: 0.85;
+  }
+  .chip .ext {
+    font-size: 0.7em;
+    color: var(--text-weak);
+  }
+  .chip:hover {
+    border-color: color-mix(in srgb, var(--ev, #ffffff) 65%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--ev, #ffffff) 22%, transparent);
+    color: color-mix(in srgb, var(--ev, #ffffff) 55%, white);
+  }
+</style>

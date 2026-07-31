@@ -1,0 +1,94 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PhotoCard from './PhotoCard.astro';
+import { photoAspect } from '../lib/photo-aspect';
+
+interface Props {
+  photos: CollectionEntry<'photos'>[];
+}
+const { photos } = Astro.props;
+const items = await Promise.all(
+  photos.map(async (p) => ({ photo: p, aspect: await photoAspect(p.data.thumb) }))
+);
+---
+
+<div class="photo-grid" data-masonry>
+  {items.map(({ photo, aspect }) => <PhotoCard photo={photo} aspect={aspect} />)}
+</div>
+
+<script>
+  // 常に一番短いカラムへ次のカードを積む(CSS multicolだと末尾カラムだけ空くため)
+  function setupMasonry(grid: HTMLElement) {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('.photo-card'));
+    let filter = 'all';
+    let currentN = 0;
+
+    const colCount = () =>
+      window.innerWidth <= 560 ? 1 : window.innerWidth <= 900 ? 2 : 3;
+
+    function layout() {
+      const n = colCount();
+      grid.classList.add('masonry');
+      grid.textContent = '';
+      const cols: HTMLElement[] = [];
+      const heights: number[] = [];
+      for (let i = 0; i < n; i++) {
+        const c = document.createElement('div');
+        c.className = 'photo-col';
+        grid.appendChild(c);
+        cols.push(c);
+        heights.push(0);
+      }
+      for (const card of cards) {
+        if (filter !== 'all' && card.dataset.category !== filter) continue;
+        let best = 0;
+        for (let i = 1; i < n; i++) if (heights[i] < heights[best]) best = i;
+        cols[best].appendChild(card);
+        // img側のaspect-ratio指定で画像ロード前でも実高さが確定している
+        heights[best] += card.offsetHeight;
+      }
+      currentN = n;
+    }
+
+    layout();
+    window.addEventListener('resize', () => {
+      if (colCount() !== currentN) layout();
+    });
+    grid.addEventListener('masonry:filter', (e) => {
+      filter = (e as CustomEvent<string>).detail;
+      layout();
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>('[data-masonry]')
+    .forEach(setupMasonry);
+</script>
+
+<style>
+  /* JS無効時はCSSマルチカラムにフォールバック */
+  .photo-grid {
+    columns: 3;
+    column-gap: 26px;
+  }
+  .photo-grid.masonry {
+    columns: auto;
+    display: flex;
+    gap: 26px;
+    align-items: flex-start;
+  }
+  .photo-grid :global(.photo-col) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  @media (max-width: 900px) {
+    .photo-grid {
+      columns: 2;
+    }
+  }
+  @media (max-width: 560px) {
+    .photo-grid {
+      columns: 1;
+    }
+  }
+</style>

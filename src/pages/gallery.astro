@@ -1,0 +1,221 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PhotoMasonry from '../components/PhotoMasonry.astro';
+
+const photos = (await getCollection('photos')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+const cats = [
+  { key: 'all', label: 'ALL' },
+  { key: 'portrait', label: 'PORTRAIT' },
+  { key: 'commercial', label: 'COMMERCIAL' },
+  { key: 'event', label: 'EVENT' },
+  { key: 'photocontest', label: 'PHOTO CONTEST' },
+];
+---
+
+<Base title="GALLERY" description="VRChatでのポートレート・商品・イベント撮影、フォトコンテスト出品作のギャラリー">
+  <main class="container">
+    <div class="blockttl">
+      <h2>ギャラリー</h2>
+      <span class="sub">GALLERY</span>
+    </div>
+
+    <div class="filter" role="tablist" aria-label="カテゴリで絞り込み">
+      {cats.map((c, i) => (
+        <button class:list={['filter-btn', { active: i === 0 }]} data-filter={c.key}>
+          {c.label}
+        </button>
+      ))}
+    </div>
+
+    <PhotoMasonry photos={photos} />
+  </main>
+
+  <!-- 写真タップで拡大表示するライトボックス -->
+  <div class="lightbox" id="lightbox" hidden>
+    <figure>
+      <img id="lb-img" src="" alt="" draggable="false" />
+      <figcaption>
+        <span class="lb-title" id="lb-title"></span>
+        <span class="lb-caption" id="lb-caption"></span>
+        <span class="lb-note">※ サイト掲載用にリサイズした画像です</span>
+      </figcaption>
+    </figure>
+  </div>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const grid = document.querySelector<HTMLElement>('[data-masonry]');
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.toggle('active', b === btn));
+      grid?.dispatchEvent(
+        new CustomEvent('masonry:filter', { detail: btn.dataset.filter })
+      );
+    });
+  });
+
+  // ライトボックス: 写真タップで拡大、もう一度タップ/Escで閉じる
+  const lightbox = document.getElementById('lightbox')!;
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement;
+  const lbTitle = document.getElementById('lb-title')!;
+  const lbCaption = document.getElementById('lb-caption')!;
+
+  grid?.addEventListener('click', (e) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>('.photo-card');
+    if (!card) return;
+    const img = card.querySelector('img');
+    if (!img) return;
+    lbImg.src = img.src;
+    lbImg.alt = card.dataset.title ?? '';
+    lbTitle.textContent = card.dataset.title ?? '';
+    lbCaption.textContent = card.dataset.caption ?? '';
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+  });
+
+  const closeLightbox = () => {
+    lightbox.hidden = true;
+    lightbox.classList.remove('zoomed');
+    lbImg.src = '';
+    document.body.style.overflow = '';
+  };
+
+  // 写真をタップ: 等倍ズームin/out。写真の外をタップ: 閉じる
+  lbImg.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (lightbox.classList.contains('zoomed')) {
+      lightbox.classList.remove('zoomed');
+      lightbox.scrollTo(0, 0);
+    } else {
+      // クリックした位置を中心にして等倍表示
+      const r = lbImg.getBoundingClientRect();
+      const rx = (e.clientX - r.left) / r.width;
+      const ry = (e.clientY - r.top) / r.height;
+      lightbox.classList.add('zoomed');
+      const iw = lbImg.naturalWidth;
+      const ih = lbImg.naturalHeight;
+      lightbox.scrollTo(
+        iw * rx - lightbox.clientWidth / 2,
+        ih * ry - lightbox.clientHeight / 2
+      );
+    }
+  });
+  lightbox.addEventListener('click', closeLightbox);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+  });
+</script>
+
+<style>
+  .filter {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: -0.8rem 0 2.4rem;
+  }
+  .filter-btn {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    color: var(--text-weak);
+    background: none;
+    border: 1px solid var(--line);
+    padding: 0.3rem 1.1rem;
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .filter-btn:hover {
+    color: var(--text);
+  }
+  .filter-btn.active {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .filter-btn:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 3px;
+  }
+
+  /* 写真はタップで拡大できる */
+  :global(.photo-card) {
+    cursor: zoom-in;
+  }
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    background: rgba(10, 10, 12, 0.94);
+    cursor: zoom-out;
+  }
+  .lightbox[hidden] {
+    display: none;
+  }
+  .lightbox figure {
+    text-align: center;
+    max-width: 100%;
+  }
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 76vh;
+    width: auto;
+    height: auto;
+    border: 1px solid var(--line);
+    cursor: zoom-in;
+  }
+  /* 等倍ズーム: スクロール/ドラッグでまじまじ見るモード
+     画像が画面より小さいときは中央、大きいときは左上基準(safe centering) */
+  .lightbox.zoomed {
+    align-items: safe center;
+    justify-content: safe center;
+    overflow: auto;
+    padding: 0;
+  }
+  .lightbox.zoomed figure {
+    max-width: none;
+  }
+  .lightbox.zoomed img {
+    max-width: none;
+    max-height: none;
+    cursor: zoom-out;
+    border: none;
+  }
+  .lightbox.zoomed figcaption {
+    display: none;
+  }
+  .lightbox figcaption {
+    margin-top: 0.9rem;
+  }
+  .lb-title {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .lb-caption {
+    display: block;
+    margin-top: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--text-weak);
+  }
+  .lb-caption:empty {
+    display: none;
+  }
+  .lb-note {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    color: var(--text-weak);
+    opacity: 0.75;
+  }
+</style>

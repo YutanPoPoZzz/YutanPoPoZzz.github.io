@@ -1,0 +1,421 @@
+---
+import '@fontsource/zen-kaku-gothic-new/400.css';
+import '@fontsource/zen-kaku-gothic-new/500.css';
+import '@fontsource/zen-kaku-gothic-new/700.css';
+import '@fontsource/space-grotesk/300.css';
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+// サイトの呼称(プロジェクト名)は「ゆたんぽぽーとふぉりお」だが、画面表示のブランドはYutanpopoZzz
+const siteName = 'YutanpopoZzz';
+const siteTagline = 'Virtual Photographer / Visual Creator';
+// 検索対策: HOMEのタイトル・既定説明文に肩書きの表記ゆれ(和/英)を持たせる
+const pageTitle = title
+  ? `${title} | ${siteName}`
+  : `${siteName} | バーチャルフォトグラファー / Virtual Photographer`;
+const defaultDescription =
+  'VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)YutanpopoZzzのポートフォリオ。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営。';
+const desc = description ?? defaultDescription;
+const siteUrl = 'https://yutanpopozzz.github.io';
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = `${siteUrl}/og.jpg`;
+const isHome = Astro.url.pathname === '/'; // ルート配信(base='/')前提
+// 鮮度シグナル: ビルド日をdateModifiedとして構造化データに載せる
+const buildDate = new Date().toISOString().slice(0, 10);
+
+// 構造化データ: 人物(表記ゆれをalternateName/jobTitleで束ねる)+サイト
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      '@id': `${siteUrl}/#person`,
+      name: 'YutanpopoZzz',
+      alternateName: ['ゆたんぽぽ'],
+      jobTitle: [
+        'バーチャルフォトグラファー',
+        'VRフォトグラファー',
+        'Virtual Photographer',
+        'VR Photographer',
+        'Visual Creator',
+      ],
+      description:
+        'VRChatを中心に活動するバーチャルフォトグラファー。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営を行う。',
+      url: `${siteUrl}/`,
+      image: `${siteUrl}/about/portrait.jpg`,
+      sameAs: [
+        'https://x.com/YutanpopoZzz',
+        'https://note.com/popoz',
+        'https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed',
+      ],
+      knowsAbout: ['VRChat', 'VR写真', 'バーチャルフォトグラフィー', 'Virtual Photography'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      name: 'YutanpopoZzz Portfolio',
+      url: `${siteUrl}/`,
+      inLanguage: 'ja',
+      dateModified: buildDate,
+      publisher: { '@id': `${siteUrl}/#person` },
+    },
+  ],
+};
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const nav = [
+  { label: 'HOME', href: `${base}/` },
+  { label: 'GALLERY', href: `${base}/gallery/` },
+  { label: 'WORKS', href: `${base}/works/` },
+  { label: 'EVENTS', href: `${base}/events/` },
+  { label: 'ABOUT', href: `${base}/about/` },
+  { label: 'CONTACT', href: `${base}/contact/` },
+];
+// 現在地タブの判定(HOMEは完全一致、他は配下ページも含む前方一致)
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === `${base}/` ? path === `${base}/` : path.startsWith(href);
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={isHome ? 'profile' : 'website'} />
+    {isHome && <meta property="profile:username" content="YutanpopoZzz" />}
+    <meta property="og:site_name" content="YutanpopoZzz Portfolio" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@YutanpopoZzz" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {
+      /* GitHub Pagesはレスポンスヘッダを設定できないためmeta CSPで代替。
+         devではVite HMR(インラインscript/ws)が要るため本番ビルドのみ */
+      import.meta.env.PROD && (
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+        />
+      )
+    }
+    <link rel="icon" href={`${base}/favicon.png`} type="image/png" />
+  </head>
+  <body>
+    <!-- 背景: 暖色の光溜まり + ヘアライン方眼(地の深青グラデはbodyに) -->
+    <div class="bg-layer bg-glow" aria-hidden="true"></div>
+    <div class="bg-layer bg-grid" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="header-in">
+        <a class="logo" href={`${base}/`} aria-label={`${siteName} ホームへ`}>
+          <img class="logo-mark" src={`${base}/icon.png`} alt={siteName} width="68" height="68" />
+          <span class="logo-sub"><span>Virtual Photographer</span><span>Visual Creator</span></span>
+        </a>
+        <nav class="global-nav">
+          {nav.map((item, i) => (
+            <Fragment>
+              {i > 0 && <span class="nav-sep" aria-hidden="true">/</span>}
+              <a
+                href={item.href}
+                class:list={[{ active: isActive(item.href) }]}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </Fragment>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <p class="footer-logo">{siteName}</p>
+        <p class="footer-role">バーチャルフォトグラファー</p>
+        <p class="footer-note">バーチャルの中に存在する文化や感情を、写真と言葉で外の世界へ運ぶ。</p>
+        <p class="copyright">© 2026 YutanpopoZzz</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #0a0a0c;
+    --bg-soft: #101014;
+    --text: rgba(255, 255, 255, 0.92);
+    --text-weak: rgba(255, 255, 255, 0.45);
+    --line: rgba(255, 255, 255, 0.14);
+    --gold: #d9b36c; /* ナビhover等のハイライト金 */
+    /* CONTACT系CTA専用(minima lagoonの青×暖金。他では使わない) */
+    --cta-blue: #4da6ff;
+    --cta-warm: #ffcf99;
+    --font-jp: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+    --font-en: 'Space Grotesk', var(--font-jp);
+  }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-jp);
+    font-size: 16px;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.8;
+    letter-spacing: 0.05em;
+    -webkit-font-smoothing: antialiased;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  img {
+    max-width: 100%;
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  /* ===== 背景レイヤー ===== */
+  body {
+    background: linear-gradient(to bottom, #0a0a0c 0%, #0a0b11 55%, #0a0d15 100%);
+    background-attachment: fixed;
+  }
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  /* 暗室の光溜まり(暖色寄り) */
+  .bg-glow {
+    background:
+      radial-gradient(
+        60% 45% at 50% 12%,
+        rgba(255, 207, 153, 0.09) 0%,
+        rgba(255, 198, 140, 0.035) 40%,
+        transparent 72%
+      );
+  }
+  /* ヘアライングリッド(方眼) */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 88px 88px;
+    /* 中央だけ見せて端は溶かす */
+    mask-image: radial-gradient(80% 70% at 50% 30%, #000 25%, transparent 85%);
+  }
+  /* ===== ここまで背景レイヤー ===== */
+
+  /* minimaの画材: グレイン */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* header: ロゴ左 / ナビ右。スクロールしても常に表示 */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: rgba(10, 10, 12, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-in {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.2rem;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+  .logo-mark {
+    align-self: center;
+    width: 68px;
+    height: 68px;
+    flex: none;
+  }
+  .logo-sub {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.62rem;
+    line-height: 1.55;
+    letter-spacing: 0.22em;
+    color: var(--text-weak);
+    white-space: nowrap;
+  }
+  .global-nav {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-family: var(--font-en);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: color-mix(in srgb, var(--gold) 72%, transparent);
+  }
+  .nav-sep {
+    color: var(--text-weak);
+    font-weight: 300;
+  }
+  .global-nav a {
+    position: relative;
+    padding: 0.28rem 0.55rem;
+  }
+  /* 現在地タブ: スラッシュ区切りに合わせた平行四辺形の金塗り */
+  .global-nav a.active {
+    color: var(--gold);
+  }
+  .global-nav a.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--gold) 20%, transparent);
+    /* Space Groteskの「/」の実測傾斜(垂直から18°)に合わせる */
+    transform: skewX(-18deg);
+  }
+  .global-nav a {
+    transition: color 0.3s, text-shadow 0.3s;
+  }
+  .global-nav a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
+  }
+  .global-nav a:focus-visible,
+  .logo:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+  }
+  @media (max-width: 640px) {
+    .header-in {
+      height: auto;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.9rem 1.2rem 0.8rem;
+    }
+    .logo-mark {
+      width: 48px;
+      height: 48px;
+    }
+    .logo-sub {
+      display: none;
+    }
+    .global-nav {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.7rem 1.3rem;
+      font-size: 0.68rem;
+    }
+  }
+
+  /* blockttl: セクション見出し(和文+英字サブ) */
+  .blockttl {
+    text-align: center;
+    margin: 4.5rem 0 2.6rem;
+  }
+  .blockttl h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-indent: 0.28em;
+  }
+  .blockttl .sub {
+    display: block;
+    margin-top: 0.3rem;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+    color: var(--text-weak);
+  }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 1.2rem;
+  }
+
+  /* footer */
+  .site-footer {
+    margin-top: 7rem;
+    border-top: 1px solid var(--line);
+    background: var(--bg-soft);
+  }
+  .footer-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 3.2rem 1.2rem;
+    text-align: center;
+  }
+  .footer-logo {
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-indent: 0.3em;
+  }
+  .footer-role {
+    margin-top: 0.3rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    color: var(--text-weak);
+  }
+  /* 一言文章がフッターの主役 */
+  .footer-note {
+    margin-top: 1.4rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+  .copyright {
+    margin-top: 1.8rem;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    color: var(--text-weak);
+  }
+</style>

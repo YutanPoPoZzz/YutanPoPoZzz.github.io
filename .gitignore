@@ -1,0 +1,18 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# 開発専用スクリプト(ローカルのドライブパスを含むため公開しない)
+# バックアップは Googleドライブ「ポートフォリオサイト関連/scripts-dev/」
+scripts/*
+!scripts/inject-csp-hashes.mjs
+
+# 環境・エディタ
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log
