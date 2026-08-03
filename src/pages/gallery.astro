@@ -69,7 +69,8 @@ const cats = [
     if (!card) return;
     const img = card.querySelector('img');
     if (!img) return;
-    lbImg.src = img.src;
+    // 拡大時だけ原寸(WebP)を読む。グリッドのimgは小さい変種なのでそのままでは粗い
+    lbImg.src = card.dataset.full || img.currentSrc || img.src;
     lbImg.alt = card.dataset.title ?? '';
     lbTitle.textContent = card.dataset.title ?? '';
     lbCaption.textContent = card.dataset.caption ?? '';
@@ -77,27 +78,41 @@ const cats = [
     document.body.style.overflow = 'hidden';
   });
 
+  // 等倍だと拡大が強すぎたので原寸の半分まで。
+  // ただし元が小さい画像だと拡大したことにならないので、最低1.5倍は効かせる
+  const ZOOM_SCALE = 0.5;
+  const MIN_ZOOM = 1.5;
+
+  const unzoom = () => {
+    lightbox.classList.remove('zoomed');
+    lbImg.style.width = '';
+    lightbox.scrollTo(0, 0);
+  };
+
   const closeLightbox = () => {
     lightbox.hidden = true;
-    lightbox.classList.remove('zoomed');
+    unzoom();
     lbImg.src = '';
     document.body.style.overflow = '';
   };
 
-  // 写真をタップ: 等倍ズームin/out。写真の外をタップ: 閉じる
+  // 写真をタップ: ズームin/out。写真の外をタップ: 閉じる
   lbImg.addEventListener('click', (e) => {
     e.stopPropagation();
     if (lightbox.classList.contains('zoomed')) {
-      lightbox.classList.remove('zoomed');
-      lightbox.scrollTo(0, 0);
+      unzoom();
     } else {
-      // クリックした位置を中心にして等倍表示
+      // クリックした位置を中心に拡大する
       const r = lbImg.getBoundingClientRect();
       const rx = (e.clientX - r.left) / r.width;
       const ry = (e.clientY - r.top) / r.height;
+      const iw = Math.min(
+        lbImg.naturalWidth,
+        Math.max(lbImg.naturalWidth * ZOOM_SCALE, r.width * MIN_ZOOM)
+      );
+      const ih = iw * (lbImg.naturalHeight / lbImg.naturalWidth);
+      lbImg.style.width = `${iw}px`;
       lightbox.classList.add('zoomed');
-      const iw = lbImg.naturalWidth;
-      const ih = lbImg.naturalHeight;
       lightbox.scrollTo(
         iw * rx - lightbox.clientWidth / 2,
         ih * ry - lightbox.clientHeight / 2

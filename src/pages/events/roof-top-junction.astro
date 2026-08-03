@@ -4,6 +4,7 @@ import Crumbs from '../../components/Crumbs.astro';
 import EventLinks from '../../components/EventLinks.astro';
 import BackFab from '../../components/BackFab.astro';
 import { events } from '../../data/events';
+import { webpFull, webpSrcset } from '../../lib/img';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ev = events.find((e) => e.name === 'Roof Top Junction')!;
@@ -33,7 +34,16 @@ const posters = [
 
     {ev.image && (
       <figure class="hero">
-        <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} />
+        <picture>
+          {webpSrcset(ev.image, base) && (
+            <source
+              type="image/webp"
+              srcset={webpSrcset(ev.image, base)}
+              sizes="(max-width: 900px) 92vw, 860px"
+            />
+          )}
+          <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} decoding="async" />
+        </picture>
       </figure>
     )}
 
@@ -66,8 +76,27 @@ const posters = [
       </p>
       <div class="poster-grid">
         {posters.map((p) => (
-          <button class="poster" type="button" data-poster={`${base}/events/rtj/${p.slug}.jpg`} data-label={p.label}>
-            <img src={`${base}/events/rtj/${p.slug}.jpg`} alt={`Roof Top Junction ${p.label} ポスター`} loading="lazy" />
+          <button
+            class="poster"
+            type="button"
+            data-poster={webpFull(`/events/rtj/${p.slug}.jpg`, base) ?? `${base}/events/rtj/${p.slug}.jpg`}
+            data-label={p.label}
+          >
+            <picture>
+              {webpSrcset(`/events/rtj/${p.slug}.jpg`, base) && (
+                <source
+                  type="image/webp"
+                  srcset={webpSrcset(`/events/rtj/${p.slug}.jpg`, base)}
+                  sizes="(max-width: 560px) 45vw, 260px"
+                />
+              )}
+              <img
+                src={`${base}/events/rtj/${p.slug}.jpg`}
+                alt={`Roof Top Junction ${p.label} ポスター`}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <span class="poster-label">{p.label}</span>
           </button>
         ))}
@@ -116,9 +145,20 @@ const posters = [
   const grid = document.querySelector('.poster-grid');
 
   if (lightbox && lbImg && lbTitle && grid) {
+    // 等倍だと拡大が強すぎたので原寸の半分まで。
+    // ただし元が小さい画像だと拡大したことにならないので、最低1.5倍は効かせる
+    const ZOOM_SCALE = 0.5;
+    const MIN_ZOOM = 1.5;
+
+    const unzoom = () => {
+      lightbox.classList.remove('zoomed');
+      lbImg.style.width = '';
+      lightbox.scrollTo(0, 0);
+    };
+
     const close = () => {
       lightbox.hidden = true;
-      lightbox.classList.remove('zoomed');
+      unzoom();
       lbImg.src = '';
       document.body.style.overflow = '';
     };
@@ -133,20 +173,25 @@ const posters = [
       document.body.style.overflow = 'hidden';
     });
 
-    // 写真タップで等倍ズーム、もう一度で戻る。外側タップ/Escで閉じる
+    // 写真タップでズーム、もう一度で戻る。外側タップ/Escで閉じる
     lbImg.addEventListener('click', (e) => {
       e.stopPropagation();
       if (lightbox.classList.contains('zoomed')) {
-        lightbox.classList.remove('zoomed');
-        lightbox.scrollTo(0, 0);
+        unzoom();
       } else {
         const r = lbImg.getBoundingClientRect();
         const rx = (e.clientX - r.left) / r.width;
         const ry = (e.clientY - r.top) / r.height;
+        const iw = Math.min(
+          lbImg.naturalWidth,
+          Math.max(lbImg.naturalWidth * ZOOM_SCALE, r.width * MIN_ZOOM)
+        );
+        const ih = iw * (lbImg.naturalHeight / lbImg.naturalWidth);
+        lbImg.style.width = `${iw}px`;
         lightbox.classList.add('zoomed');
         lightbox.scrollTo(
-          lbImg.naturalWidth * rx - lightbox.clientWidth / 2,
-          lbImg.naturalHeight * ry - lightbox.clientHeight / 2
+          iw * rx - lightbox.clientWidth / 2,
+          ih * ry - lightbox.clientHeight / 2
         );
       }
     });

@@ -2,6 +2,9 @@
 import Base from '../layouts/Base.astro';
 import EventLinks from '../components/EventLinks.astro';
 import { events } from '../data/events';
+import { webpSrcset } from '../lib/img';
+
+const EV_SIZES = '(max-width: 900px) 92vw, 720px';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -47,10 +50,30 @@ const groups = [
               <div class:list={['img-frame', { linked: !!ev.page }]}>
                 {ev.page ? (
                   <a href={`${base}${ev.page}`} aria-label={`${ev.name} の紹介ページへ`}>
-                    <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} loading="lazy" />
+                    <picture>
+                      {webpSrcset(ev.image, base) && (
+                        <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes={EV_SIZES} />
+                      )}
+                      <img
+                        src={`${base}${ev.image}`}
+                        alt={`${ev.name} キービジュアル`}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                   </a>
                 ) : (
-                  <img src={`${base}${ev.image}`} alt={`${ev.name} キービジュアル`} loading="lazy" />
+                  <picture>
+                    {webpSrcset(ev.image, base) && (
+                      <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes={EV_SIZES} />
+                    )}
+                    <img
+                      src={`${base}${ev.image}`}
+                      alt={`${ev.name} キービジュアル`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
                 )}
               </div>
             )}

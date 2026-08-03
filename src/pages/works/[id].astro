@@ -4,6 +4,7 @@ import Base from '../../layouts/Base.astro';
 import Crumbs from '../../components/Crumbs.astro';
 import BackFab from '../../components/BackFab.astro';
 import { serviceColor } from '../../data/services';
+import { webpSrcset } from '../../lib/img';
 
 export async function getStaticPaths() {
   const works = await getCollection('works');
@@ -24,6 +25,8 @@ const crumbs = [
 ];
 const d = work.data.date;
 const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+const heroSrc = work.data.full ?? work.data.thumb;
+const heroSrcset = webpSrcset(heroSrc, base);
 ---
 
 <Base title={work.data.title} description={work.data.summary}>
@@ -40,7 +43,12 @@ const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0'
     </header>
 
     <figure class="hero-thumb">
-      <img src={`${base}${work.data.full ?? work.data.thumb}`} alt={work.data.title} />
+      <picture>
+        {heroSrcset && (
+          <source type="image/webp" srcset={heroSrcset} sizes="(max-width: 900px) 92vw, 860px" />
+        )}
+        <img src={`${base}${heroSrc}`} alt={work.data.title} decoding="async" />
+      </picture>
     </figure>
 
     {(work.data.client || work.data.role) && (

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { serviceColor } from '../data/services';
+import { webpSrcset } from '../lib/img';
 
 interface Props {
   work: CollectionEntry<'works'>;
@@ -17,7 +18,23 @@ const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0'
   <span class="entry-cat">{work.data.category}</span>
   {work.data.status && <span class="entry-status">{work.data.status}</span>}
   <figure class="entry-bg">
-    <img src={`${base}${work.data.thumb}`} alt={work.data.title} loading="lazy" width="800" height="500" />
+    <picture>
+      {webpSrcset(work.data.thumb, base) && (
+        <source
+          type="image/webp"
+          srcset={webpSrcset(work.data.thumb, base)}
+          sizes="(max-width: 560px) 92vw, (max-width: 900px) 45vw, 340px"
+        />
+      )}
+      <img
+        src={`${base}${work.data.thumb}`}
+        alt={work.data.title}
+        loading="lazy"
+        decoding="async"
+        width="800"
+        height="500"
+      />
+    </picture>
   </figure>
   <div class="entry-btm">
     <time class="entry-day" datetime={d.toISOString()}>{dateLabel}</time>

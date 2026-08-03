@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { availability } from '../data/profile';
 
 const items = [
   'お名前（活動名）',
@@ -38,11 +39,28 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
       <span class="sub">CONTACT</span>
     </div>
     <div class="body">
+      {/* 語の途中で折り返さないよう、日付と本文をそれぞれ nowrap で包む */}
+      <p class="status" data-open={availability.open ? '' : undefined}>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="status-txt"
+          ><b class="nb">{availability.asOf}現在</b><span class="nb"> — {availability.text}</span></span
+        >
+      </p>
       <p>
         VRChatでのポートレート撮影、アバター・衣装・商品のプロモーション撮影、イベント記録、
         ポスターやSNS告知などのビジュアル制作のご依頼を受け付けています。
         ご相談だけでも大丈夫ですので、遠慮なくご連絡ください。
       </p>
+      <div class="notes">
+        <h3>料金について</h3>
+        <p class="lead">
+          撮影時間・納品枚数・レタッチの度合い・使用範囲によって変わるため、
+          ご依頼の内容を伺ったうえでお見積りをお出しします。
+          ご予算がお決まりの場合は、その範囲でできることをご提案しますので、
+          金額感からのご相談でも遠慮なくお知らせください。
+        </p>
+      </div>
+
       <p>
         ご依頼の際は、以下の項目を添えていただけると、確認のやり取りが少なくスムーズです。
       </p>
@@ -53,6 +71,18 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
       <div class="channels">
         <a href="https://x.com/YutanpopoZzz" target="_blank" rel="noopener noreferrer">X のDMで相談する ↗</a>
         <a href={mailHref}>メールで相談する ↗</a>
+      </div>
+
+      <div class="notes">
+        <h3>ご相談のうえ進めたいこと</h3>
+        <p class="lead">
+          次のようなご依頼は、私ひとりでは責任を持ちきれない部分があります。
+          お断りするという意味ではなく、進め方を一緒に決めさせてください。
+        </p>
+        <ul>
+          <li>性的・過激な表現を含む撮影</li>
+          <li>ワールド・アバター・アセットの利用規約や権利関係が確認できない案件</li>
+        </ul>
       </div>
 
       <div class="notes">
@@ -77,6 +107,52 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
   }
   .body p {
     margin: 1rem 0;
+  }
+  /* 受付状況: 依頼の入口なのでCTA系(lagoon配色)の青を灯す。金(ナビ)とは別系統 */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 1.6rem;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid var(--line);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .status b {
+    font-weight: 600;
+  }
+  .status .nb {
+    white-space: nowrap;
+  }
+  .status .dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-weak);
+  }
+  .status[data-open] {
+    border-color: color-mix(in srgb, var(--cta-blue) 34%, transparent);
+  }
+  .status[data-open] .dot {
+    background: var(--cta-blue);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--cta-blue) 70%, transparent);
+    animation: status-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .status[data-open] .dot {
+      animation: none;
+    }
   }
   .items {
     margin: 1.4rem 0;
@@ -106,11 +182,21 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
   .notes {
     border-top: 1px solid var(--line);
     padding-top: 1.6rem;
+    margin-top: 2rem;
   }
   .notes h3 {
     font-size: 0.95rem;
     letter-spacing: 0.14em;
     margin-bottom: 0.6rem;
+  }
+  .notes .lead {
+    margin: 0.6rem 0 0;
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--text-weak);
+  }
+  .notes .lead + ul {
+    margin-top: 0.9rem;
   }
   .notes ul {
     padding-left: 1.4rem;

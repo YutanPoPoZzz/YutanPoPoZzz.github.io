@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { awards, clientWorks, sponsors, exhibitions, activities } from '../data/profile';
+import { webpSrcset } from '../lib/img';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -53,13 +54,23 @@ const splitGrade = (t: string) => {
       </ul>
     </div>
     <figure class="me">
-      <img
-        src={`${base}/about/portrait.jpg`}
-        alt="YutanpopoZzz のポートレート"
-        width="1200"
-        height="1600"
-        loading="lazy"
-      />
+      <picture>
+        {webpSrcset('/about/portrait.jpg', base) && (
+          <source
+            type="image/webp"
+            srcset={webpSrcset('/about/portrait.jpg', base)}
+            sizes="(max-width: 900px) 92vw, 420px"
+          />
+        )}
+        <img
+          src={`${base}/about/portrait.jpg`}
+          alt="YutanpopoZzz のポートレート"
+          width="1200"
+          height="1600"
+          loading="lazy"
+          decoding="async"
+        />
+      </picture>
     </figure>
     </div>
 

@@ -1,9 +1,10 @@
 ﻿---
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { awards } from '../data/profile';
+import { availability, awards } from '../data/profile';
 import { events } from '../data/events';
 import { photoAspect } from '../lib/photo-aspect';
+import { webpSrcset } from '../lib/img';
 import { workCategories } from '../data/work-categories';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -55,7 +56,16 @@ for (const p of photos.slice(0, 12)) {
       <div class="shelf" data-shelf>
         {shelfItems.map(({ p, aspect }) => (
           <a class="shelf-item" href={`${base}/gallery/`} style={`--ar: ${aspect.toFixed(4)}`}>
-            <img src={`${base}${p.data.thumb}`} alt={p.data.title} loading="lazy" />
+            <picture>
+              {webpSrcset(p.data.thumb, base) && (
+                <source
+                  type="image/webp"
+                  srcset={webpSrcset(p.data.thumb, base)}
+                  sizes="(max-width: 640px) 80vw, 640px"
+                />
+              )}
+              <img src={`${base}${p.data.thumb}`} alt={p.data.title} loading="lazy" decoding="async" />
+            </picture>
           </a>
         ))}
         <button class="shelf-nav prev" type="button" aria-label="前の写真">‹</button>
@@ -75,7 +85,16 @@ for (const p of photos.slice(0, 12)) {
           <a class="wc-card" href={`${base}/works/#${cat.slug}`}>
             <span class="wc-frame" aria-hidden="true">
               {cat.thumb ? (
-                <img src={`${base}${cat.thumb}`} alt="" loading="lazy" />
+                <picture>
+                  {webpSrcset(cat.thumb, base) && (
+                    <source
+                      type="image/webp"
+                      srcset={webpSrcset(cat.thumb, base)}
+                      sizes="(max-width: 560px) 92vw, (max-width: 900px) 45vw, 340px"
+                    />
+                  )}
+                  <img src={`${base}${cat.thumb}`} alt="" loading="lazy" decoding="async" />
+                </picture>
               ) : (
                 <span class="wc-en">{cat.en}</span>
               )}
@@ -98,7 +117,21 @@ for (const p of photos.slice(0, 12)) {
         <a class="ev-main" href={`${base}${mainEvent.page ?? '/events/'}`} style={`--ev: ${mainEvent.color}`}>
           {mainEvent.image && (
             <span class="ev-main-img">
-              <img src={`${base}${mainEvent.image}`} alt={`${mainEvent.name} キービジュアル`} loading="lazy" />
+              <picture>
+                {webpSrcset(mainEvent.image, base) && (
+                  <source
+                    type="image/webp"
+                    srcset={webpSrcset(mainEvent.image, base)}
+                    sizes="(max-width: 900px) 92vw, 560px"
+                  />
+                )}
+                <img
+                  src={`${base}${mainEvent.image}`}
+                  alt={`${mainEvent.name} キービジュアル`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
             </span>
           )}
           <span class="ev-main-head">
@@ -152,8 +185,16 @@ for (const p of photos.slice(0, 12)) {
 
     <!-- CONTACT 帯 -->
     <a class="contact-band" href={`${base}/contact/`}>
-      <span class="cb-label">CONTACT</span>
-      <span class="cb-body">撮影・ビジュアル制作のご依頼、ご相談だけでも歓迎です</span>
+      <span class="cb-head">
+        <span class="cb-label">CONTACT</span>
+        {availability.open && <span class="cb-status">{availability.short}</span>}
+      </span>
+      {/* 語の途中で折り返さないよう、意味の切れ目ごとに nowrap で包む */}
+      <span class="cb-body"
+        ><span class="nb">撮影・ビジュアル制作の</span><span class="nb">ご依頼、</span><span class="nb"
+          >ご相談だけでも歓迎です</span
+        ></span
+      >
       <span class="cb-arrow">→</span>
     </a>
   </main>
@@ -660,6 +701,25 @@ for (const p of photos.slice(0, 12)) {
     font-weight: 700;
     letter-spacing: 0.05em;
   }
+  .cb-body .nb {
+    white-space: nowrap;
+  }
+  /* 受付中バッジ: 本文の幅を削らないようCONTACTラベルの下に積む(状況はCONTACTページが正) */
+  .cb-head {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .cb-status {
+    padding: 0.24rem 0.66rem;
+    border: 1px solid color-mix(in srgb, var(--cta-warm) 55%, transparent);
+    color: var(--cta-warm);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
   .cb-arrow {
     color: var(--cta-warm);
     transition: transform 0.3s ease;
@@ -671,6 +731,23 @@ for (const p of photos.slice(0, 12)) {
     .contact-band {
       flex-wrap: wrap;
       gap: 0.6rem 1rem;
+    }
+    /* 狭い画面ではラベル+バッジを1行目に流し、本文は横幅いっぱいで読ませる */
+    .cb-head {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.8rem;
+      width: 100%;
+    }
+    .cb-status {
+      font-size: 0.82rem;
+    }
+    .cb-body {
+      flex: 1 0 100%;
+      font-size: 1rem;
+    }
+    .cb-arrow {
+      margin-left: auto;
     }
   }
 

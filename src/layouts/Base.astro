@@ -193,6 +193,10 @@ const isActive = (href: string) =>
     max-width: 100%;
     display: block;
   }
+  /* WebP配信用の<picture>はレイアウトに出さない(imgが親の直下と同じ扱いになる) */
+  picture {
+    display: contents;
+  }
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

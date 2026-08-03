@@ -1,12 +1,22 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { webpFull, webpSrcset } from '../lib/img';
 
 interface Props {
   photo: CollectionEntry<'photos'>;
   aspect?: number;
+  /** グリッドでの表示幅。既定はGALLERY/HOMEの3カラム想定 */
+  sizes?: string;
 }
-const { photo, aspect } = Astro.props;
+const {
+  photo,
+  aspect,
+  sizes = '(max-width: 560px) 92vw, (max-width: 900px) 45vw, 350px',
+} = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// カードには小さい変種を配り、ライトボックスの原寸だけ data-full で別に渡す
+const srcset = webpSrcset(photo.data.thumb, base);
+const full = webpFull(photo.data.thumb, base) ?? `${base}${photo.data.thumb}`;
 const catLabel: Record<string, string> = {
   portrait: 'PORTRAIT',
   commercial: 'COMMERCIAL',
@@ -21,14 +31,19 @@ const catLabel: Record<string, string> = {
   data-aspect={aspect}
   data-title={photo.data.title}
   data-caption={photo.data.caption ?? ''}
+  data-full={full}
 >
   <div class="frame">
-    <img
-      src={`${base}${photo.data.thumb}`}
-      alt={photo.data.title}
-      loading="lazy"
-      style={aspect ? `aspect-ratio: ${aspect}` : undefined}
-    />
+    <picture>
+      {srcset && <source type="image/webp" srcset={srcset} sizes={sizes} />}
+      <img
+        src={`${base}${photo.data.thumb}`}
+        alt={photo.data.title}
+        loading="lazy"
+        decoding="async"
+        style={aspect ? `aspect-ratio: ${aspect}` : undefined}
+      />
+    </picture>
   </div>
   <figcaption>
     <span class="cat">{catLabel[photo.data.category]}</span>
@@ -45,6 +60,10 @@ const catLabel: Record<string, string> = {
     border: 1px solid var(--line);
     overflow: hidden;
     transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  /* pictureはレイアウトに影響させない(枠の中でimgが直接効くように) */
+  .frame picture {
+    display: contents;
   }
   .frame img {
     width: 100%;

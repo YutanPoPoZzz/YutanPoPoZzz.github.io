@@ -1,5 +1,18 @@
 // ABOUTページに並べる実績データ。
 
+/**
+ * ご依頼の受付状況。CONTACTページとHOMEのCONTACT帯が参照する。
+ * サイト更新(号令メンテ)のたびに asOf / open / text を見直すこと。
+ */
+export const availability = {
+  open: true,
+  asOf: '2026年8月',
+  text: 'ご依頼を受け付けています',
+  /** HOMEのCONTACT帯に出す短縮表記 */
+  short: '受付中',
+};
+
+
 export type Achievement = {
   year: string;
   title: string;
