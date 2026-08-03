@@ -2,6 +2,12 @@
 
 export type EventLink = { label: string; url: string };
 
+/**
+ * イベント規模の注記。グループ人数や来場者数は時期で増減するので、
+ * 数字がいつ時点のものかを添える。サイト更新(号令メンテ)で数字を直したらここも直す。
+ */
+export const scaleNote = 'イベント規模の数字は2026年8月時点の目安です。時期によって変動します。';
+
 export type EventEntry = {
   name: string;
   genre: string;
@@ -77,7 +83,7 @@ export const events: EventEntry[] = [
     ],
     roles: 'イベントスタッフ、撮影スタッフ',
     tasks: '会場スタッフ、写真撮影業務、ゲスト出演者との事前調整業務',
-    scale: ['グループ人数 470人', 'Discord人数 450人'],
+    scale: ['グループ人数 470人'],
     related: [
       {
         name: 'ロールプレイイベント『サロン・ドゥ・エレガンティーク』',

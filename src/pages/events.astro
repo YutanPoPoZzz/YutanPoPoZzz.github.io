@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import EventLinks from '../components/EventLinks.astro';
-import { events } from '../data/events';
+import { events, scaleNote } from '../data/events';
 import { webpSrcset } from '../lib/img';
 
 const EV_SIZES = '(max-width: 900px) 92vw, 720px';
@@ -29,6 +29,7 @@ const groups = [
       撮影やビジュアル制作のほかに、VRChat内のイベント運営にも携わっています。
       主催・企画から広報、会場運営まで——「場をつくる」側の仕事の記録です。
     </p>
+    <p class="scale-note">※ {scaleNote}</p>
 
     {groups.map((g) => (
       <section class="group">
@@ -146,7 +147,14 @@ const groups = [
     text-align: center;
     font-size: 0.9rem;
     color: var(--text-weak);
-    margin: -0.8rem 0 3rem;
+    margin: -0.8rem 0 1rem;
+  }
+  /* 規模の数字がいつ時点のものかの断り書き */
+  .scale-note {
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--text-weak);
+    margin: 0 0 3rem;
   }
 
   .group {

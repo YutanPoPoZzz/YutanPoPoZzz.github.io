@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Crumbs from '../../components/Crumbs.astro';
 import EventLinks from '../../components/EventLinks.astro';
 import BackFab from '../../components/BackFab.astro';
-import { events } from '../../data/events';
+import { events, scaleNote } from '../../data/events';
 import { webpFull, webpSrcset } from '../../lib/img';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -64,7 +64,10 @@ const posters = [
         </div>
         <div>
           <dt>イベント規模</dt>
-          <dd>{ev.scale.join(' ／ ')}</dd>
+          <dd>
+            {ev.scale.join(' ／ ')}
+            <span class="scale-note">※ {scaleNote}</span>
+          </dd>
         </div>
       </dl>
     </section>
@@ -286,6 +289,13 @@ const posters = [
   }
   .meta dd {
     flex: 1;
+  }
+  /* 規模の数字がいつ時点のものかの断り書き */
+  .scale-note {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--text-weak);
   }
   /* ポスターアーカイブ */
   .posters {
