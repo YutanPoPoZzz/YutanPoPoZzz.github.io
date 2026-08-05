@@ -106,8 +106,18 @@ const isActive = (href: string) =>
       import.meta.env.PROD && (
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+          content="default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'"
         />
+      )
+    }
+    {
+      /* GA4(測定ID G-25QMLSF6S0)。開発中の閲覧を計測に混ぜないため本番ビルドのみ。
+         設定コードは public/ga.js に出してある(CSPに'unsafe-inline'を足さずに済ませるため) */
+      import.meta.env.PROD && (
+        <>
+          <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-25QMLSF6S0" />
+          <script is:inline src={`${base}/ga.js`} />
+        </>
       )
     }
     <link rel="icon" href={`${base}/favicon.png`} type="image/png" />
