@@ -88,6 +88,11 @@ const isActive = (href: string) =>
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
+    {/* Search Consoleの所有権確認。消すと確認が外れるので残すこと */}
+    <meta
+      name="google-site-verification"
+      content="8TQM-U1MtuAIn-3LffT0ulozDsF9-67uZMfh7KMZ0RM"
+    />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content={isHome ? 'profile' : 'website'} />
     {isHome && <meta property="profile:username" content="YutanpopoZzz" />}
@@ -113,12 +118,7 @@ const isActive = (href: string) =>
     {
       /* GA4(測定ID G-25QMLSF6S0)。開発中の閲覧を計測に混ぜないため本番ビルドのみ。
          設定コードは public/ga.js に出してある(CSPに'unsafe-inline'を足さずに済ませるため) */
-      import.meta.env.PROD && (
-        <>
-          <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-25QMLSF6S0" />
-          <script is:inline src={`${base}/ga.js`} />
-        </>
-      )
+      import.meta.env.PROD && <script is:inline src={`${base}/ga.js`} />
     }
     <link rel="icon" href={`${base}/favicon.png`} type="image/png" />
   </head>
