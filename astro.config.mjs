@@ -5,5 +5,8 @@ import sitemap from '@astrojs/sitemap';
 // ルート配信なので base は既定の '/'
 export default defineConfig({
   site: 'https://yutanpopozzz.github.io',
-  integrations: [sitemap()],
+  integrations: [
+    // llms-full.txt はページではなくAI向けの生成物なのでサイトマップから外す
+    sitemap({ filter: (page) => !page.endsWith('/llms-full.txt') }),
+  ],
 });

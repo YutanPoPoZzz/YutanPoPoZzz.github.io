@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { availability } from '../data/profile';
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
 const items = [
   'お名前（活動名）',
   'ご連絡先（XのDM / メールアドレス）',
@@ -32,7 +34,10 @@ const mailBody = [
 const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
 ---
 
-<Base title="CONTACT" description="撮影・ビジュアル制作のご依頼はこちら">
+<Base
+  fullTitle="撮影・ビジュアル制作のご依頼 | バーチャルフォトグラファー YutanpopoZzz"
+  description="VRChatでのポートレート撮影、アバター・衣装の宣材写真、イベント記録、告知ビジュアル制作のご依頼窓口です。XのDMまたはメールから受け付けています。料金は内容を伺ったうえで個別にお見積もりします。ご相談だけでも歓迎です。"
+>
   <main class="container contact">
     <div class="blockttl">
       <h2>ご依頼・お問い合わせ</h2>
@@ -50,6 +55,10 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
         VRChatでのポートレート撮影、アバター・衣装・商品のプロモーション撮影、イベント記録、
         ポスターやSNS告知などのビジュアル制作のご依頼を受け付けています。
         ご相談だけでも大丈夫ですので、遠慮なくご連絡ください。
+      </p>
+      <p class="guide-link">
+        はじめての方は <a href={`${base}/photography/`}>撮影依頼ガイド</a>
+        に、依頼できる内容・納品までの流れ・よくある質問をまとめています。
       </p>
       <div class="notes">
         <h3>料金について</h3>
@@ -153,6 +162,18 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
     .status[data-open] .dot {
       animation: none;
     }
+  }
+  .guide-link {
+    font-size: 0.85rem;
+    color: var(--text-weak);
+  }
+  .guide-link a {
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.3s;
+  }
+  .guide-link a:hover {
+    border-color: var(--text);
   }
   .items {
     margin: 1.4rem 0;

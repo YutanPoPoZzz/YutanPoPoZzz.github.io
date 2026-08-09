@@ -20,7 +20,10 @@ const splitGrade = (t: string) => {
 };
 ---
 
-<Base title="ABOUT" description="YutanpopoZzz — VRChatを中心に活動するバーチャルフォトグラファー">
+<Base
+  fullTitle="プロフィール・受賞歴 | バーチャルフォトグラファー YutanpopoZzz"
+  description="バーチャルフォトグラファー YutanpopoZzz のプロフィール。VRChatを中心にポートレート・商品・イベントの撮影とビジュアル制作を行っています。VR Photography Contest 2025 最優秀賞、VR PHOTO COMPETITION 2025 優秀賞ほか、受賞歴・クライアントワーク・展示の実績。"
+>
   <main class="container about">
     <div class="blockttl">
       <h2>じぶんのこと</h2>
@@ -272,7 +275,9 @@ const splitGrade = (t: string) => {
       flex-wrap: wrap;
     }
     .ach .note {
-      flex-basis: 100%;
+      /* flex-basis:100% に flex:none のままだと左マージン分だけ行からはみ出す */
+      flex: 1 1 100%;
+      min-width: 0;
       margin-left: calc(6.2em + 1rem);
       text-align: left;
     }

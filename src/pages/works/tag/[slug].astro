@@ -23,7 +23,10 @@ const { service, items } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<Base title={service.name} description={`${service.name}の制作実績 — ${service.desc}`}>
+<Base
+  fullTitle={`${service.name}の実績 | バーチャルフォトグラファー YutanpopoZzz`}
+  description={`VRChatでの${service.name}の実績。${service.desc}。バーチャルフォトグラファー YutanpopoZzz が承っています。`}
+>
   <main class="container tagpage" style={`--sv: ${service.color}`}>
     <Crumbs
       items={[

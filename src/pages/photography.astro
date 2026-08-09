@@ -1,0 +1,484 @@
+---
+// 「VRChat 撮影 依頼」「バーチャルフォトグラファー とは」で入ってきた人が
+// 最初に着地するページ。答えを先に書き、最後にCONTACTへ渡す。
+// 事実はCONTACT・WORKS・ABOUTに書いてあることだけを使う(ここで新しい条件を作らない)。
+import Base from '../layouts/Base.astro';
+import { availability, awards, exhibitions, clientWorks } from '../data/profile';
+import { services } from '../data/services';
+import { faqs } from '../data/faq';
+import { orderFlow } from '../data/order-flow';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const siteUrl = 'https://yutanpopozzz.github.io';
+
+// サービスごとの詳しい説明(短い一言は services.ts、ここは依頼者向けの本文)
+const detail: Record<string, string> = {
+  portrait:
+    'キャラクター性を強く引き出すポートレートが得意です。クールでストリートな空気をまとわせながら、一枚から物語が想像できる画面をつくります。バーチャル宣材写真、記念撮影、コンセプトフォトなど。イメージに合うワールド探しから一緒に決められます。',
+  product:
+    'アバター・衣装・ギミックの販売用ビジュアル。商品の見せたい部分と、身にまとったときの空気の両方が伝わる画面を設計します。商品ページやSNS告知にそのまま置ける形で仕上げます。',
+  event:
+    'DJイベントやコミュニティイベントの記録撮影。当日の熱と空気を写真に残します。自分でもDJイベント「Roof Top Junction」を主催しているので、進行を止めない立ち回りができます。',
+  poster:
+    'イベント告知やSNS用の、文字を入れ込んだビジュアル制作。撮影から文字組み・仕上げまで一貫して行うので、撮影とセットで頼めます。',
+  exhibition:
+    '展示に向けた作品制作。プリントやレコードなど、実物の設計から設営まで。金沢21世紀美術館での「Virtual Photography Showcase 2026」に招待作家として参加しています。',
+  writing:
+    'VR写真についての記事執筆・寄稿、写真教室や講評などの登壇。感覚を言葉に置き換えて伝える仕事です。',
+};
+
+// 実績の要約(全量はABOUT)
+const topAwards = awards.filter((a) => a.year !== '—').slice(0, 3);
+
+const pageJsonLd = [
+  {
+    '@type': 'FAQPage',
+    '@id': `${siteUrl}/photography/#faq`,
+    inLanguage: 'ja',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+  {
+    '@type': 'WebPage',
+    '@id': `${siteUrl}/photography/`,
+    url: `${siteUrl}/photography/`,
+    name: 'VRChatの撮影依頼ガイド',
+    inLanguage: 'ja',
+    about: { '@id': `${siteUrl}/#person` },
+    isPartOf: { '@id': `${siteUrl}/#website` },
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'HOME', item: `${siteUrl}/` },
+        { '@type': 'ListItem', position: 2, name: '撮影のご依頼', item: `${siteUrl}/photography/` },
+      ],
+    },
+  },
+];
+---
+
+<Base
+  fullTitle="VRChatの撮影依頼ガイド | バーチャルフォトグラファー YutanpopoZzz"
+  description="VRChatでの撮影は依頼できます。バーチャルフォトグラファーYutanpopoZzzが、ポートレート・アバターや衣装の宣材写真・イベント記録・告知ビジュアルの制作を受けています。依頼できる内容、納品までの流れ、料金の考え方、よくある質問をまとめました。"
+  jsonLd={pageJsonLd}
+>
+  <main class="container photo">
+    <div class="blockttl">
+      <h1>VRChatの撮影を依頼する</h1>
+      <span class="sub">PHOTOGRAPHY</span>
+    </div>
+
+    {/* Answer-First: 冒頭で結論を言い切る(AI検索はここを引用する) */}
+    <section class="lead-block">
+      <p class="lead">
+        VRChatでの撮影は、バーチャルフォトグラファーに依頼できます。
+        YutanpopoZzzは、VRChatを中心にポートレート、アバター・衣装の宣材写真、イベント記録、
+        ポスターや告知ビジュアルの制作を受けている写真家です。
+        固定の料金表は設けず、内容を伺ったうえで個別にお見積もりします。
+        ご相談だけでも大丈夫です。
+      </p>
+      <p class="status" data-open={availability.open ? '' : undefined}>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="status-txt"
+          ><b class="nb">{availability.asOf}現在</b><span class="nb"> — {availability.text}</span></span
+        >
+      </p>
+    </section>
+
+    <!-- 職種そのものの説明(「バーチャルフォトグラファーとは」で入ってくる人向け) -->
+    <section class="block">
+      <h2>バーチャルフォトグラファーとは<span class="en">WHAT IS A VIRTUAL PHOTOGRAPHER</span></h2>
+      <p>
+        バーチャルフォトグラファーとは、VRChatをはじめとするソーシャルVR空間の中で、
+        アバターやワールドを被写体に撮影する写真家です。現実のカメラの代わりにVR内のカメラを使い、
+        構図・光・レンズを自分で決めて一枚を作ります。VRフォトグラファー、Virtual Photographer とも呼ばれます。
+      </p>
+      <p>
+        現実の撮影と違うのは、重力や天候、機材や移動の制約がないことです。
+        そのぶん構図・光・キャラクターと、どこまでも純粋に向き合えます。
+        そしてVRChatは、会話だけでなく「空間を共有する」SNSでもあります。
+        同じ場所に立つことで生まれる風景や関係性には、現実を超えた魅力がある——
+        ここにしか写せない本質があると考えています。
+      </p>
+      <p>
+        ただ、その魅力はまだ外の世界からは見えにくいままです。だから写真で残して、伝える。
+        撮影と並行して、VR写真についての執筆や、VRChatでの写真教室・撮影講習も続けています。
+      </p>
+      <p class="more"><a href={`${base}/about/`}>プロフィールと考えていることを読む →</a></p>
+    </section>
+
+    <!-- 依頼できる内容 -->
+    <section class="block">
+      <h2>依頼できる撮影・制作<span class="en">SERVICES</span></h2>
+      <div class="sv-list">
+        {services.map((s) => (
+          <article class="sv" id={s.slug} style={`--sv: ${s.color}`}>
+            <h3><span class="sv-dot" aria-hidden="true"></span>{s.name}</h3>
+            <p>{detail[s.slug] ?? s.desc}</p>
+            <p class="sv-more">
+              <a href={`${base}/works/tag/${s.slug}/`}>{s.name}の実績を見る →</a>
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- 流れ -->
+    <section class="block">
+      <h2>依頼から納品までの流れ<span class="en">HOW IT WORKS</span></h2>
+      <ol class="steps">
+        {orderFlow.map((s, i) => (
+          <li>
+            <span class="step-no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="step-body">
+              <b>{s.t}</b>
+              <span>{s.d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- 第三者評価(依頼者が最後に確かめたいところ) -->
+    <section class="block">
+      <h2>これまでの評価<span class="en">CREDENTIALS</span></h2>
+      <ul class="creds">
+        {topAwards.map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}</li>
+        ))}
+        {exhibitions.map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}{a.note && <span class="cn">（{a.note}）</span>}</li>
+        ))}
+        {clientWorks.map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}{a.note && <span class="cn">（{a.note}）</span>}</li>
+        ))}
+      </ul>
+      <p class="more"><a href={`${base}/about/`}>受賞・クライアントワークの全量 →</a></p>
+    </section>
+
+    <!-- FAQ -->
+    <section class="block" id="faq">
+      <h2>よくある質問<span class="en">FAQ</span></h2>
+      <dl class="faq">
+        {faqs.map((f) => (
+          <div class="qa">
+            <dt>{f.q}</dt>
+            <dd>{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <a class="cta" href={`${base}/contact/`}>
+      <span class="cta-label">CONTACT</span>
+      <span class="cta-body">撮影・ビジュアル制作のご依頼、ご相談だけでも歓迎です</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </main>
+</Base>
+
+<style>
+  .photo {
+    max-width: 760px;
+  }
+  .photo h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-indent: 0.28em;
+  }
+
+  /* 冒頭の結論 */
+  .lead-block {
+    margin-bottom: 3.4rem;
+  }
+  .lead {
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.06em;
+  }
+  /* 受付状況: CONTACTページと同じ見せ方(CTA系の青を灯す) */
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1.6rem 0 0;
+    padding: 0.62rem 0.95rem;
+    border: 1px solid var(--line);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .status b {
+    font-weight: 600;
+  }
+  .status .nb {
+    white-space: nowrap;
+  }
+  .status .dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-weak);
+  }
+  .status[data-open] {
+    border-color: color-mix(in srgb, var(--cta-blue) 34%, transparent);
+  }
+  .status[data-open] .dot {
+    background: var(--cta-blue);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--cta-blue) 70%, transparent);
+    animation: status-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes status-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .status[data-open] .dot {
+      animation: none;
+    }
+  }
+
+  /* セクション見出し(WORKS/ABOUTと同じ形) */
+  .block {
+    margin-bottom: 3.4rem;
+  }
+  .block h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 1.4rem;
+  }
+  .block h2 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: color-mix(in srgb, var(--gold) 70%, transparent);
+    /* 英字サブが長いので、狭い幅では折り返さず縮める */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .block p {
+    margin: 0.9rem 0;
+    font-size: 0.9rem;
+    line-height: 1.95;
+  }
+  .more {
+    font-size: 0.82rem;
+  }
+  .more a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .more a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  /* 依頼できる内容 */
+  .sv-list {
+    display: grid;
+    gap: 14px;
+  }
+  .sv {
+    border: 1px solid color-mix(in srgb, var(--sv) 32%, transparent);
+    background: color-mix(in srgb, var(--sv) 7%, transparent);
+    padding: 1.1rem 1.3rem;
+    scroll-margin-top: 120px;
+  }
+  .sv h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.55em;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .sv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sv);
+    flex: none;
+  }
+  .sv p {
+    margin: 0.55rem 0 0;
+    font-size: 0.86rem;
+    line-height: 1.9;
+    color: var(--text-weak);
+  }
+  .sv-more {
+    font-size: 0.78rem;
+  }
+  .sv-more a {
+    color: color-mix(in srgb, var(--sv) 70%, white);
+    border-bottom: 1px solid color-mix(in srgb, var(--sv) 40%, transparent);
+    transition: border-color 0.3s;
+  }
+  .sv-more a:hover {
+    border-color: color-mix(in srgb, var(--sv) 90%, transparent);
+  }
+
+  /* 流れ */
+  .steps {
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    display: flex;
+    gap: 1.1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .steps li:last-child {
+    border-bottom: none;
+  }
+  .step-no {
+    flex: none;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    padding-top: 0.25rem;
+  }
+  .step-body b {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .step-body span {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.84rem;
+    line-height: 1.9;
+    color: var(--text-weak);
+  }
+
+  /* 評価 */
+  .creds {
+    list-style: none;
+  }
+  .creds li {
+    padding: 0.4rem 0;
+    font-size: 0.86rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .creds .cy {
+    display: inline-block;
+    min-width: 6.2em;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .creds .cn {
+    font-size: 0.72rem;
+    color: var(--text-weak);
+  }
+
+  /* FAQ */
+  .qa {
+    border-bottom: 1px solid var(--line);
+    padding: 1.1rem 0;
+  }
+  .qa:last-child {
+    border-bottom: none;
+  }
+  .faq dt {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .faq dd {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    line-height: 1.95;
+    color: var(--text-weak);
+  }
+
+  /* 依頼CTA(WORKS・HOMEと同じ帯) */
+  .cta {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    margin: 4.5rem auto 0;
+    padding: 1.5rem 1.7rem;
+    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
+    box-shadow:
+      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
+      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
+      background 0.4s ease;
+  }
+  .cta:hover {
+    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    border-color: var(--cta-blue);
+    box-shadow:
+      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
+      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    transform: translateY(-4px);
+  }
+  .cta-label {
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.3em;
+    color: var(--cta-warm);
+    white-space: nowrap;
+  }
+  .cta-body {
+    flex: 1;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .cta-arrow {
+    color: var(--cta-warm);
+    transition: transform 0.3s ease;
+  }
+  .cta:hover .cta-arrow {
+    transform: translateX(8px);
+  }
+
+  @media (max-width: 560px) {
+    .photo h1 {
+      font-size: 1.25rem;
+    }
+    .block h2 {
+      flex-wrap: wrap;
+      gap: 0.2rem 0.8rem;
+    }
+    .block h2 .en {
+      white-space: normal;
+    }
+    .creds .cy {
+      display: block;
+    }
+    .cta {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+</style>

@@ -6,18 +6,30 @@ import '@fontsource/space-grotesk/300.css';
 import '@fontsource/space-grotesk/400.css';
 import '@fontsource/space-grotesk/500.css';
 
+import { awards } from '../data/profile';
+import { services } from '../data/services';
+
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * <title>を丸ごと指定する。検索対策で「職種+ブランド」の語順を作りたいページ用。
+   * 指定しない場合は `${title} | YutanpopoZzz`。
+   */
+  fullTitle?: string;
+  /** このページだけの構造化データ。共通の@graphに足される */
+  jsonLd?: Record<string, unknown>[];
 }
-const { title, description } = Astro.props;
+const { title, description, fullTitle, jsonLd: pageJsonLd = [] } = Astro.props;
 // サイトの呼称(プロジェクト名)は「ゆたんぽぽーとふぉりお」だが、画面表示のブランドはYutanpopoZzz
 const siteName = 'YutanpopoZzz';
 const siteTagline = 'Virtual Photographer / Visual Creator';
 // 検索対策: HOMEのタイトル・既定説明文に肩書きの表記ゆれ(和/英)を持たせる
-const pageTitle = title
-  ? `${title} | ${siteName}`
-  : `${siteName} | バーチャルフォトグラファー / Virtual Photographer`;
+const pageTitle =
+  fullTitle ??
+  (title
+    ? `${title} | ${siteName}`
+    : `バーチャルフォトグラファー ${siteName} | VRChat撮影・ビジュアル制作`);
 const defaultDescription =
   'VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)YutanpopoZzzのポートフォリオ。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営。';
 const desc = description ?? defaultDescription;
@@ -36,7 +48,8 @@ const jsonLd = {
       '@type': 'Person',
       '@id': `${siteUrl}/#person`,
       name: 'YutanpopoZzz',
-      alternateName: ['ゆたんぽぽ'],
+      // 表記ゆれを1エンティティに束ねる(検索・AI回答で別人扱いされないように)
+      alternateName: ['ゆたんぽぽ', 'ゆたんぽぽZzz', 'yutanpopo', 'YutanPoPoZzz'],
       jobTitle: [
         'バーチャルフォトグラファー',
         'VRフォトグラファー',
@@ -53,17 +66,56 @@ const jsonLd = {
         'https://note.com/popoz',
         'https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed',
       ],
-      knowsAbout: ['VRChat', 'VR写真', 'バーチャルフォトグラフィー', 'Virtual Photography'],
+      knowsAbout: [
+        'VRChat',
+        'VR写真',
+        'バーチャルフォトグラフィー',
+        'Virtual Photography',
+        'メタバース',
+        'アバター撮影',
+        'バーチャル宣材写真',
+        'ワールド撮影',
+        'ライティング',
+        'レタッチ',
+      ],
+      // E-E-A-T: 第三者評価を機械可読にする(AIの回答で「実績のある人物」として扱われる材料)
+      award: awards.filter((a) => a.year !== '—').map((a) => a.title),
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'バーチャルフォトグラファー',
+        alternateName: ['Virtual Photographer', 'VRフォトグラファー', 'VR Photographer'],
+        description:
+          'VRChatなどのソーシャルVR空間で、アバターやワールドを被写体に撮影を行う写真家。',
+      },
+      // 依頼検索の受け皿: 何を発注できるのかを構造化して並べる
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'VRChatでの撮影・ビジュアル制作',
+        itemListElement: services.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: s.name,
+            description: s.desc,
+            serviceType: s.name,
+            provider: { '@id': `${siteUrl}/#person` },
+            areaServed: { '@type': 'VirtualLocation', name: 'VRChat' },
+            url: `${siteUrl}/photography/#${s.slug}`,
+          },
+        })),
+      },
     },
     {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
       name: 'YutanpopoZzz Portfolio',
+      alternateName: ['ゆたんぽぽーとふぉりお', 'YutanpopoZzz ポートフォリオ'],
       url: `${siteUrl}/`,
       inLanguage: 'ja',
       dateModified: buildDate,
       publisher: { '@id': `${siteUrl}/#person` },
     },
+    ...pageJsonLd,
   ],
 };
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');

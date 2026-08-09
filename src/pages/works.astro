@@ -21,7 +21,10 @@ const misc = [minimaSeriesCard];
 
 ---
 
-<Base title="WORKS" description="画像制作・執筆活動・講演/教室の3本柱と、受けられるお仕事のご紹介">
+<Base
+  fullTitle="ポートフォリオ・制作実績 | バーチャルフォトグラファー YutanpopoZzz"
+  description="バーチャルフォトグラファーYutanpopoZzzの制作実績。VRChatでのポートレート撮影、アバター・衣装の商品撮影、イベント記録、ポスターや告知ビジュアルの制作、執筆・登壇まで。受けられる6種類の依頼と作例をまとめています。"
+>
   <main class="container works">
     <div class="blockttl">
       <h2>ポートフォリオ</h2>
@@ -77,6 +80,10 @@ const misc = [minimaSeriesCard];
     <!-- しごとについて: 受けられる依頼 -->
     <section class="block">
       <h3>しごとについて<span class="en">SERVICES</span></h3>
+      <p class="sv-lead">
+        依頼できる内容・納品までの流れ・料金の考え方は
+        <a href={`${base}/photography/`}>撮影依頼ガイド</a>にまとめています。
+      </p>
       <ul class="services">
         {services.map((s) => (
           <li style={`--sv: ${s.color}`}>
@@ -236,6 +243,19 @@ const misc = [minimaSeriesCard];
   }
 
   /* しごとについて */
+  .sv-lead {
+    margin: -0.6rem 0 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-weak);
+  }
+  .sv-lead a {
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.3s;
+  }
+  .sv-lead a:hover {
+    border-color: var(--text);
+  }
   .services {
     list-style: none;
     display: grid;
