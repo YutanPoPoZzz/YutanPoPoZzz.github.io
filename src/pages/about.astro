@@ -18,11 +18,26 @@ const splitGrade = (t: string) => {
   const m = t.match(/^(.*?)\s*(最優秀賞|優秀賞|入賞|審査員賞)$/);
   return m ? { base: m[1], grade: m[2] } : { base: t, grade: null };
 };
+
+// 指名検索の受け皿: このページが「YutanpopoZzz(ゆたんぽぽ)本人のプロフィール」だと明示する
+const siteUrl = 'https://yutanpopozzz.github.io';
+const pageJsonLd = [
+  {
+    '@type': 'ProfilePage',
+    '@id': `${siteUrl}/about/`,
+    url: `${siteUrl}/about/`,
+    name: 'YutanpopoZzz（ゆたんぽぽ）のプロフィール',
+    inLanguage: 'ja',
+    mainEntity: { '@id': `${siteUrl}/#person` },
+    isPartOf: { '@id': `${siteUrl}/#website` },
+  },
+];
 ---
 
 <Base
-  fullTitle="プロフィール・受賞歴 | バーチャルフォトグラファー YutanpopoZzz"
-  description="バーチャルフォトグラファー YutanpopoZzz のプロフィール。VRChatを中心にポートレート・商品・イベントの撮影とビジュアル制作を行っています。VR Photography Contest 2025 最優秀賞、VR PHOTO COMPETITION 2025 優秀賞ほか、受賞歴・クライアントワーク・展示の実績。"
+  fullTitle="プロフィール・受賞歴 | バーチャルフォトグラファー YutanpopoZzz（ゆたんぽぽ）"
+  description="YutanpopoZzz（ゆたんぽぽ）のプロフィール。VRChatを中心に活動するバーチャルフォトグラファーで、ポートレート・商品・イベントの撮影とビジュアル制作を行っています。VR Photography Contest 2025 最優秀賞、VR PHOTO COMPETITION 2025 優秀賞ほか、受賞歴・クライアントワーク・展示の実績。"
+  jsonLd={pageJsonLd}
 >
   <main class="container about">
     <div class="blockttl">
@@ -33,6 +48,7 @@ const splitGrade = (t: string) => {
     <div class="body">
       <p class="name-line">
         <strong>YutanpopoZzz</strong>
+        <span class="reading">ゆたんぽぽ</span>
         <span class="role">Virtual Photographer / Visual Creator</span>
       </p>
       <p>
@@ -162,6 +178,12 @@ const splitGrade = (t: string) => {
     font-size: 1.15rem;
     font-weight: 500;
     letter-spacing: 0.12em;
+  }
+  /* 読み仮名: 名前のすぐ隣に和文で置く(指名検索の受け皿) */
+  .reading {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--gold) 80%, transparent);
   }
   .role {
     font-family: var(--font-en);

@@ -37,6 +37,7 @@ const misc = [minimaSeriesCard];
       <div class="pf-body">
         <p class="pf-name">
           YutanpopoZzz
+          <span class="pf-reading">ゆたんぽぽ</span>
           <span class="pf-roles">Virtual Photographer / Visual Creator</span>
         </p>
         <p class="pf-catch">「ここには人がいて、物語がある。」</p>
@@ -151,6 +152,13 @@ const misc = [minimaSeriesCard];
     font-size: 1.05rem;
     font-weight: 500;
     letter-spacing: 0.12em;
+  }
+  /* 読み仮名: 名前のすぐ隣に和文で置く(指名検索の受け皿) */
+  .pf-reading {
+    font-family: var(--font-jp);
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--gold) 80%, transparent);
   }
   .pf-roles {
     font-weight: 300;

@@ -29,9 +29,9 @@ const pageTitle =
   fullTitle ??
   (title
     ? `${title} | ${siteName}`
-    : `バーチャルフォトグラファー ${siteName} | VRChat撮影・ビジュアル制作`);
+    : `バーチャルフォトグラファー ${siteName}（ゆたんぽぽ）| VRChat撮影・ビジュアル制作`);
 const defaultDescription =
-  'VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)YutanpopoZzzのポートフォリオ。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営。';
+  'YutanpopoZzz(ゆたんぽぽ)は、VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)です。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営を行っています。';
 const desc = description ?? defaultDescription;
 const siteUrl = 'https://yutanpopozzz.github.io';
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
@@ -65,6 +65,7 @@ const jsonLd = {
         'https://x.com/YutanpopoZzz',
         'https://note.com/popoz',
         'https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed',
+        'https://github.com/YutanPoPoZzz',
       ],
       knowsAbout: [
         'VRChat',
@@ -125,6 +126,8 @@ const nav = [
   { label: 'WORKS', href: `${base}/works/` },
   { label: 'EVENTS', href: `${base}/events/` },
   { label: 'ABOUT', href: `${base}/about/` },
+  // 依頼の受け皿。CONTACTの手前に置いて「知る→頼む」の順にする
+  { label: 'PHOTOGRAPHY', href: `${base}/photography/` },
   { label: 'CONTACT', href: `${base}/contact/` },
 ];
 // 現在地タブの判定(HOMEは完全一致、他は配下ページも含む前方一致)
@@ -208,7 +211,8 @@ const isActive = (href: string) =>
     <footer class="site-footer">
       <div class="footer-inner">
         <p class="footer-logo">{siteName}</p>
-        <p class="footer-role">バーチャルフォトグラファー</p>
+        {/* 指名検索(「ゆたんぽぽ」)の受け皿。読み仮名は全ページの本文に1回は出しておく */}
+        <p class="footer-role">ゆたんぽぽ ／ バーチャルフォトグラファー</p>
         <p class="footer-note">バーチャルの中に存在する文化や感情を、写真と言葉で外の世界へ運ぶ。</p>
         <p class="copyright">© 2026 YutanpopoZzz</p>
       </div>
@@ -394,7 +398,10 @@ const isActive = (href: string) =>
     outline: 1px solid var(--text);
     outline-offset: 4px;
   }
-  @media (max-width: 640px) {
+  /* ロゴとナビが一行に収まらなくなる幅で、ロゴを上・ナビを下に積む。
+     1040pxなのは ロゴ222px + 7項目のナビ738px + 左右padding が
+     これ未満だと収まらないため(実測) */
+  @media (max-width: 1040px) {
     .header-in {
       height: auto;
       flex-direction: column;
@@ -402,6 +409,12 @@ const isActive = (href: string) =>
       gap: 0.6rem;
       padding: 0.9rem 1.2rem 0.8rem;
     }
+    .global-nav {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  @media (max-width: 640px) {
     .logo-mark {
       width: 48px;
       height: 48px;
@@ -410,10 +423,13 @@ const isActive = (href: string) =>
       display: none;
     }
     .global-nav {
-      flex-wrap: wrap;
-      justify-content: center;
       gap: 0.7rem 1.3rem;
       font-size: 0.68rem;
+    }
+    /* 折り返すと行末に「/」が取り残されるうえ、7項目だと3行に膨らむ。
+       スマホでは区切りを落として2行に収める(高さは6項目時代と同じ) */
+    .nav-sep {
+      display: none;
     }
   }
 
