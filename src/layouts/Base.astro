@@ -109,8 +109,10 @@ const jsonLd = {
     {
       '@type': 'WebSite',
       '@id': `${siteUrl}/#website`,
-      name: 'YutanpopoZzz Portfolio',
-      alternateName: ['ゆたんぽぽーとふぉりお', 'YutanpopoZzz ポートフォリオ'],
+      // 検索結果のサイト名になる。og:site_nameと完全一致させる。
+      // 「Portfolio」のような一般語を足すとブランドとして認識されにくい
+      name: 'YutanpopoZzz',
+      alternateName: ['ゆたんぽぽ', 'ゆたんぽぽーとふぉりお', 'YutanpopoZzz Portfolio'],
       url: `${siteUrl}/`,
       inLanguage: 'ja',
       dateModified: buildDate,
@@ -151,7 +153,9 @@ const isActive = (href: string) =>
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content={isHome ? 'profile' : 'website'} />
     {isHome && <meta property="profile:username" content="YutanpopoZzz" />}
-    <meta property="og:site_name" content="YutanpopoZzz Portfolio" />
+    {/* 検索結果に出るサイト名。WebSiteのnameと1文字も違えないこと(揺れると
+        Googleは外部の言及にフォールバックし、github.ioの親ブランド名を出す) */}
+    <meta property="og:site_name" content="YutanpopoZzz" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={canonical} />
@@ -176,6 +180,21 @@ const isActive = (href: string) =>
       import.meta.env.PROD && <script is:inline src={`${base}/ga.js`} />
     }
     <link rel="icon" href={`${base}/favicon.png`} type="image/png" />
+    {/* JSが動かない環境ではメニューを開けないので、畳まずそのまま並べる */}
+    <noscript>
+      <style>
+        .nav-toggle { display: none !important; }
+        .global-nav {
+          position: static !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          transform: none !important;
+          background: none !important;
+          border-bottom: none !important;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <!-- 背景: 暖色の光溜まり + ヘアライン方眼(地の深青グラデはbodyに) -->
@@ -183,27 +202,39 @@ const isActive = (href: string) =>
     <div class="bg-layer bg-grid" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
 
-    <header class="site-header">
+    <header class="site-header" data-header>
       <div class="header-in">
         <a class="logo" href={`${base}/`} aria-label={`${siteName} ホームへ`}>
           <img class="logo-mark" src={`${base}/icon.png`} alt={siteName} width="68" height="68" />
           <span class="logo-sub"><span>Virtual Photographer</span><span>Visual Creator</span></span>
         </a>
-        <nav class="global-nav">
-          {nav.map((item, i) => (
-            <Fragment>
-              {i > 0 && <span class="nav-sep" aria-hidden="true">/</span>}
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="global-nav"
+          aria-label="メニューを開く"
+          data-nav-toggle
+        >
+          <span class="bars" aria-hidden="true"></span>
+        </button>
+      </div>
+      {/* リンクは常にHTMLに出したままにして、開閉はvisibilityで切り替える(クローラは全項目を読める) */}
+      <nav class="global-nav" id="global-nav" aria-label="メインメニュー">
+        <ul>
+          {nav.map((item) => (
+            <li>
               <a
                 href={item.href}
                 class:list={[{ active: isActive(item.href) }]}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
-                {item.label}
+                <span class="lbl">{item.label}</span>
               </a>
-            </Fragment>
+            </li>
           ))}
-        </nav>
-      </div>
+        </ul>
+      </nav>
     </header>
 
     <slot />
@@ -217,6 +248,41 @@ const isActive = (href: string) =>
         <p class="copyright">© 2026 YutanpopoZzz</p>
       </div>
     </footer>
+    <script>
+      // ハンバーガーの開閉。開いている状態は header の data-open で表し、
+      // 見た目(CSS)・支援技術(aria-expanded)・ラベルの3つを1箇所で切り替える。
+      const header = document.querySelector<HTMLElement>('[data-header]');
+      const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+      const nav = document.getElementById('global-nav');
+
+      if (header && toggle && nav) {
+        const setOpen = (open: boolean) => {
+          header.toggleAttribute('data-open', open);
+          toggle.setAttribute('aria-expanded', String(open));
+          toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+        };
+
+        toggle.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
+
+        // 現在地のページへのリンクを踏んでも遷移しないことがあるので、明示的に閉じる
+        nav.addEventListener('click', (e) => {
+          if ((e.target as HTMLElement).closest('a')) setOpen(false);
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key !== 'Escape' || !header.hasAttribute('data-open')) return;
+          setOpen(false);
+          toggle.focus();
+        });
+
+        // ヘッダーの外を触ったら閉じる(ボタン自身のクリックはここより先に処理済み)
+        document.addEventListener('click', (e) => {
+          if (!header.hasAttribute('data-open')) return;
+          if (header.contains(e.target as Node)) return;
+          setOpen(false);
+        });
+      }
+    </script>
   </body>
 </html>
 
@@ -355,25 +421,118 @@ const isActive = (href: string) =>
     color: var(--text-weak);
     white-space: nowrap;
   }
-  .global-nav {
-    display: flex;
-    align-items: baseline;
-    gap: 0.55rem;
-    font-family: var(--font-en);
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    color: color-mix(in srgb, var(--gold) 72%, transparent);
+  /* ===== ハンバーガーボタン ===== */
+  .nav-toggle {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 1px solid transparent;
+    color: color-mix(in srgb, var(--gold) 78%, transparent);
+    cursor: pointer;
+    transition: color 0.3s;
   }
-  .nav-sep {
-    color: var(--text-weak);
-    font-weight: 300;
+  .nav-toggle:hover {
+    color: var(--gold);
+  }
+  .nav-toggle:focus-visible,
+  .logo:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+  }
+  /* 3本線。開いているあいだは×へ組み替える */
+  .bars,
+  .bars::before,
+  .bars::after {
+    display: block;
+    width: 26px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.32s ease, opacity 0.18s ease, background 0.18s ease;
+  }
+  .bars {
+    position: relative;
+  }
+  .bars::before,
+  .bars::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+  .bars::before {
+    top: -8px;
+  }
+  .bars::after {
+    top: 8px;
+  }
+  .site-header[data-open] .bars {
+    background: transparent;
+  }
+  .site-header[data-open] .bars::before {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .site-header[data-open] .bars::after {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* ===== 畳んだメニュー本体 ===== */
+  .global-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: rgba(10, 10, 12, 0.97);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    /* 閉じるときだけvisibilityを遅らせて、フェードアウトを見せる */
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+  }
+  .site-header[data-open] .global-nav {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
+  }
+  .global-nav ul {
+    list-style: none;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 1.2rem 1.2rem 1.8rem;
+  }
+  .global-nav li + li {
+    margin-top: 0.15rem;
   }
   .global-nav a {
     position: relative;
-    padding: 0.28rem 0.55rem;
+    display: inline-block;
+    padding: 0.55rem 0.9rem;
+    font-family: var(--font-en);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: color-mix(in srgb, var(--gold) 72%, transparent);
+    transition: color 0.3s, text-shadow 0.3s;
   }
-  /* 現在地タブ: スラッシュ区切りに合わせた平行四辺形の金塗り */
+  .global-nav a .lbl {
+    position: relative;
+    z-index: 1;
+  }
+  .global-nav a:hover {
+    color: var(--gold);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
+  }
+  .global-nav a:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+  }
+  /* 現在地: 「/」の実測傾斜(垂直から18°)に合わせた平行四辺形の金塗り */
   .global-nav a.active {
     color: var(--gold);
   }
@@ -381,40 +540,13 @@ const isActive = (href: string) =>
     content: '';
     position: absolute;
     inset: 0;
-    z-index: -1;
     background: color-mix(in srgb, var(--gold) 20%, transparent);
-    /* Space Groteskの「/」の実測傾斜(垂直から18°)に合わせる */
     transform: skewX(-18deg);
   }
-  .global-nav a {
-    transition: color 0.3s, text-shadow 0.3s;
-  }
-  .global-nav a:hover {
-    color: var(--gold);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
-  }
-  .global-nav a:focus-visible,
-  .logo:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 4px;
-  }
-  /* ロゴとナビが一行に収まらなくなる幅で、ロゴを上・ナビを下に積む。
-     1040pxなのは ロゴ222px + 7項目のナビ738px + 左右padding が
-     これ未満だと収まらないため(実測) */
-  @media (max-width: 1040px) {
-    .header-in {
-      height: auto;
-      flex-direction: column;
-      justify-content: center;
-      gap: 0.6rem;
-      padding: 0.9rem 1.2rem 0.8rem;
-    }
-    .global-nav {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  }
   @media (max-width: 640px) {
+    .header-in {
+      height: 76px;
+    }
     .logo-mark {
       width: 48px;
       height: 48px;
@@ -422,14 +554,8 @@ const isActive = (href: string) =>
     .logo-sub {
       display: none;
     }
-    .global-nav {
-      gap: 0.7rem 1.3rem;
-      font-size: 0.68rem;
-    }
-    /* 折り返すと行末に「/」が取り残されるうえ、7項目だと3行に膨らむ。
-       スマホでは区切りを落として2行に収める(高さは6項目時代と同じ) */
-    .nav-sep {
-      display: none;
+    .global-nav a {
+      font-size: 0.88rem;
     }
   }
 
