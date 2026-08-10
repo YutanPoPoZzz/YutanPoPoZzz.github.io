@@ -122,15 +122,16 @@ const jsonLd = {
   ],
 };
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// 和文が主・英字が従(blockttlと同じ見せ方)。和文は各ページの見出しに合わせる
 const nav = [
-  { label: 'HOME', href: `${base}/` },
-  { label: 'GALLERY', href: `${base}/gallery/` },
-  { label: 'WORKS', href: `${base}/works/` },
-  { label: 'EVENTS', href: `${base}/events/` },
-  { label: 'ABOUT', href: `${base}/about/` },
-  // 依頼の受け皿。CONTACTの手前に置いて「知る→頼む」の順にする
-  { label: 'PHOTOGRAPHY', href: `${base}/photography/` },
-  { label: 'CONTACT', href: `${base}/contact/` },
+  { jp: 'ホーム', en: 'HOME', href: `${base}/` },
+  { jp: 'ギャラリー', en: 'GALLERY', href: `${base}/gallery/` },
+  { jp: 'ポートフォリオ', en: 'WORKS', href: `${base}/works/` },
+  { jp: 'イベント運営', en: 'EVENTS', href: `${base}/events/` },
+  { jp: 'じぶんのこと', en: 'ABOUT', href: `${base}/about/` },
+  // 依頼の受け皿。お問い合わせの手前に置いて「知る→頼む」の順にする
+  { jp: '撮影依頼ガイド', en: 'PHOTOGRAPHY', href: `${base}/photography/` },
+  { jp: 'お問い合わせ', en: 'CONTACT', href: `${base}/contact/` },
 ];
 // 現在地タブの判定(HOMEは完全一致、他は配下ページも含む前方一致)
 const path = Astro.url.pathname;
@@ -183,16 +184,20 @@ const isActive = (href: string) =>
     {/* JSが動かない環境ではメニューを開けないので、畳まずそのまま並べる */}
     <noscript>
       <style>
-        .nav-toggle { display: none !important; }
+        .nav-toggle, .nav-close, .nav-scrim { display: none !important; }
         .global-nav {
           position: static !important;
+          width: auto !important;
+          height: auto !important;
           visibility: visible !important;
-          opacity: 1 !important;
-          pointer-events: auto !important;
           transform: none !important;
           background: none !important;
-          border-bottom: none !important;
+          border-left: none !important;
+          box-shadow: none !important;
+          border-bottom: 1px solid var(--line);
         }
+        .global-nav ul { display: flex; flex-wrap: wrap; gap: 0 0.4rem; padding: 0.6rem 1.2rem; }
+        .global-nav li + li { margin-top: 0; }
       </style>
     </noscript>
   </head>
@@ -219,23 +224,33 @@ const isActive = (href: string) =>
           <span class="bars" aria-hidden="true"></span>
         </button>
       </div>
-      {/* リンクは常にHTMLに出したままにして、開閉はvisibilityで切り替える(クローラは全項目を読める) */}
-      <nav class="global-nav" id="global-nav" aria-label="メインメニュー">
-        <ul>
-          {nav.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class:list={[{ active: isActive(item.href) }]}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-              >
-                <span class="lbl">{item.label}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
     </header>
+
+    {/* ドロワーは header の外に出す。header は backdrop-filter を持つので、
+        中に置くと position:fixed の基準がheaderになってしまう */}
+    <div class="nav-scrim" data-nav-scrim aria-hidden="true"></div>
+    {/* リンクは常にHTMLに出したままにして、開閉はvisibilityで切り替える(クローラは全項目を読める) */}
+    <nav class="global-nav" id="global-nav" aria-label="メインメニュー">
+      <button class="nav-close" type="button" aria-label="メニューを閉じる" data-nav-close>
+        <span class="x" aria-hidden="true"></span>
+      </button>
+      <ul>
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[{ active: isActive(item.href) }]}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              <span class="lbl">
+                <span class="jp">{item.jp}</span>
+                <span class="en">{item.en}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
 
     <slot />
 
@@ -249,20 +264,28 @@ const isActive = (href: string) =>
       </div>
     </footer>
     <script>
-      // ハンバーガーの開閉。開いている状態は header の data-open で表し、
-      // 見た目(CSS)・支援技術(aria-expanded)・ラベルの3つを1箇所で切り替える。
-      const header = document.querySelector<HTMLElement>('[data-header]');
+      // 右ドロワーの開閉。開いている状態は <html> の data-nav-open だけで表し、
+      // 見た目(CSS)・背後のスクロール止め・aria-expanded をそこから引く。
       const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+      const closeBtn = document.querySelector<HTMLButtonElement>('[data-nav-close]');
+      const scrim = document.querySelector<HTMLElement>('[data-nav-scrim]');
       const nav = document.getElementById('global-nav');
+      const root = document.documentElement;
 
-      if (header && toggle && nav) {
+      if (toggle && closeBtn && scrim && nav) {
+        const isOpen = () => root.hasAttribute('data-nav-open');
+
         const setOpen = (open: boolean) => {
-          header.toggleAttribute('data-open', open);
+          root.toggleAttribute('data-nav-open', open);
           toggle.setAttribute('aria-expanded', String(open));
-          toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+          // 開いている間はドロワーの中だけを触れるようにする
+          if (open) closeBtn.focus();
+          else toggle.focus();
         };
 
-        toggle.addEventListener('click', () => setOpen(!header.hasAttribute('data-open')));
+        toggle.addEventListener('click', () => setOpen(!isOpen()));
+        closeBtn.addEventListener('click', () => setOpen(false));
+        scrim.addEventListener('click', () => setOpen(false));
 
         // 現在地のページへのリンクを踏んでも遷移しないことがあるので、明示的に閉じる
         nav.addEventListener('click', (e) => {
@@ -270,15 +293,7 @@ const isActive = (href: string) =>
         });
 
         document.addEventListener('keydown', (e) => {
-          if (e.key !== 'Escape' || !header.hasAttribute('data-open')) return;
-          setOpen(false);
-          toggle.focus();
-        });
-
-        // ヘッダーの外を触ったら閉じる(ボタン自身のクリックはここより先に処理済み)
-        document.addEventListener('click', (e) => {
-          if (!header.hasAttribute('data-open')) return;
-          if (header.contains(e.target as Node)) return;
+          if (e.key !== 'Escape' || !isOpen()) return;
           setOpen(false);
         });
       }
@@ -467,70 +482,149 @@ const isActive = (href: string) =>
   .bars::after {
     top: 8px;
   }
-  .site-header[data-open] .bars {
+  :root[data-nav-open] .bars {
     background: transparent;
   }
-  .site-header[data-open] .bars::before {
+  :root[data-nav-open] .bars::before {
     transform: translateY(8px) rotate(45deg);
   }
-  .site-header[data-open] .bars::after {
+  :root[data-nav-open] .bars::after {
     transform: translateY(-8px) rotate(-45deg);
   }
 
-  /* ===== 畳んだメニュー本体 ===== */
-  .global-nav {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
-    background: rgba(10, 10, 12, 0.97);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line);
+  /* ===== 右から出るドロワー ===== */
+  .nav-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(4, 4, 6, 0.62);
+    backdrop-filter: blur(3px);
     visibility: hidden;
     opacity: 0;
-    pointer-events: none;
-    transform: translateY(-8px);
-    /* 閉じるときだけvisibilityを遅らせて、フェードアウトを見せる */
-    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+    transition: opacity 0.32s ease, visibility 0s linear 0.32s;
   }
-  .site-header[data-open] .global-nav {
+  :root[data-nav-open] .nav-scrim {
     visibility: visible;
     opacity: 1;
-    pointer-events: auto;
-    transform: none;
-    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s;
+    transition: opacity 0.32s ease, visibility 0s;
   }
+
+  .global-nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 910;
+    width: min(340px, 84vw);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 12, 0.98);
+    backdrop-filter: blur(14px);
+    border-left: 1px solid color-mix(in srgb, var(--gold) 26%, transparent);
+    box-shadow: -30px 0 60px rgba(0, 0, 0, 0.5);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.36s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  :root[data-nav-open] .global-nav {
+    transform: none;
+    visibility: visible;
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+  }
+  /* 開いている間は背後を動かさない */
+  :root[data-nav-open] {
+    overflow: hidden;
+  }
+
+  .nav-close {
+    align-self: flex-end;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    margin: 1.1rem 1rem 0 0;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 1px solid transparent;
+    color: color-mix(in srgb, var(--gold) 78%, transparent);
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .nav-close:hover {
+    color: var(--gold);
+  }
+  .nav-close:focus-visible,
+  .global-nav a:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+  }
+  .x {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: transparent;
+  }
+  .x::before,
+  .x::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+  }
+  .x::before {
+    transform: rotate(45deg);
+  }
+  .x::after {
+    transform: rotate(-45deg);
+  }
+
   .global-nav ul {
     list-style: none;
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 1.2rem 1.2rem 1.8rem;
+    padding: 0.8rem 1.5rem 2.4rem;
   }
   .global-nav li + li {
-    margin-top: 0.15rem;
+    margin-top: 0.2rem;
   }
   .global-nav a {
     position: relative;
-    display: inline-block;
-    padding: 0.55rem 0.9rem;
-    font-family: var(--font-en);
-    font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
-    color: color-mix(in srgb, var(--gold) 72%, transparent);
+    display: block;
+    padding: 0.7rem 0.9rem;
+    color: color-mix(in srgb, var(--gold) 78%, transparent);
     transition: color 0.3s, text-shadow 0.3s;
   }
-  .global-nav a .lbl {
+  /* 和文が主・英字が従(blockttlと同じ組み方) */
+  .global-nav .lbl {
     position: relative;
     z-index: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+  }
+  .global-nav .jp {
+    font-size: 0.98rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    /* 「撮影依頼ガイド」等が語の途中で割れないように */
+    word-break: keep-all;
+    white-space: nowrap;
+  }
+  .global-nav .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.6rem;
+    letter-spacing: 0.24em;
+    color: var(--text-weak);
+    transition: color 0.3s;
   }
   .global-nav a:hover {
     color: var(--gold);
     text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
   }
-  .global-nav a:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 4px;
+  .global-nav a:hover .en {
+    color: color-mix(in srgb, var(--gold) 55%, transparent);
   }
   /* 現在地: 「/」の実測傾斜(垂直から18°)に合わせた平行四辺形の金塗り */
   .global-nav a.active {
@@ -543,6 +637,12 @@ const isActive = (href: string) =>
     background: color-mix(in srgb, var(--gold) 20%, transparent);
     transform: skewX(-18deg);
   }
+  @media (prefers-reduced-motion: reduce) {
+    .global-nav,
+    .nav-scrim {
+      transition-duration: 0s;
+    }
+  }
   @media (max-width: 640px) {
     .header-in {
       height: 76px;
@@ -553,9 +653,6 @@ const isActive = (href: string) =>
     }
     .logo-sub {
       display: none;
-    }
-    .global-nav a {
-      font-size: 0.88rem;
     }
   }
 
