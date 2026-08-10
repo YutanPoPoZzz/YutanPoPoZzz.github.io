@@ -1,4 +1,4 @@
----
+﻿---
 title: 'minima city — アイソメの夜景で鳴るシティポップ'
 summary: 'Plastic Love系シティポップ機。ネオン・マゼンタの差し色、外から俯瞰するアイソメトリックの箱庭ビル群とヘリ。'
 date: 2026-07-09
@@ -6,7 +6,7 @@ category: '音楽アプリ'
 color: '#ff4dd2'
 thumb: '/thumbs/minima-city.svg'
 links:
-  - { label: 'ブラウザで鳴らす', url: 'https://yutanpopozzz.github.io/minima-city/' }
+  - { label: 'ブラウザで鳴らす', url: '/minima-city/' }
   - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-city' }
 featured: false
 ---

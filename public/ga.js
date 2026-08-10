@@ -2,10 +2,13 @@
 // 定番のインラインスニペットではなく自ドメインの外部JSとして読み込む。
 (function () {
   var ID = 'G-25QMLSF6S0';
-  var HOST = 'yutanpopozzz.github.io';
+  // 本番ドメインを列挙する。独自ドメイン移行後も旧ドメインを残すのは、
+  // GitHubの転送が効くまでの期間に計測が落ちないようにするため。
+  // ★ここを直し忘れると、サイトは正常なのにGA4だけ静かに止まる
+  var HOSTS = ['yutanpopozzz.com', 'www.yutanpopozzz.com', 'yutanpopozzz.github.io'];
 
   // 本番ドメイン以外(ローカルプレビュー等)からは計測を飛ばさない
-  if (location.hostname !== HOST) return;
+  if (HOSTS.indexOf(location.hostname) === -1) return;
 
   // ?ga-optout=1 でこのブラウザを恒久除外、?ga-optout=0 で解除。
   // 自分のアクセスを数字に混ぜないための仕組み(固定IPが無くIP除外が使えないため)。

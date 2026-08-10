@@ -1,4 +1,4 @@
----
+﻿---
 title: 'minima fission — 核分裂ブレイクビーツ 160BPM'
 summary: '原子核が再生ボタン、中性子がプレイヘッド、制御棒を抜くとCRITICAL。緑×黄で暴れるブレイクビーツ機。'
 date: 2026-07-10
@@ -6,7 +6,7 @@ category: '音楽アプリ'
 color: '#4dff88'
 thumb: '/thumbs/minima-fission.svg'
 links:
-  - { label: 'ブラウザで鳴らす', url: 'https://yutanpopozzz.github.io/minima-fission/' }
+  - { label: 'ブラウザで鳴らす', url: '/minima-fission/' }
   - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-fission' }
 featured: false
 ---

@@ -1,4 +1,4 @@
----
+﻿---
 title: 'minima melt — 溶けるアシッド303テクノ'
 summary: '紫の巨大液塊と溶けたドクロが再生ボタン。下縁から滴る16の雫がステップになる、重力カスケードのアシッド機。'
 date: 2026-07-10
@@ -6,7 +6,7 @@ category: '音楽アプリ'
 color: '#a34dff'
 thumb: '/thumbs/minima-melt.svg'
 links:
-  - { label: 'ブラウザで鳴らす', url: 'https://yutanpopozzz.github.io/minima-melt/' }
+  - { label: 'ブラウザで鳴らす', url: '/minima-melt/' }
   - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-melt' }
 featured: false
 ---

@@ -1,4 +1,4 @@
----
+﻿---
 title: 'minima lagoon — 母鯨と潜るディープハウス'
 summary: '水中サイドビューを母鯨がゆく、122BPMのディープハウス機。16本の光条がステップ、子鯨がプレイヘッド、DIVEで深く潜る。'
 date: 2026-07-10
@@ -6,7 +6,7 @@ category: '音楽アプリ'
 color: '#4da6ff'
 thumb: '/thumbs/minima-lagoon.svg'
 links:
-  - { label: 'ブラウザで鳴らす', url: 'https://yutanpopozzz.github.io/minima-lagoon/' }
+  - { label: 'ブラウザで鳴らす', url: '/minima-lagoon/' }
   - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-lagoon' }
 featured: true
 ---

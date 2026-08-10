@@ -1,4 +1,4 @@
----
+﻿---
 title: 'minima drift — 夜の峠を下るダブテクノ'
 summary: 'Basic Channel風のダブテクノ機。差し色はテールライトの赤。夜の峠道を車が下っていく画面がそのままシーケンサー。'
 date: 2026-07-09
@@ -6,7 +6,7 @@ category: '音楽アプリ'
 color: '#ff3b30'
 thumb: '/thumbs/minima-drift.svg'
 links:
-  - { label: 'ブラウザで鳴らす', url: 'https://yutanpopozzz.github.io/minima-drift/' }
+  - { label: 'ブラウザで鳴らす', url: '/minima-drift/' }
   - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-drift' }
 featured: false
 ---
