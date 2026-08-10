@@ -9,7 +9,7 @@ import { faqs } from '../data/faq';
 import { orderFlow } from '../data/order-flow';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const siteUrl = 'https://yutanpopozzz.github.io';
+const siteUrl = Astro.site!.href.replace(/\/$/, '');
 
 // サービスごとの詳しい説明(短い一言は services.ts、ここは依頼者向けの本文)
 const detail: Record<string, string> = {

@@ -33,7 +33,8 @@ const pageTitle =
 const defaultDescription =
   'YutanpopoZzz(ゆたんぽぽ)は、VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)です。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営を行っています。';
 const desc = description ?? defaultDescription;
-const siteUrl = 'https://yutanpopozzz.github.io';
+// 公開URLの正は astro.config.mjs の site。ドメイン移行はそこ1箇所を直せば全部追従する
+const siteUrl = Astro.site!.href.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
 const ogImage = `${siteUrl}/og.jpg`;
 const isHome = Astro.url.pathname === '/'; // ルート配信(base='/')前提

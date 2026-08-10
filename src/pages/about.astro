@@ -20,7 +20,7 @@ const splitGrade = (t: string) => {
 };
 
 // 指名検索の受け皿: このページが「YutanpopoZzz(ゆたんぽぽ)本人のプロフィール」だと明示する
-const siteUrl = 'https://yutanpopozzz.github.io';
+const siteUrl = Astro.site!.href.replace(/\/$/, '');
 const pageJsonLd = [
   {
     '@type': 'ProfilePage',

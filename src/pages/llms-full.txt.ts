@@ -6,12 +6,12 @@ import { orderFlow } from '../data/order-flow';
 import { services } from '../data/services';
 import { awards, clientWorks, exhibitions, activities, availability } from '../data/profile';
 
-const SITE = 'https://yutanpopozzz.github.io';
-
 const list = (items: { year: string; title: string; note?: string }[]) =>
   items.map((a) => `- ${a.year !== '—' ? `${a.year} ` : ''}${a.title}${a.note ? `（${a.note}）` : ''}`).join('\n');
 
-export const GET: APIRoute = () => {
+export const GET: APIRoute = ({ site }) => {
+  // 公開URLの正は astro.config.mjs の site
+  const SITE = site!.href.replace(/\/$/, '');
   const updated = new Date().toISOString().slice(0, 10);
 
   const body = `# YutanpopoZzz — バーチャルフォトグラファー（詳細版）

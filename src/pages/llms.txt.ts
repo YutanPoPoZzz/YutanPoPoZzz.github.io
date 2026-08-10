@@ -1,4 +1,11 @@
-# YutanpopoZzz — バーチャルフォトグラファー / Virtual Photographer
+// AI検索向けの要約。public/ に静的で置くとドメイン移行のときURLが取り残されるので、
+// astro.config.mjs の site から生成する。詳細版は llms-full.txt.ts。
+import type { APIRoute } from 'astro';
+
+export const GET: APIRoute = ({ site }) => {
+  const SITE = site!.href.replace(/\/$/, '');
+
+  const body = `# YutanpopoZzz — バーチャルフォトグラファー / Virtual Photographer
 
 > VRChatを中心に活動するバーチャルフォトグラファー(VRフォトグラファー / VR Photographer)YutanpopoZzz(ゆたんぽぽ)のポートフォリオサイト。ポートレート・商品・イベントのプロモーション撮影、ビジュアル制作、イベント運営を行う。VRChatでの撮影は個人・ブランド・企業から依頼できる。
 
@@ -24,12 +31,12 @@ VRChatでの撮影とビジュアル制作を、個人からアバター・衣�
 窓口はXのDMとメール。
 
 ## 主なページ
-- [撮影依頼ガイド](https://yutanpopozzz.github.io/photography/): バーチャルフォトグラファーとは何か、依頼できる内容、納品までの流れ、よくある質問
-- [ギャラリー](https://yutanpopozzz.github.io/gallery/): 写真作品(ポートレート/コマーシャル/イベント/フォトコンテスト)
-- [ポートフォリオ](https://yutanpopozzz.github.io/works/): 画像制作・執筆活動・講演/教室の3本柱と制作物
-- [イベント運営](https://yutanpopozzz.github.io/events/): DJイベント「Roof Top Junction」主催ほか、VRChat内イベント運営の実績
-- [プロフィール](https://yutanpopozzz.github.io/about/): 経歴・受賞歴・クライアントワーク
-- [お問い合わせ](https://yutanpopozzz.github.io/contact/): 撮影・ビジュアル制作の依頼窓口
+- [撮影依頼ガイド](${SITE}/photography/): バーチャルフォトグラファーとは何か、依頼できる内容、納品までの流れ、よくある質問
+- [ギャラリー](${SITE}/gallery/): 写真作品(ポートレート/コマーシャル/イベント/フォトコンテスト)
+- [ポートフォリオ](${SITE}/works/): 画像制作・執筆活動・講演/教室の3本柱と制作物
+- [イベント運営](${SITE}/events/): DJイベント「Roof Top Junction」主催ほか、VRChat内イベント運営の実績
+- [プロフィール](${SITE}/about/): 経歴・受賞歴・クライアントワーク
+- [お問い合わせ](${SITE}/contact/): 撮影・ビジュアル制作の依頼窓口
 
 ## 実績ハイライト
 - VR Photography Contest 2025 最優秀賞(XR Grapher Association)
@@ -40,9 +47,15 @@ VRChatでの撮影とビジュアル制作を、個人からアバター・衣�
 - DJイベント「Roof Top Junction」主催(2025年3月〜)
 
 ## 詳細版
-- [llms-full.txt](https://yutanpopozzz.github.io/llms-full.txt): 質問と回答の形でまとめた詳細版
+- [llms-full.txt](${SITE}/llms-full.txt): 質問と回答の形でまとめた詳細版
 
 ## リンク
 - X: https://x.com/YutanpopoZzz
 - note: https://note.com/popoz
 - VRChat: https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed
+`;
+
+  return new Response(body, {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+};
