@@ -147,10 +147,17 @@ const isActive = (href: string) =>
     <title>{pageTitle}</title>
     <meta name="description" content={desc} />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    {/* Search Consoleの所有権確認。消すと確認が外れるので残すこと */}
+    {/* Search Consoleの所有権確認。消すと確認が外れるので残すこと。
+        トークンはプロパティごとに違うため、旧ドメインと新ドメインの2本を併記する。
+        1本目: https://yutanpopozzz.github.io/ (旧・転送元として維持)
+        2本目: https://yutanpopozzz.com/       (新・2026-08-11追加) */}
     <meta
       name="google-site-verification"
       content="8TQM-U1MtuAIn-3LffT0ulozDsF9-67uZMfh7KMZ0RM"
+    />
+    <meta
+      name="google-site-verification"
+      content="6oZgrZQYZw5Y6zXfBjYIXA9I2rTyvEVE8oEsjFTCrz8"
     />
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content={isHome ? 'profile' : 'website'} />
