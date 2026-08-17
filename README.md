@@ -2,7 +2,7 @@
 
 VRChatバーチャルフォトグラファー **YutanpopoZzz** のポートフォリオサイト。
 
-https://yutanpopozzz.github.io/
+https://yutanpopozzz.com/
 
 Astro製の静的サイト。
 
