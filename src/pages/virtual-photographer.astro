@@ -1,0 +1,488 @@
+---
+// 「バーチャルフォトグラファー」「VRフォトグラファー」「バーチャルフォト」で
+// 入ってきた人が着地する、職種そのものを主題にしたページ。
+//
+// /photography/ との役割分担:
+//   このページ = 職種とは何か(情報系クエリの受け皿)
+//   /photography/ = 依頼できる内容・流れ・料金(取引系クエリの受け皿)
+// 同じ見出しを両方に置くと共食いするので、/photography/ 側は要約+リンクに削ってある。
+//
+// 事実はサイト内に既にある記述(ABOUT・実績データ)だけを使う。ここで新しい経歴を作らない。
+import Base from '../layouts/Base.astro';
+import { awards, exhibitions, activities } from '../data/profile';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const siteUrl = Astro.site!.href.replace(/\/$/, '');
+const updated = new Date().toISOString().slice(0, 10);
+
+// 呼び名の対応表。表記ゆれを1ページで束ねる(VRフォトグラファーの受け皿もここ)
+const names = [
+  { term: 'バーチャルフォトグラファー', note: '日本語で最も広く使われる呼び方。この記事の見出しもこれ' },
+  { term: 'VRフォトグラファー', note: '同じ意味。VR空間で撮ることを強調した言い方' },
+  { term: 'Virtual Photographer', note: '英語表記。海外のコミュニティではこちら' },
+  { term: 'バーチャルフォト / VR写真', note: '撮る行為・撮られた写真そのものを指す言葉' },
+];
+
+const diffs = [
+  {
+    t: '天候も時間も選べる',
+    d: 'ワールドによっては時間帯や天気を変えられます。「この光を待つ」ではなく「この光を選ぶ」撮影になります。',
+  },
+  {
+    t: '機材と移動の制約がない',
+    d: 'レンズを何本も担いで移動する必要がなく、画角も立ち位置も自由に取り直せます。そのぶん構図と光の判断がそのまま写真の差になります。',
+  },
+  {
+    t: '被写体と同じ空間に立っている',
+    d: 'VRChatは会話だけでなく空間を共有するSNSです。カメラマンと被写体が同じ場所にいる状態で撮るので、その場の空気がそのまま写ります。',
+  },
+];
+
+const faqs = [
+  {
+    q: 'バーチャルフォトグラファーとVRフォトグラファーは違うものですか？',
+    a: '同じものを指します。日本語では「バーチャルフォトグラファー」が広く使われ、「VRフォトグラファー」は VR空間で撮ることを強調した言い方です。英語では Virtual Photographer と表記します。撮られた写真そのものは「バーチャルフォト」「VR写真」と呼ばれます。',
+  },
+  {
+    q: 'バーチャルフォトは現実の写真と何が違うのですか？',
+    a: '被写体がアバター、舞台がVR空間という点が違います。天候や時間帯を選べる、機材や移動の制約がない、撮影者と被写体が同じ空間に立っている、の3つが実際の撮影で効いてきます。一方で、構図・光・視線・ポーズを設計して一枚を作るという写真の本質は変わりません。',
+  },
+  {
+    q: 'バーチャルフォトグラファーに撮影を依頼できますか？',
+    a: '依頼できます。ポートレート、アバターや衣装の宣材写真、イベントの記録、告知ビジュアルの制作などを受けています。依頼できる内容・納品までの流れ・料金の考え方は撮影依頼ガイドにまとめています。',
+  },
+  {
+    q: 'バーチャルフォトを始めるには何が必要ですか？',
+    a: 'VRChatのアカウントと、VR機器またはPCがあれば始められます。VRChatにはカメラ機能が備わっているので、専用の機材を買い足さなくても撮れます。撮り方そのものについては、VRChat内で写真教室と撮影講習を行っています。',
+  },
+];
+
+const pageJsonLd = [
+  {
+    '@type': 'Article',
+    '@id': `${siteUrl}/virtual-photographer/#article`,
+    headline: 'バーチャルフォトグラファーとは',
+    description:
+      'バーチャルフォトグラファーとは、VRChatなどのソーシャルVR空間でアバターやワールドを被写体に撮影する写真家です。VRフォトグラファー・Virtual Photographerとも呼ばれます。',
+    inLanguage: 'ja',
+    dateModified: updated,
+    author: { '@id': `${siteUrl}/#person` },
+    publisher: { '@id': `${siteUrl}/#person` },
+    mainEntityOfPage: `${siteUrl}/virtual-photographer/`,
+    about: [
+      { '@type': 'Thing', name: 'バーチャルフォトグラファー' },
+      { '@type': 'Thing', name: 'VRフォトグラファー' },
+      { '@type': 'Thing', name: 'バーチャルフォト' },
+    ],
+  },
+  {
+    '@type': 'FAQPage',
+    '@id': `${siteUrl}/virtual-photographer/#faq`,
+    inLanguage: 'ja',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+];
+---
+
+<Base
+  fullTitle="バーチャルフォトグラファーとは | VRフォトグラファーの仕事と、VRChatで撮るということ"
+  description="バーチャルフォトグラファーとは、VRChatなどのソーシャルVR空間でアバターやワールドを被写体に撮影する写真家です。VRフォトグラファー・Virtual Photographerとも呼ばれます。現実の写真との違い、何を撮るのか、日本での広がりを、実際に活動している写真家がまとめました。"
+  jsonLd={pageJsonLd}
+>
+  <main class="container vp">
+    <div class="blockttl">
+      <h1>バーチャルフォトグラファーとは</h1>
+      <span class="sub">WHAT IS A VIRTUAL PHOTOGRAPHER</span>
+    </div>
+
+    {/* Answer-First: 冒頭で定義を言い切る */}
+    <section class="lead-block">
+      <p class="lead">
+        バーチャルフォトグラファーとは、VRChatをはじめとするソーシャルVR空間の中で、
+        アバターやワールドを被写体に撮影する写真家です。
+        現実のカメラの代わりにVR内のカメラを使い、構図・光・レンズを自分で決めて一枚を作ります。
+        <b>VRフォトグラファー</b>、英語では <b>Virtual Photographer</b> とも呼ばれます。
+      </p>
+      <p class="byline">
+        このページは、VRChatで活動しているバーチャルフォトグラファー
+        <a href={`${base}/about/`}>YutanpopoZzz（ゆたんぽぽ）</a>が書いています。
+      </p>
+    </section>
+
+    <!-- 呼び名の整理 -->
+    <section class="block">
+      <h2>呼び方はいくつかある<span class="en">NAMES</span></h2>
+      <p>
+        同じ活動を指すのに複数の言い方があり、検索するときに迷いやすいところです。
+        意味の違いはほとんどなく、どれで呼んでも通じます。
+      </p>
+      <dl class="names">
+        {names.map((n) => (
+          <div class="name-row">
+            <dt>{n.term}</dt>
+            <dd>{n.note}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <!-- 現実の写真との違い -->
+    <section class="block">
+      <h2>現実の写真と違うところ<span class="en">WHAT MAKES IT DIFFERENT</span></h2>
+      <p>
+        構図・光・視線・ポーズを設計して一枚を作るという、写真の本質は変わりません。
+        変わるのは、その設計にかけられる自由度です。
+      </p>
+      <ol class="diffs">
+        {diffs.map((d, i) => (
+          <li>
+            <span class="d-no">{String(i + 1).padStart(2, '0')}</span>
+            <span class="d-body">
+              <b>{d.t}</b>
+              <span>{d.d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p>
+        制約がないぶん、うまくいかない理由を機材や天気のせいにできません。
+        バーチャルフォトは、構図と光と被写体に、どこまでも純粋に向き合う撮影だと考えています。
+      </p>
+    </section>
+
+    <!-- 何を撮るのか -->
+    <section class="block">
+      <h2>何を撮るのか<span class="en">WHAT WE SHOOT</span></h2>
+      <p>
+        人を撮るポートレートが中心ですが、被写体はそれだけではありません。
+        アバターや衣装といった「商品」を売るための宣材写真、イベント当日の記録、
+        ワールドそのものを主役にした風景写真まで、現実の写真とほぼ同じ幅があります。
+      </p>
+      <p>
+        違うのは、その写真が使われる場所です。アバターや衣装の販売ページ、イベントの告知ポスター、
+        コミュニティの記録——バーチャル空間の中で経済や文化が回っていて、
+        そこに写真の仕事があります。
+      </p>
+      <p class="more"><a href={`${base}/gallery/`}>実際に撮った写真を見る →</a></p>
+    </section>
+
+    <!-- 日本での広がり(一次情報=受賞・展示) -->
+    <section class="block">
+      <h2>日本でどう広がっているか<span class="en">IN JAPAN</span></h2>
+      <p>
+        コンテストと展示という受け皿ができてきています。私が参加してきたものを挙げると、
+        次のようなものがあります。
+      </p>
+      <ul class="creds">
+        {awards.filter((a) => a.year !== '—').map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}{a.note && <span class="cn">（{a.note}）</span>}</li>
+        ))}
+        {exhibitions.map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}{a.note && <span class="cn">（{a.note}）</span>}</li>
+        ))}
+      </ul>
+      <p>
+        フジフイルムのようなカメラメーカーがVR写真のコンペティションを開き、
+        美術館での展示にバーチャルフォトが並ぶところまで来ました。
+        まだ外の世界からは見えにくい文化ですが、写真として評価される場所は確実に増えています。
+      </p>
+    </section>
+
+    <!-- これから撮る人へ -->
+    <section class="block">
+      <h2>これから撮ってみたい人へ<span class="en">GETTING STARTED</span></h2>
+      <p>
+        VRChatのアカウントと、VR機器またはPCがあれば始められます。
+        VRChatにはカメラ機能が備わっているので、専用の機材を買い足す必要はありません。
+        まずは好きなワールドで、好きなアバターを撮ってみるところからで十分です。
+      </p>
+      <p>
+        撮り方そのものについては、VRChat内で写真教室と撮影講習を行っています。
+        構図や光の考え方、講評まで、相手に合わせて内容を組んでいます。
+      </p>
+      <ul class="creds">
+        {activities.map((a) => (
+          <li><span class="cy">{a.year}</span>{a.title}{a.note && <span class="cn">（{a.note}）</span>}</li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- FAQ -->
+    <section class="block" id="faq">
+      <h2>よくある質問<span class="en">FAQ</span></h2>
+      <dl class="faq">
+        {faqs.map((f) => (
+          <div class="qa">
+            <dt>{f.q}</dt>
+            <dd>{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <a class="cta" href={`${base}/photography/`}>
+      <span class="cta-label">PHOTOGRAPHY</span>
+      <span class="cta-body">撮影を依頼したい方へ — 内容・流れ・よくある質問</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </main>
+</Base>
+
+<style>
+  .vp {
+    max-width: 760px;
+  }
+  .vp h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    text-wrap: balance;
+  }
+
+  .lead-block {
+    margin-bottom: 3.4rem;
+  }
+  .lead {
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.06em;
+  }
+  .lead b {
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .byline {
+    margin-top: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-weak);
+  }
+  .byline a {
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.3s;
+  }
+  .byline a:hover {
+    border-color: var(--text);
+  }
+
+  .block {
+    margin-bottom: 3.4rem;
+  }
+  .block h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.14em;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.45rem;
+    margin-bottom: 1.4rem;
+  }
+  .block h2 .en {
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.66rem;
+    letter-spacing: 0.26em;
+    color: color-mix(in srgb, var(--gold) 70%, transparent);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .block p {
+    margin: 0.9rem 0;
+    font-size: 0.9rem;
+    line-height: 1.95;
+  }
+  .more {
+    font-size: 0.82rem;
+  }
+  .more a {
+    color: var(--text-weak);
+    border-bottom: 1px solid var(--line);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .more a:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  /* 呼び名の対応表 */
+  .names {
+    border-top: 1px solid var(--line);
+  }
+  .name-row {
+    display: grid;
+    grid-template-columns: 15em 1fr;
+    gap: 0 1.2rem;
+    padding: 0.75rem 0.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .names dt {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    /* 「バーチャルフォトグラファー」を途中で割らない */
+    word-break: keep-all;
+  }
+  .names dd {
+    font-size: 0.84rem;
+    line-height: 1.85;
+    color: var(--text-weak);
+  }
+
+  /* 違い */
+  .diffs {
+    list-style: none;
+  }
+  .diffs li {
+    display: flex;
+    gap: 1.1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .diffs li:last-child {
+    border-bottom: none;
+  }
+  .d-no {
+    flex: none;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    padding-top: 0.25rem;
+  }
+  .d-body b {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .d-body span {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.84rem;
+    line-height: 1.9;
+    color: var(--text-weak);
+  }
+
+  /* 実績リスト */
+  .creds {
+    list-style: none;
+  }
+  .creds li {
+    padding: 0.4rem 0;
+    font-size: 0.86rem;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .creds .cy {
+    display: inline-block;
+    min-width: 6.2em;
+    font-family: var(--font-en);
+    font-weight: 300;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: color-mix(in srgb, var(--gold) 62%, transparent);
+    font-variant-numeric: tabular-nums;
+  }
+  .creds .cn {
+    font-size: 0.72rem;
+    color: var(--text-weak);
+  }
+
+  /* FAQ */
+  .qa {
+    border-bottom: 1px solid var(--line);
+    padding: 1.1rem 0;
+  }
+  .qa:last-child {
+    border-bottom: none;
+  }
+  .faq dt {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .faq dd {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    line-height: 1.95;
+    color: var(--text-weak);
+  }
+
+  /* CTA(サイト共通の帯) */
+  .cta {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    margin: 4.5rem auto 0;
+    padding: 1.5rem 1.7rem;
+    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
+    box-shadow:
+      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
+      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
+      background 0.4s ease;
+  }
+  .cta:hover {
+    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    border-color: var(--cta-blue);
+    box-shadow:
+      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
+      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
+    transform: translateY(-4px);
+  }
+  .cta-label {
+    font-family: var(--font-en);
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.3em;
+    color: var(--cta-warm);
+    white-space: nowrap;
+  }
+  .cta-body {
+    flex: 1;
+    font-size: 1.02rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .cta-arrow {
+    color: var(--cta-warm);
+    transition: transform 0.3s ease;
+  }
+  .cta:hover .cta-arrow {
+    transform: translateX(8px);
+  }
+
+  @media (max-width: 640px) {
+    .vp h1 {
+      font-size: 1.2rem;
+    }
+    .block h2 {
+      flex-wrap: wrap;
+      gap: 0.2rem 0.8rem;
+    }
+    .block h2 .en {
+      white-space: normal;
+    }
+    .name-row {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+    .creds .cy {
+      display: block;
+    }
+    .cta {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+    }
+  }
+</style>

@@ -130,7 +130,8 @@ const nav = [
   { jp: 'ポートフォリオ', en: 'WORKS', href: `${base}/works/` },
   { jp: 'イベント運営', en: 'EVENTS', href: `${base}/events/` },
   { jp: 'じぶんのこと', en: 'ABOUT', href: `${base}/about/` },
-  // 依頼の受け皿。お問い合わせの手前に置いて「知る→頼む」の順にする
+  // 「知る→頼む→問い合わせる」の順に並べる
+  { jp: 'バーチャルフォトとは', en: 'VIRTUAL PHOTO', href: `${base}/virtual-photographer/` },
   { jp: '撮影依頼ガイド', en: 'PHOTOGRAPHY', href: `${base}/photography/` },
   { jp: 'お問い合わせ', en: 'CONTACT', href: `${base}/contact/` },
 ];
@@ -609,7 +610,9 @@ const isActive = (href: string) =>
     z-index: 1;
     display: flex;
     align-items: baseline;
-    gap: 0.7rem;
+    gap: 0.15rem 0.7rem;
+    /* 長い項目は英字を次の行へ落とす(英字自体が途中で割れるのを防ぐ) */
+    flex-wrap: wrap;
   }
   .global-nav .jp {
     font-size: 0.98rem;
@@ -625,6 +628,7 @@ const isActive = (href: string) =>
     font-size: 0.6rem;
     letter-spacing: 0.24em;
     color: var(--text-weak);
+    white-space: nowrap;
     transition: color 0.3s;
   }
   .global-nav a:hover {

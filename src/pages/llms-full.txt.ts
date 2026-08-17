@@ -79,6 +79,7 @@ ${list(activities)}
 ## リンク
 
 - サイト: ${SITE}/
+- バーチャルフォトグラファーとは（職種の解説）: ${SITE}/virtual-photographer/
 - 撮影依頼ガイド: ${SITE}/photography/
 - ギャラリー: ${SITE}/gallery/
 - ポートフォリオ: ${SITE}/works/
