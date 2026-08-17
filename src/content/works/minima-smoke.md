@@ -5,9 +5,7 @@ date: 2026-07-10
 category: '音楽アプリ'
 color: '#ff5a4d'
 thumb: '/thumbs/minima-smoke.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-smoke/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-smoke' }
+links: []
 featured: false
 ---
 

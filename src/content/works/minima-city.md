@@ -5,9 +5,7 @@ date: 2026-07-09
 category: '音楽アプリ'
 color: '#ff4dd2'
 thumb: '/thumbs/minima-city.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-city/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-city' }
+links: []
 featured: false
 ---
 

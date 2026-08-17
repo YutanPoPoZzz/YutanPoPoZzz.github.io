@@ -5,9 +5,7 @@ date: 2026-07-10
 category: '音楽アプリ'
 color: '#4dff88'
 thumb: '/thumbs/minima-fission.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-fission/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-fission' }
+links: []
 featured: false
 ---
 

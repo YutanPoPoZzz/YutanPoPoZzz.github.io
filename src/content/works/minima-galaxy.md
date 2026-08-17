@@ -1,12 +1,11 @@
----
+﻿---
 title: 'minima galaxy — 星空のテクノ・グルーブボックス'
 summary: 'minimaシリーズ1機目。ブラウザ/デスクトップで鳴らせる、漆黒と白線画のミニマルなテクノ・グルーブボックス。'
 date: 2026-07-05
 category: '音楽アプリ'
 color: '#cfd8ff'
 thumb: '/thumbs/minima-galaxy.svg'
-links:
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-galaxy' }
+links: []
 featured: false
 ---
 

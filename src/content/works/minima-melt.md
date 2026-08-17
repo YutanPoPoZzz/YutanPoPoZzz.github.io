@@ -5,9 +5,7 @@ date: 2026-07-10
 category: '音楽アプリ'
 color: '#a34dff'
 thumb: '/thumbs/minima-melt.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-melt/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-melt' }
+links: []
 featured: false
 ---
 

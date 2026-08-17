@@ -5,9 +5,7 @@ date: 2026-07-10
 category: '音楽アプリ'
 color: '#4da6ff'
 thumb: '/thumbs/minima-lagoon.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-lagoon/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-lagoon' }
+links: []
 featured: true
 ---
 

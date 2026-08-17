@@ -5,9 +5,7 @@ date: 2026-07-09
 category: '音楽アプリ'
 color: '#ff3b30'
 thumb: '/thumbs/minima-drift.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-drift/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-drift' }
+links: []
 featured: false
 ---
 

@@ -5,9 +5,7 @@ date: 2026-07-09
 category: '音楽アプリ'
 color: '#9ec9d8'
 thumb: '/thumbs/minima-rain.svg'
-links:
-  - { label: 'ブラウザで鳴らす', url: '/minima-rain/' }
-  - { label: 'GitHub', url: 'https://github.com/YutanPoPoZzz/minima-rain' }
+links: []
 featured: false
 ---
 
