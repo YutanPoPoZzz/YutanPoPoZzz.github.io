@@ -1071,6 +1071,42 @@
       ]
     ]
   },
+  "/works/junrei-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/junrei-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/junrei-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/junrei-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/junrei-full.jpg": {
+    "width": 1080,
+    "height": 1920,
+    "variants": [
+      [
+        640,
+        "/works/junrei-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/junrei-full-w1024.webp"
+      ],
+      [
+        1080,
+        "/works/junrei-full-w1080.webp"
+      ]
+    ]
+  },
   "/works/note-retouch-card.jpg": {
     "width": 1200,
     "height": 675,
@@ -1104,6 +1140,78 @@
       [
         1280,
         "/works/note-retouch-full-w1280.webp"
+      ]
+    ]
+  },
+  "/works/photo-training-wheels-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/photo-training-wheels-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/photo-training-wheels-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/photo-training-wheels-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/photo-training-wheels-full.jpg": {
+    "width": 1200,
+    "height": 1200,
+    "variants": [
+      [
+        640,
+        "/works/photo-training-wheels-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/photo-training-wheels-full-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/photo-training-wheels-full-w1200.webp"
+      ]
+    ]
+  },
+  "/works/rtj-posters-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/rtj-posters-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/rtj-posters-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/rtj-posters-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/rtj-posters-full.jpg": {
+    "width": 1280,
+    "height": 1100,
+    "variants": [
+      [
+        640,
+        "/works/rtj-posters-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/rtj-posters-full-w1024.webp"
+      ],
+      [
+        1280,
+        "/works/rtj-posters-full-w1280.webp"
       ]
     ]
   },
