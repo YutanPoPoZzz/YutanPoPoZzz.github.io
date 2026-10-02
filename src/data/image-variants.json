@@ -1269,6 +1269,38 @@
       ]
     ]
   },
+  "/works/vrcdj-workshop-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/vrcdj-workshop-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/vrcdj-workshop-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/vrcdj-workshop-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/vrcdj-workshop-full.jpg": {
+    "width": 1000,
+    "height": 1415,
+    "variants": [
+      [
+        640,
+        "/works/vrcdj-workshop-full-w640.webp"
+      ],
+      [
+        1000,
+        "/works/vrcdj-workshop-full-w1000.webp"
+      ]
+    ]
+  },
   "/works/ym3-card.jpg": {
     "width": 1200,
     "height": 675,
