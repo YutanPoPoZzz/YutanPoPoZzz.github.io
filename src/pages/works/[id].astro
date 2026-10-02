@@ -5,9 +5,12 @@ import Crumbs from '../../components/Crumbs.astro';
 import BackFab from '../../components/BackFab.astro';
 import { serviceColor } from '../../data/services';
 import { webpSrcset } from '../../lib/img';
+import { SHOW_MINIMA } from '../../data/minima-series-card';
 
 export async function getStaticPaths() {
-  const works = await getCollection('works');
+  const works = (await getCollection('works')).filter(
+    (w) => SHOW_MINIMA || !w.id.startsWith('minima-')
+  );
   return works.map((work) => ({
     params: { id: work.id },
     props: { work },

@@ -1,5 +1,10 @@
 // WORKS一覧とHOMEダイジェストに出す「minimaシリーズ」の集約カード。
 // WorkCardが読むCollectionEntry互換の形(実体はシリーズページ /works/minima-series/ へのリンク)
+
+// minimaシリーズの掲載スイッチ(2026-10-02 一旦非公開)。
+// 戻すときは true にし、pages/works/_minima-series.astro を minima-series.astro へ改名する
+export const SHOW_MINIMA = false;
+
 export const minimaSeriesCard = {
   id: 'minima-series',
   data: {
