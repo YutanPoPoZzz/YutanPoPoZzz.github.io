@@ -14,10 +14,14 @@ const works = (await getCollection('works')).sort(
 // minima各機はシリーズカード1枠に集約するため一覧からは除外
 const otherWorks = works.filter((w) => !w.id.startsWith('minima-'));
 
-// 制作実績: minima以外のすべて(カテゴリはカードのチップに出る)
-const records = otherWorks;
-// その他: minimaシリーズ
-const misc = [minimaSeriesCard];
+// 自作の配布物・ツールは「その他のつくりもの」へ回すカテゴリ
+const MISC_CATEGORIES = ['VRChatギミック'];
+const isMisc = (w: (typeof works)[number]) => MISC_CATEGORIES.includes(w.data.category);
+
+// 制作実績: minimaと自作ツール以外のすべて(カテゴリはカードのチップに出る)
+const records = otherWorks.filter((w) => !isMisc(w));
+// その他: 自作ツール(新しい順)+minimaシリーズ
+const misc = [...otherWorks.filter(isMisc), minimaSeriesCard];
 
 ---
 
