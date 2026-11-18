@@ -72,13 +72,8 @@ const pageJsonLd = [
 
     {/* Answer-First: 冒頭で結論を言い切る(AI検索はここを引用する) */}
     <section class="lead-block">
-      <p class="lead">
-        VRChatでの撮影は、バーチャルフォトグラファーに依頼できます。
-        YutanpopoZzzは、VRChatを中心にポートレート、アバター・衣装の宣材写真、イベント記録、
-        ポスターや告知ビジュアルの制作を受けている写真家です。
-        固定の料金表は設けず、内容を伺ったうえで個別にお見積もりします。
-        ご相談だけでも大丈夫です。
-      </p>
+      <p class="lead-line">VRChatでの撮影は、バーチャルフォトグラファーに依頼できます。</p>
+      <p>YutanpopoZzzは、VRChatを中心にポートレート、アバター・衣装の宣材写真、イベント記録、ポスターや告知ビジュアルの制作を受けている写真家です。固定の料金表は設けず、内容を伺ったうえで個別にお見積もりします。ご相談だけでも大丈夫です。</p>
       <p class="status" data-open={availability.open ? '' : undefined}>
         {availability.open && <b class="open">{availability.short}</b>}
         <span class="status-txt"><span class="nb">{availability.asOf}現在</span><span class="nb"> — {availability.text}</span></span>
@@ -88,16 +83,9 @@ const pageJsonLd = [
     {/* 職種そのものの解説は /virtual-photographer/ が主。
         同じ見出しを両方に置くと共食いするので、ここは要約＋送り出しに留める */}
     <section class="block">
-      <h2>バーチャルフォトグラファーに頼むということ</h2>
-      <p>
-        バーチャルフォトグラファーは、ゲームや仮想空間の中で写真を撮る写真家です。
-        YutanpopoZzzはその中でもVRChatを舞台に、アバターを着た人を撮っています。
-        現実の撮影と違って天候や機材の制約がないぶん、
-        どんな画面にしたいかを一緒に決めるところから撮影が始まります。
-      </p>
-      <p>
-        撮影と並行して、VR写真についての執筆や、VRChatでの写真教室・撮影講習も続けています。
-      </p>
+      <h2 class="scene-title">バーチャルフォトグラファーに頼むということ</h2>
+      <p>バーチャルフォトグラファーは、ゲームや仮想空間の中で写真を撮る写真家です。YutanpopoZzzはその中でもVRChatを舞台に、アバターを着た人を撮っています。現実の撮影と違って天候や機材の制約がないぶん、どんな画面にしたいかを一緒に決めるところから撮影が始まります。</p>
+      <p>撮影と並行して、VR写真についての執筆や、VRChatでの写真教室・撮影講習も続けています。</p>
       <p class="more">
         <a href={`${base}/virtual-photographer/`}>バーチャルフォトグラファーとは何かを詳しく読む</a>
       </p>
@@ -106,15 +94,21 @@ const pageJsonLd = [
 
     <!-- 依頼できる内容 -->
     <section class="block">
-      <h2>依頼できる撮影・制作</h2>
+      <h2 class="scene-title">依頼できる撮影・制作</h2>
       <div class="sv-list">
         {services.map((s) => (
           <article class="sv" id={s.slug}>
             <h3>{s.name}</h3>
-            <p>{detail[s.slug] ?? s.desc}</p>
-            <p class="sv-more">
-              <a href={`${base}/works/tag/${s.slug}/`}>{s.name}の実績を見る</a>
-            </p>
+            <p>{s.desc}</p>
+            {detail[s.slug] ? (
+              <details class="fold">
+                <summary>くわしく見る</summary>
+                <p>{detail[s.slug]}</p>
+                <p class="sv-more"><a href={`${base}/works/tag/${s.slug}/`}>{s.name}の実績を見る</a></p>
+              </details>
+            ) : (
+              <p class="sv-more"><a href={`${base}/works/tag/${s.slug}/`}>{s.name}の実績を見る</a></p>
+            )}
           </article>
         ))}
       </div>
@@ -122,7 +116,7 @@ const pageJsonLd = [
 
     <!-- 流れ -->
     <section class="block">
-      <h2>依頼から納品までの流れ</h2>
+      <h2 class="scene-title">依頼から納品までの流れ</h2>
       <ol class="steps">
         {orderFlow.map((s, i) => (
           <li>
@@ -138,7 +132,7 @@ const pageJsonLd = [
 
     <!-- 第三者評価(依頼者が最後に確かめたいところ) -->
     <section class="block">
-      <h2>これまでの評価</h2>
+      <h2 class="scene-title">これまでの評価</h2>
       <AwardPhoto size="medium" />
       <table class="awards"><tbody>
         {exhibitions.map((a) => (
@@ -153,15 +147,28 @@ const pageJsonLd = [
 
     <!-- FAQ -->
     <section class="block" id="faq">
-      <h2>よくある質問</h2>
+      <h2 class="scene-title">よくある質問</h2>
       <dl class="faq">
-        {faqs.map((f) => (
+        {faqs.slice(0, 3).map((f) => (
           <div class="qa">
             <dt>{f.q}</dt>
             <dd>{f.a}</dd>
           </div>
         ))}
       </dl>
+      {faqs.length > 3 && (
+        <details class="fold">
+          <summary>ほかの質問を見る</summary>
+          <dl class="faq">
+            {faqs.slice(3).map((f) => (
+              <div class="qa">
+                <dt>{f.q}</dt>
+                <dd>{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      )}
     </section>
 
     <a class="cta" href={`${base}/contact/`}>
@@ -173,7 +180,6 @@ const pageJsonLd = [
 
 <style>
 .photo { max-width: 840px; }
-  .lead { line-height: 2; }
   .sv-list { margin-top: 2.4rem; }
   .sv + .sv { margin-top: 3rem; }
   .sv p { margin-top: 0.7rem; }

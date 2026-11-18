@@ -42,7 +42,7 @@ const heroSrcset = webpSrcset(heroSrc, base);
         {work.data.status && <span class="status">{work.data.status}</span>}
       </div>
       <h1>{work.data.title}</h1>
-      <p class="lead">{work.data.summary}</p>
+      <p class="lead lead-line">{work.data.summary}</p>
     </header>
 
     <figure class="hero-thumb">
@@ -115,7 +115,7 @@ const heroSrcset = webpSrcset(heroSrc, base);
   .credit dt { color: var(--pencil); }
   .links { display: flex; flex-wrap: wrap; gap: 0.8rem 2rem; margin-top: 2rem; }
   .body { margin-top: 6rem; }
-  .body :global(h2) { margin: 7rem 0 1.2rem; font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: 1.2rem; letter-spacing: 0.04em; }
+  .body :global(h2) { margin: 6rem 0 .8rem; font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: clamp(1.3rem, 1.18rem + .5vw, 1.55rem); letter-spacing: 0.04em; }
   .body :global(h3) { margin: 3rem 0 1rem; }
   .body :global(p) { margin: 1.2rem 0; max-width: 38em; }
   .body :global(p:has(img)) { max-width: none; }

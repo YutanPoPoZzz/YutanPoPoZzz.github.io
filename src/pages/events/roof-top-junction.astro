@@ -50,11 +50,19 @@ const posters = [
     )}
 
     <section class="body">
-      {ev.summary.map((p) => <p>{p}</p>)}
+      {ev.summary.map((p, i) => {
+        const end = p.indexOf('。') + 1;
+        return ev.summary.length >= 3 && i === 0 && end > 0 ? (
+          <>
+            <p class="lead-line">{p.slice(0, end)}</p>
+            {p.slice(end) && <p>{p.slice(end)}</p>}
+          </>
+        ) : <p>{p}</p>;
+      })}
     </section>
 
     <section class="meta-block">
-      <h2>イベント概要</h2>
+      <h2 class="scene-title">イベント概要</h2>
       <dl class="meta">
         <div>
           <dt>主な役割</dt>
@@ -93,10 +101,8 @@ const posters = [
     </div>
 
     <section class="posters">
-      <h2>ポスターアーカイブ</h2>
-      <p class="posters-lead">
-        各回の告知ポスターは自分で制作しています。写真・レイアウト・文字組みまで一貫して担当。
-      </p>
+      <h2 class="scene-title">ポスターアーカイブ</h2>
+      <p class="posters-lead">各回の告知ポスターは自分で制作しています。写真・レイアウト・文字組みまで一貫して担当。</p>
       <div class="poster-grid">
         {posters.map((p) => (
           <button
@@ -225,6 +231,7 @@ const posters = [
   .hero img { width: 100%; height: auto; }
   .body { margin-top: 2.4rem; }
   .body p { margin: 1.2rem 0; }
+  .body .lead-line { margin-bottom: 2.2rem; }
   .meta-block { margin-top: 6rem; }
   .posters { margin-top: 9rem; }
   .posters-lead { color: var(--pencil); margin-bottom: 2rem; }

@@ -49,28 +49,10 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
         {availability.open && <b class="open">{availability.short}</b>}
         <span class="status-txt"><span class="nb">{availability.asOf}現在</span><span class="nb"> — {availability.text}</span></span>
       </p>
-      <p>
-        VRChatでのポートレート撮影、アバター・衣装・商品のプロモーション撮影、イベント記録、
-        ポスターやSNS告知などのビジュアル制作のご依頼を受け付けています。
-        ご相談だけでも大丈夫ですので、遠慮なくご連絡ください。
-      </p>
-      <p class="guide-link">
-        はじめての方は <a href={`${base}/photography/`}>撮影依頼ガイド</a>
-        に、依頼できる内容・納品までの流れ・よくある質問をまとめています。
-      </p>
-      <div class="notes">
-        <h3>料金について</h3>
-        <p class="lead">
-          撮影時間・納品枚数・レタッチの度合い・使用範囲によって変わるため、
-          ご依頼の内容を伺ったうえでお見積りをお出しします。
-          ご予算がお決まりの場合は、その範囲でできることをご提案しますので、
-          金額感からのご相談でも遠慮なくお知らせください。
-        </p>
-      </div>
+      <p>VRChatでのポートレート撮影、アバター・衣装・商品のプロモーション撮影、イベント記録、ポスターやSNS告知などのビジュアル制作のご依頼を受け付けています。ご相談だけでも大丈夫ですので、遠慮なくご連絡ください。</p>
+      <p class="guide-link">はじめての方は <a href={`${base}/photography/`}>撮影依頼ガイド</a>に、依頼できる内容・納品までの流れ・よくある質問をまとめています。</p>
 
-      <p>
-        ご依頼の際は、以下の項目を添えていただけると、確認のやり取りが少なくスムーズです。
-      </p>
+      <p class="request-items">ご依頼の際は、以下の項目を添えていただけると、確認のやり取りが少なくスムーズです。</p>
       <ol class="items">
         {items.map((item) => <li>{item}</li>)}
       </ol>
@@ -80,20 +62,22 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
         <a href={mailHref}><span style="display:inline-block">メールで</span><span style="display:inline-block">相談する</span></a>
       </div>
 
-      <div class="notes">
-        <h3>ご相談のうえ進めたいこと</h3>
-        <p class="lead">
-          次のようなご依頼は、私ひとりでは責任を持ちきれない部分があります。
-          お断りするという意味ではなく、進め方を一緒に決めさせてください。
-        </p>
+      <div class="notes fees">
+        <h3 class="scene-title">料金について</h3>
+        <p class="lead">撮影時間・納品枚数・レタッチの度合い・使用範囲によって変わるため、ご依頼の内容を伺ったうえでお見積りをお出しします。ご予算がお決まりの場合は、その範囲でできることをご提案しますので、金額感からのご相談でも遠慮なくお知らせください。</p>
+      </div>
+
+      <div class="notes consultation">
+        <h3 class="scene-title">ご相談のうえ進めたいこと</h3>
+        <p class="lead">次のようなご依頼は、私ひとりでは責任を持ちきれない部分があります。お断りするという意味ではなく、進め方を一緒に決めさせてください。</p>
         <ul>
           <li>性的・過激な表現を含む撮影</li>
           <li>ワールド・アバター・アセットの利用規約や権利関係が確認できない案件</li>
         </ul>
       </div>
 
-      <div class="notes">
-        <h3>ご依頼にあたって</h3>
+      <div class="notes terms">
+        <h3 class="scene-title">ご依頼にあたって</h3>
         <ul>
           <li>写真の使用範囲・クレジット表記は事前にご相談のうえ取り決めます</li>
           <li>商用利用はご相談ください</li>
@@ -110,13 +94,14 @@ const mailHref = `mailto:${MAIL_TO}?subject=${encodeURIComponent(mailSubject)}&b
 .contact { max-width: 760px; }
   .body p { margin: 1.2rem 0; }
   .guide-link { color: var(--pencil); font-size: 0.9rem; }
-  .notes { margin-top: 8rem; }
-  .notes:first-of-type { margin-top: 6rem; margin-bottom: 3rem; }
-  .notes:last-child { margin-top: 6rem; }
+  .fees { margin-top: 6rem; }
+  .consultation { margin-top: 7rem; }
+  .terms { margin-top: 5rem; }
+  .body .request-items { margin-top: 5rem; }
   .items { padding-left: 1.6rem; margin: 1.6rem 0; }
   .items li { margin: 0.6rem 0; }
   .items li::marker { color: var(--pencil); }
-  .channels { display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; margin-top: 3rem; }
+  .channels { display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; margin-top: 5rem; }
   .notes ul { padding-left: 1.4rem; max-width: 38em; }
   .notes li { margin: 0.6rem 0; }
 </style>

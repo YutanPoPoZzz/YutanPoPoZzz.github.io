@@ -46,26 +46,11 @@ const pageJsonLd = [
     </div>
     <div class="body-wrap">
     <div class="body">
-      <p class="name-line">
-        <strong>YutanpopoZzz</strong>
-        <span class="reading">ゆたんぽぽ</span>
-        <span class="role">Virtual Photographer / Visual Creator</span>
-      </p>
-      <p>
-        VRChatを中心に、ポートレートや商品・イベントのプロモーション撮影、ビジュアル制作を行っています。
-        得意なのは、キャラクター性を強く引き出すポートレート。クールでストリートな空気をまとわせながら、
-        一枚から物語が想像できる画面をつくります。その持ち味を活かして、ポスターや告知ビジュアルの制作も手がけています。
-      </p>
-      <p>
-        なぜVRで撮るのか。ここには重力や天候といった現実の制約がなく、構図・光・キャラクターと、
-        どこまでも純粋に向き合えるからです。そしてVRChatは、会話だけでなく「空間を共有する」SNSでもあります。
-        同じ場所に立つことで生まれる風景や関係性には、現実を超えた魅力がある——
-        ここにしか写せない本質があると、私は考えています。
-      </p>
-      <p>
-        ただ、その魅力はまだ外の世界からは見えにくいままです。だから、写真で残して、伝える。
-        同じ思いで、VRChatについての文章の執筆や、写真文化を広げるための撮影講習も続けています。
-      </p>
+      <p class="name-line"><strong>YutanpopoZzz</strong><span class="reading">ゆたんぽぽ</span><span class="role">Virtual Photographer / Visual Creator</span></p>
+      <p>VRChatを中心に、ポートレートや商品・イベントのプロモーション撮影、ビジュアル制作を行っています。得意なのは、キャラクター性を強く引き出すポートレート。クールでストリートな空気をまとわせながら、一枚から物語が想像できる画面をつくります。その持ち味を活かして、ポスターや告知ビジュアルの制作も手がけています。</p>
+      <h2 class="scene-title">なぜVRで撮るのか</h2>
+      <p>ここには重力や天候といった現実の制約がなく、構図・光・キャラクターと、どこまでも純粋に向き合えるからです。そしてVRChatは、会話だけでなく「空間を共有する」SNSでもあります。同じ場所に立つことで生まれる風景や関係性には、現実を超えた魅力がある——ここにしか写せない本質があると、私は考えています。</p>
+      <p>ただ、その魅力はまだ外の世界からは見えにくいままです。だから、写真で残して、伝える。同じ思いで、VRChatについての文章の執筆や、写真文化を広げるための撮影講習も続けています。</p>
       <ul class="sns">
         <li><a href="https://vrchat.com/home/user/usr_029b3b9d-63fc-4557-97d4-68cc176922ed" target="_blank" rel="noopener noreferrer">VRChat</a></li>
         <li><a href="https://x.com/YutanpopoZzz" target="_blank" rel="noopener noreferrer">X</a></li>
@@ -96,8 +81,9 @@ const pageJsonLd = [
     <div class="blockttl">
       <h2>実績</h2>
     </div>
+    <div class="achievements">
     {sections.map((s) => (
-      <section class="ach">
+      <section class:list={["ach", { "ach-awards": s.key === "AWARDS" }]}>
         <h3>{s.jp}</h3>
         <table class="awards"><tbody>
           {s.items.map((a) => {
@@ -118,6 +104,7 @@ const pageJsonLd = [
         </tbody></table>
       </section>
     ))}
+    </div>
     <p class="events-link"><a href={`${base}/events/`}>イベント運営の実績をくわしく見る</a></p>
     <p class="disclaimer">※ 実績の詳細名・クライアント名は順次追記します</p>
   </main>
@@ -136,9 +123,11 @@ const pageJsonLd = [
   .role { flex-basis: 100%; font-family: var(--font-en); color: var(--pencil); font-size: 1rem; }
   .sns { list-style: none; display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin-top: 2rem; }
   .body-wrap + .blockttl { margin-top: 10rem; }
-  .ach { max-width: 48rem; }
-  .ach + .ach { margin-top: 6rem; }
-  .ach:nth-of-type(2n) { margin-top: 8rem; }
+  .body .scene-title { margin-top: 5rem; }
+  .achievements { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6rem clamp(2rem, 5vw, 4.4rem); }
+  .ach { min-width: 0; }
+  .ach-awards { grid-column: 1 / -1; max-width: 48rem; }
+  @media (min-width: 900px) { .achievements { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .events-link { margin-top: 3rem; }
   .disclaimer { margin-top: 1rem; color: var(--pencil); font-size: 0.82rem; }
   @media (max-width: 760px) { .body-wrap { grid-template-columns: 1fr; } .me { width: 85%; max-width: 28rem; } }

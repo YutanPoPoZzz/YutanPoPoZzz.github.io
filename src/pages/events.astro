@@ -26,10 +26,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
     <div class="blockttl">
       <h1>イベント運営</h1>
     </div>
-    <p class="lead">
-      撮影やビジュアル制作のほかに、VRChat内のイベント運営にも携わっています。
-      主催・企画から広報、会場運営まで——「場をつくる」側の仕事の記録です。
-    </p>
+    <p class="lead">撮影やビジュアル制作のほかに、VRChat内のイベント運営にも携わっています。主催・企画から広報、会場運営まで——「場をつくる」側の仕事の記録です。</p>
     <p class="scale-note">※ {scaleNote}</p>
 
     {groups.map((g) => (
@@ -82,6 +79,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
 
             {ev.summary.map((p) => <p class="summary">{p}</p>)}
 
+            {ev.status === 'host' ? (
             <dl class="meta">
               <div>
                 <dt>主な役割</dt>
@@ -113,6 +111,42 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
                 </div>
               )}
             </dl>
+            ) : (
+              <details class="fold">
+                <summary>役割と規模を見る</summary>
+            <dl class="meta">
+              <div>
+                <dt>主な役割</dt>
+                <dd>{ev.roles}</dd>
+              </div>
+              <div>
+                <dt>担当業務</dt>
+                <dd>{ev.tasks}</dd>
+              </div>
+              <div>
+                <dt>イベント規模</dt>
+                <dd>{ev.scale.join(' ／ ')}</dd>
+              </div>
+              {ev.related && (
+                <div>
+                  <dt>関連イベント</dt>
+                  <dd>
+                    <ul class="related">
+                      {ev.related.map((r) => (
+                        <li>
+                          {r.name} — {r.scale}
+                          {r.links?.map((l) => (
+                            <a class="rel-link" href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a>
+                          ))}
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
+              </details>
+            )}
 
             {(ev.links.length > 0 || ev.credits) && (
               <div class="foot">
@@ -140,7 +174,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
                   <a href={`${base}${ev.page}`} aria-label={`${ev.name} の紹介ページへ`}>
                     <picture>
                       {webpSrcset(ev.image, base) && (
-                        <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes="(max-width: 760px) 66vw, 288px" />
+                        <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes="(max-width: 760px) 66vw, 352px" />
                       )}
                       <img
                         src={`${base}${ev.image}`}
@@ -153,7 +187,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
                 ) : (
                   <picture>
                     {webpSrcset(ev.image, base) && (
-                      <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes="(max-width: 760px) 66vw, 288px" />
+                      <source type="image/webp" srcset={webpSrcset(ev.image, base)} sizes="(max-width: 760px) 66vw, 352px" />
                     )}
                     <img
                       src={`${base}${ev.image}`}
@@ -175,10 +209,10 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
 
 
 <style>
-  .supporting.has-image { display: grid; grid-template-columns: 18rem minmax(0, 1fr); gap: 3rem; align-items: start; }
+  .supporting.has-image { display: grid; grid-template-columns: 22rem minmax(0, 1fr); gap: 3rem; align-items: start; }
   .supporting.has-image .img-frame { grid-column: 1; grid-row: 1; }
   .supporting.has-image .event-copy { grid-column: 2; grid-row: 1; min-width: 0; }
-  .supporting.has-image.reverse { grid-template-columns: minmax(0, 1fr) 18rem; }
+  .supporting.has-image.reverse { grid-template-columns: minmax(0, 1fr) 22rem; }
   .supporting.has-image.reverse .img-frame { grid-column: 2; }
   .supporting.has-image.reverse .event-copy { grid-column: 1; }
   .event.supporting h4 { font-size: clamp(1.4rem, 1.2rem + 0.6vw, 1.8rem); }
