@@ -1,9 +1,9 @@
 ---
+import '../../styles/book.css';
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Crumbs from '../../components/Crumbs.astro';
 import BackFab from '../../components/BackFab.astro';
-import { serviceColor } from '../../data/services';
 import { webpSrcset } from '../../lib/img';
 import { SHOW_MINIMA } from '../../data/minima-series-card';
 
@@ -33,7 +33,7 @@ const heroSrcset = webpSrcset(heroSrc, base);
 ---
 
 <Base title={work.data.title} description={work.data.summary}>
-  <main class="container article" style={`--c: ${serviceColor(work.data.category, work.data.color)}`}>
+  <main class="container book-page article">
     <Crumbs items={crumbs} />
     <header class="article-head">
       <div class="meta">
@@ -48,7 +48,7 @@ const heroSrcset = webpSrcset(heroSrc, base);
     <figure class="hero-thumb">
       <picture>
         {heroSrcset && (
-          <source type="image/webp" srcset={heroSrcset} sizes="(max-width: 900px) 92vw, 860px" />
+          <source type="image/webp" srcset={heroSrcset} sizes="(max-width: 960px) 94vw, 884px" />
         )}
         <img src={`${base}${heroSrc}`} alt={work.data.title} decoding="async" />
       </picture>
@@ -75,7 +75,7 @@ const heroSrcset = webpSrcset(heroSrc, base);
       <div class="links">
         {work.data.links.map((l) => (
           <a href={l.url} target="_blank" rel="noopener noreferrer">
-            {l.label} ↗
+            {l.label}
           </a>
         ))}
       </div>
@@ -87,9 +87,9 @@ const heroSrcset = webpSrcset(heroSrc, base);
 
     <p class="back">
       {isMinima ? (
-        <a href={`${base}/works/minima-series/`}>← minimaシリーズにもどる</a>
+        <a href={`${base}/works/minima-series/`}>minimaシリーズにもどる</a>
       ) : (
-        <a href={`${base}/works/`}>← ポートフォリオ一覧にもどる</a>
+        <a href={`${base}/works/`}>ポートフォリオ一覧にもどる</a>
       )}
     </p>
   </main>
@@ -100,144 +100,26 @@ const heroSrcset = webpSrcset(heroSrc, base);
   />
 </Base>
 
+
 <style>
-  .article {
-    max-width: 760px;
-    padding-top: 3.5rem;
-  }
-  .article-head {
-    text-align: center;
-  }
-  .meta {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.74rem;
-    color: var(--text-weak);
-  }
-  .category {
-    position: relative;
-    padding-left: 0.9rem;
-    letter-spacing: 0.1em;
-  }
-  .category::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    translate: 0 -50%;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--c);
-  }
-  time {
-    font-family: var(--font-en);
-    font-weight: 300;
-    letter-spacing: 0.08em;
-  }
-  .status {
-    border: 1px solid var(--line);
-    padding: 0.02rem 0.6rem;
-    font-size: 0.66rem;
-    letter-spacing: 0.14em;
-  }
-  h1 {
-    margin-top: 0.9rem;
-    font-size: 1.55rem;
-    line-height: 1.6;
-    letter-spacing: 0.06em;
-  }
-  .lead {
-    margin-top: 0.7rem;
-    font-size: 0.86rem;
-    color: var(--text-weak);
-  }
-  .hero-thumb {
-    margin: 2.4rem auto 0;
-    max-width: 620px;
-    border: 1px solid var(--line);
-    box-shadow: 0 0 60px color-mix(in srgb, var(--c) 12%, transparent);
-  }
-  .hero-thumb img {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-  .credit {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.6rem 2.2rem;
-    margin-top: 1.4rem;
-    font-size: 0.82rem;
-  }
-  .credit > div {
-    display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
-  }
-  .credit dt {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    color: var(--text-weak);
-  }
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.7rem;
-    margin-top: 1.8rem;
-  }
-  .links a {
-    border: 1px solid var(--line);
-    padding: 0.4rem 1.2rem;
-    font-size: 0.76rem;
-    letter-spacing: 0.1em;
-    transition: border-color 0.3s, box-shadow 0.3s, color 0.3s;
-  }
-  .links a:hover,
-  .links a:focus-visible {
-    border-color: color-mix(in srgb, var(--c) 60%, transparent);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--c) 25%, transparent);
-    color: color-mix(in srgb, var(--c) 55%, white);
-  }
-  .body {
-    margin-top: 2.8rem;
-    font-size: 0.92rem;
-  }
-  .body :global(h2) {
-    margin: 2.6rem 0 0.9rem;
-    padding-bottom: 0.45rem;
-    font-size: 1.05rem;
-    letter-spacing: 0.12em;
-    border-bottom: 1px solid var(--line);
-  }
-  .body :global(p) {
-    margin: 0.9rem 0;
-  }
-  .body :global(ul) {
-    margin: 0.9rem 0;
-    padding-left: 1.4rem;
-  }
-  .body :global(li) {
-    margin: 0.3rem 0;
-  }
-  .back {
-    margin-top: 3.6rem;
-    text-align: center;
-    font-size: 0.88rem;
-  }
-  .back a {
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: color-mix(in srgb, var(--gold) 85%, white);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
-    transition: color 0.3s, text-shadow 0.3s;
-  }
-  .back a:hover {
-    color: var(--gold);
-    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
-  }
+.article { max-width: 960px; padding-top: 1.5rem; }
+  .article-head { margin-top: 2.4rem; }
+  .meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; font-size: 0.85rem; color: var(--pencil); }
+  .meta .status { margin: 0; }
+  h1 { margin-top: 0.8rem; }
+  .lead { margin-top: 1.2rem; }
+  .hero-thumb { margin-top: 3rem; }
+  .hero-thumb img { width: 100%; height: auto; }
+  .credit { margin-top: 2rem; font-size: 0.9rem; }
+  .credit > div { display: grid; grid-template-columns: 7em minmax(0,1fr); gap: 1rem; margin-top: 0.5rem; }
+  .credit dt { color: var(--pencil); }
+  .links { display: flex; flex-wrap: wrap; gap: 0.8rem 2rem; margin-top: 2rem; }
+  .body { margin-top: 6rem; }
+  .body :global(h2) { margin: 7rem 0 1.2rem; font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: 1.2rem; letter-spacing: 0.04em; }
+  .body :global(h3) { margin: 3rem 0 1rem; }
+  .body :global(p) { margin: 1.2rem 0; max-width: 38em; }
+  .body :global(p:has(img)) { max-width: none; }
+  .body :global(img) { width: 100%; height: auto; margin: 2rem 0; }
+  .body :global(ul), .body :global(ol) { max-width: 38em; padding-left: 1.5rem; margin: 1.2rem 0; }
+  .body :global(li) { margin: 0.4rem 0; }
 </style>

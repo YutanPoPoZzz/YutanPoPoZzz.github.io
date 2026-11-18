@@ -1,17 +1,24 @@
 ---
+import '../styles/book.css';
+import '../styles/lightbox.css';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import PhotoCard from '../components/PhotoCard.astro';
+import { photoAspect } from '../lib/photo-aspect';
 import PhotoMasonry from '../components/PhotoMasonry.astro';
 
 const photos = (await getCollection('photos')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
+const featured = photos.find((p) => p.data.featured) ?? photos[0];
+const featuredAspect = featured ? featured.data.aspect ?? await photoAspect(featured.data.thumb) : 1;
+const masonryPhotos = photos.filter((p) => p !== featured);
 const cats = [
-  { key: 'all', label: 'ALL' },
-  { key: 'portrait', label: 'PORTRAIT' },
-  { key: 'commercial', label: 'COMMERCIAL' },
-  { key: 'event', label: 'EVENT' },
-  { key: 'photocontest', label: 'PHOTO CONTEST' },
+  { key: 'all', label: 'すべて' },
+  { key: 'portrait', label: 'ポートレート' },
+  { key: 'commercial', label: '宣材・商品' },
+  { key: 'event', label: 'イベント' },
+  { key: 'photocontest', label: 'フォトコンテスト' },
 ];
 ---
 
@@ -19,11 +26,16 @@ const cats = [
   fullTitle="作品ギャラリー | バーチャルフォトグラファー YutanpopoZzz"
   description="バーチャルフォトグラファー YutanpopoZzz のVR写真ギャラリー。VRChatで撮影したポートレート、アバター・衣装の商品撮影、イベント記録、フォトコンテスト出品作を分類して掲載しています。"
 >
-  <main class="container">
+  <main class="container book-page">
     <div class="blockttl">
-      <h2>ギャラリー</h2>
-      <span class="sub">GALLERY</span>
+      <h1>ギャラリー</h1>
     </div>
+
+    {featured && (
+      <div class:list={['gallery-feature', { portrait: featuredAspect < 1 }]} data-featured data-category={featured.data.category}>
+        <PhotoCard photo={featured} aspect={featuredAspect} sizes="(max-width: 1180px) 94vw, 1104px" titleOnly />
+      </div>
+    )}
 
     <div class="filter" role="tablist" aria-label="カテゴリで絞り込み">
       {cats.map((c, i) => (
@@ -33,7 +45,7 @@ const cats = [
       ))}
     </div>
 
-    <PhotoMasonry photos={photos} />
+    <PhotoMasonry photos={masonryPhotos} />
   </main>
 
   <!-- 写真タップで拡大表示するライトボックス -->
@@ -52,9 +64,11 @@ const cats = [
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
   const grid = document.querySelector<HTMLElement>('[data-masonry]');
+  const featured = document.querySelector<HTMLElement>('[data-featured]');
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       buttons.forEach((b) => b.classList.toggle('active', b === btn));
+      if (featured) featured.hidden = btn.dataset.filter !== 'all' && btn.dataset.filter !== featured.dataset.category;
       grid?.dispatchEvent(
         new CustomEvent('masonry:filter', { detail: btn.dataset.filter })
       );
@@ -67,7 +81,7 @@ const cats = [
   const lbTitle = document.getElementById('lb-title')!;
   const lbCaption = document.getElementById('lb-caption')!;
 
-  grid?.addEventListener('click', (e) => {
+  document.querySelector('main')?.addEventListener('click', (e) => {
     const card = (e.target as HTMLElement).closest<HTMLElement>('.photo-card');
     if (!card) return;
     const img = card.querySelector('img');
@@ -128,112 +142,25 @@ const cats = [
   });
 </script>
 
+
 <style>
-  .filter {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.6rem;
-    margin: -0.8rem 0 2.4rem;
-  }
-  .filter-btn {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.68rem;
-    letter-spacing: 0.2em;
-    color: var(--text-weak);
-    background: none;
-    border: 1px solid var(--line);
-    padding: 0.3rem 1.1rem;
-    cursor: pointer;
-    transition: color 0.3s, border-color 0.3s;
-  }
-  .filter-btn:hover {
-    color: var(--text);
-  }
-  .filter-btn.active {
-    color: var(--text);
-    border-color: rgba(255, 255, 255, 0.5);
-  }
-  .filter-btn:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 3px;
+  .gallery-feature { margin-bottom: 5rem; }
+  .gallery-feature :global(.photo-card) { margin: 0; }
+  .gallery-feature :global(figcaption) { font-size: 0.82rem; }
+  .gallery-feature :global(.ttl) { display: block; margin-bottom: 0.2rem; font-size: 1rem; }
+  .gallery-feature.portrait :global(.photo-card) { display: flex; align-items: flex-end; gap: 2.4rem; }
+  .gallery-feature.portrait :global(.frame) { flex: 0 1 auto; min-width: 0; }
+  .gallery-feature.portrait :global(.frame img) { width: auto; height: min(86svh, 56rem); max-width: 100%; object-fit: contain; object-position: left bottom; }
+  .gallery-feature.portrait :global(figcaption) { flex: 1; min-width: 10rem; }
+  @media (max-width: 760px) {
+    .gallery-feature.portrait :global(.photo-card) { display: block; }
+    .gallery-feature.portrait :global(.frame img) { width: 100%; height: auto; }
   }
 
-  /* 写真はタップで拡大できる */
-  :global(.photo-card) {
-    cursor: zoom-in;
-  }
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4vh 4vw;
-    background: rgba(10, 10, 12, 0.94);
-    cursor: zoom-out;
-  }
-  .lightbox[hidden] {
-    display: none;
-  }
-  .lightbox figure {
-    text-align: center;
-    max-width: 100%;
-  }
-  .lightbox img {
-    max-width: 92vw;
-    max-height: 76vh;
-    width: auto;
-    height: auto;
-    border: 1px solid var(--line);
-    cursor: zoom-in;
-  }
-  /* 等倍ズーム: スクロール/ドラッグでまじまじ見るモード
-     画像が画面より小さいときは中央、大きいときは左上基準(safe centering) */
-  .lightbox.zoomed {
-    align-items: safe center;
-    justify-content: safe center;
-    overflow: auto;
-    padding: 0;
-  }
-  .lightbox.zoomed figure {
-    max-width: none;
-  }
-  .lightbox.zoomed img {
-    max-width: none;
-    max-height: none;
-    cursor: zoom-out;
-    border: none;
-  }
-  .lightbox.zoomed figcaption {
-    display: none;
-  }
-  .lightbox figcaption {
-    margin-top: 0.9rem;
-  }
-  .lb-title {
-    display: block;
-    font-size: 0.92rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .lb-caption {
-    display: block;
-    margin-top: 0.3rem;
-    font-size: 0.78rem;
-    color: var(--text-weak);
-  }
-  .lb-caption:empty {
-    display: none;
-  }
-  .lb-note {
-    display: block;
-    margin-top: 0.55rem;
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
-    color: var(--text-weak);
-    opacity: 0.75;
-  }
+.filter { display: flex; flex-wrap: wrap; gap: 0.8rem 1.8rem; margin: 0 0 3rem; }
+  .filter-btn { all: unset; font-family: var(--font-jp); font-size: 0.9rem; color: var(--pencil); cursor: pointer; }
+  .filter-btn:hover { color: var(--ink); }
+  .filter-btn.active { color: var(--ink); text-decoration: underline 1px var(--pencil); text-underline-offset: 0.35em; }
+  .filter-btn:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+  :global(.photo-card) { cursor: zoom-in; }
 </style>

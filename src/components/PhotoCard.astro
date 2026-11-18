@@ -7,21 +7,23 @@ interface Props {
   aspect?: number;
   /** グリッドでの表示幅。既定はGALLERY/HOMEの3カラム想定 */
   sizes?: string;
+  titleOnly?: boolean;
 }
 const {
   photo,
   aspect,
-  sizes = '(max-width: 560px) 92vw, (max-width: 900px) 45vw, 350px',
+  sizes = '(max-width: 560px) 94vw, (max-width: 900px) 53vw, (max-width: 1180px) 40vw, 460px',
+  titleOnly = false,
 } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // カードには小さい変種を配り、ライトボックスの原寸だけ data-full で別に渡す
 const srcset = webpSrcset(photo.data.thumb, base);
 const full = webpFull(photo.data.thumb, base) ?? `${base}${photo.data.thumb}`;
 const catLabel: Record<string, string> = {
-  portrait: 'PORTRAIT',
-  commercial: 'COMMERCIAL',
-  event: 'EVENT',
-  photocontest: 'PHOTO CONTEST',
+  portrait: 'ポートレート',
+  commercial: '宣材・商品',
+  event: 'イベント',
+  photocontest: 'フォトコンテスト',
 };
 ---
 
@@ -30,7 +32,7 @@ const catLabel: Record<string, string> = {
   data-category={photo.data.category}
   data-aspect={aspect}
   data-title={photo.data.title}
-  data-caption={photo.data.caption ?? ''}
+  data-caption={`${catLabel[photo.data.category]}　${photo.data.date.getFullYear()}${photo.data.caption ? `　${photo.data.caption}` : ''}`}
   data-full={full}
 >
   <div class="frame">
@@ -46,54 +48,16 @@ const catLabel: Record<string, string> = {
     </picture>
   </div>
   <figcaption>
-    <span class="cat">{catLabel[photo.data.category]}</span>
-    <span class="ttl">{photo.data.title}</span>
+    <b class="ttl">{titleOnly ? photo.data.title.match(/『(.+?)』/)?.[1] ?? photo.data.title : photo.data.title}</b>
+    <span class="cat">{catLabel[photo.data.category]}　{photo.data.date.getFullYear()}</span>
   </figcaption>
 </figure>
 
+
 <style>
-  .photo-card {
-    break-inside: avoid;
-    margin: 0 0 26px;
-  }
-  .frame {
-    border: 1px solid var(--line);
-    overflow: hidden;
-    transition: box-shadow 0.4s ease, border-color 0.4s ease;
-  }
-  /* pictureはレイアウトに影響させない(枠の中でimgが直接効くように) */
-  .frame picture {
-    display: contents;
-  }
-  .frame img {
-    width: 100%;
-    height: auto;
-    transition: transform 0.4s ease;
-  }
-  .photo-card:hover .frame {
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 32px rgba(255, 255, 255, 0.08);
-  }
-  .photo-card:hover .frame img {
-    transform: scale(1.02);
-  }
-  figcaption {
-    display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
-    padding: 8px 2px 0;
-  }
-  .cat {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.62rem;
-    letter-spacing: 0.2em;
-    color: var(--text-weak);
-    white-space: nowrap;
-  }
-  .ttl {
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-  }
+.photo-card { break-inside: avoid; margin: 0 0 2.4rem; }
+  .frame img { width: 100%; height: auto; transition: opacity 0.25s; }
+  .photo-card:hover .frame img { opacity: 0.86; }
+  figcaption { margin-top: 0.6rem; font-size: 0.82rem; color: var(--pencil); line-height: 1.6; }
+  .ttl { font-family: 'Shippori Mincho', serif; font-weight: 500; color: var(--ink); margin-right: 1em; font-size: 0.92rem; }
 </style>

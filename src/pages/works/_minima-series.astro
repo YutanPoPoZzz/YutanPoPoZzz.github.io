@@ -1,4 +1,5 @@
 ---
+import '../../styles/book.css';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import WorkCard from '../../components/WorkCard.astro';
@@ -15,18 +16,17 @@ const minima = (await getCollection('works'))
   title="minima series"
   description="ブラウザで鳴らせる自作の音楽アプリ全10機。漆黒×1色、1機=1ジャンル×1シーンの設計思想"
 >
-  <main class="container series">
+  <main class="container book-page series">
     <Crumbs items={[{ label: 'ワークス', href: `${base}/works/` }, { label: 'minimaシリーズ' }]} />
     <div class="blockttl">
       <h2>minima series</h2>
-      <span class="sub">MUSIC APPS</span>
     </div>
     <p class="lead">
       ブラウザで鳴らせる、小さな音楽アプリのシリーズ。全10機。
     </p>
 
     <section class="philosophy">
-      <h3>設計思想<span class="en">CONCEPT</span></h3>
+      <h3>設計思想</h3>
       <dl>
         <div>
           <dt>1機 = 1ジャンル × 1シーン × 1色</dt>
@@ -62,95 +62,24 @@ const minima = (await getCollection('works'))
     </section>
 
     <section class="lineup">
-      <h3>ラインナップ<span class="en">LINEUP</span></h3>
+      <h3>ラインナップ</h3>
       <div class="grid">
         {minima.map((w) => <WorkCard work={w} />)}
       </div>
     </section>
 
-    <p class="back"><a href={`${base}/works/`}>← ポートフォリオ一覧にもどる</a></p>
+    <p class="back"><a href={`${base}/works/`}>ポートフォリオ一覧にもどる</a></p>
   </main>
 
   <BackFab href={`${base}/works/`} label="ポートフォリオ" />
 </Base>
 
+
 <style>
-  .series :global(.blockttl) {
-    margin-top: 1rem;
-  }
-  .lead {
-    text-align: center;
-    margin: -1.2rem 0 3rem;
-    font-size: 0.84rem;
-    color: var(--text-weak);
-  }
-  .philosophy {
-    max-width: 700px;
-    margin: 0 auto 3.6rem;
-  }
-  .philosophy h3,
-  .lineup h3 {
-    display: flex;
-    align-items: baseline;
-    gap: 0.8rem;
-    font-size: 0.95rem;
-    letter-spacing: 0.14em;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 0.45rem;
-    margin-bottom: 1.4rem;
-  }
-  .philosophy h3 .en,
-  .lineup h3 .en {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.66rem;
-    letter-spacing: 0.26em;
-    color: var(--text-weak);
-  }
-  .philosophy dl > div {
-    margin-bottom: 1.6rem;
-  }
-  .philosophy dt {
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.4rem;
-  }
-  .philosophy dd {
-    font-size: 0.87rem;
-    line-height: 1.85;
-    color: var(--text);
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 34px 30px;
-  }
-  .back {
-    margin-top: 3.6rem;
-    text-align: center;
-    font-size: 0.88rem;
-  }
-  .back a {
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: color-mix(in srgb, var(--gold) 85%, white);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 35%, transparent);
-    transition: color 0.3s, text-shadow 0.3s;
-  }
-  .back a:hover {
-    color: var(--gold);
-    text-shadow: 0 0 22px color-mix(in srgb, var(--gold) 60%, transparent);
-  }
-  @media (max-width: 900px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 560px) {
-    .grid {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
-  }
+.lead { color: var(--pencil); }
+  .philosophy { margin-top: 6rem; max-width: 38em; }
+  .philosophy dl > div { margin-top: 2.4rem; }
+  .philosophy dt { font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: 1.15rem; }
+  .philosophy dd { margin-top: 0.6rem; }
+  .lineup { margin-top: 9rem; }
 </style>

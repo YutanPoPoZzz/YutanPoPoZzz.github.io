@@ -37,6 +37,7 @@ for (const p of photos) {
       for (let i = 0; i < n; i++) {
         const c = document.createElement('div');
         c.className = 'photo-col';
+        c.style.flexGrow = String(n === 3 ? [5, 3, 4][i] : n === 2 ? [5, 4][i] : 1);
         grid.appendChild(c);
         cols.push(c);
         heights.push(0);
@@ -71,12 +72,12 @@ for (const p of photos) {
   /* JS無効時はCSSマルチカラムにフォールバック */
   .photo-grid {
     columns: 3;
-    column-gap: 26px;
+    column-gap: 2.4rem;
   }
   .photo-grid.masonry {
     columns: auto;
     display: flex;
-    gap: 26px;
+    gap: 2.4rem;
     align-items: flex-start;
   }
   .photo-grid :global(.photo-col) {

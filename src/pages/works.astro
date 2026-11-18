@@ -1,4 +1,5 @@
 ---
+import '../styles/book.css';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import WorkCard from '../components/WorkCard.astro';
@@ -29,10 +30,9 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
   fullTitle="ポートフォリオ・制作実績 | バーチャルフォトグラファー YutanpopoZzz"
   description="バーチャルフォトグラファーYutanpopoZzzの制作実績。VRChatでのポートレート撮影、アバター・衣装の商品撮影、イベント記録、ポスターや告知ビジュアルの制作、執筆・登壇まで。受けられる6種類の依頼と作例をまとめています。"
 >
-  <main class="container works">
+  <main class="container book-page works">
     <div class="blockttl">
-      <h2>ポートフォリオ</h2>
-      <span class="sub">WORKS</span>
+      <h1>ポートフォリオ</h1>
     </div>
 
     {/* ページ冒頭のプロフィール帯 */}
@@ -50,13 +50,13 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
           <span>撮影の時間そのものと人の温度を大切に、瞬間ごとの空気を写真に残します。</span>
           <span>作家として、自分の世界観を形にする作品制作も。</span>
         </p>
-        <p class="pf-link"><a href={`${base}/about/`}>くわしいプロフィールと実績 →</a></p>
+        <p class="pf-link"><a href={`${base}/about/`}>くわしいプロフィールと実績</a></p>
       </div>
     </section>
 
     <!-- なにをしているのか: 3本柱 -->
     <section class="block">
-      <h3>なにをしているのか<span class="en">WHAT I DO</span></h3>
+      <h3>なにをしているのか</h3>
       <div class="pillars">
         {workCategories.map((cat) => (
           <div class="pillar" id={cat.slug}>
@@ -68,7 +68,7 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
                     <source
                       type="image/webp"
                       srcset={webpSrcset(cat.thumb, base)}
-                      sizes="(max-width: 560px) 92vw, (max-width: 900px) 45vw, 340px"
+                      sizes="(max-width: 760px) 92vw, 680px"
                     />
                   )}
                   <img src={`${base}${cat.thumb}`} alt="" loading="lazy" decoding="async" />
@@ -84,18 +84,17 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
 
     <!-- しごとについて: 受けられる依頼 -->
     <section class="block">
-      <h3>しごとについて<span class="en">SERVICES</span></h3>
+      <h3>しごとについて</h3>
       <p class="sv-lead">
         依頼できる内容・納品までの流れ・料金の考え方は
         <a href={`${base}/photography/`}>撮影依頼ガイド</a>にまとめています。
       </p>
       <ul class="services">
         {services.map((s) => (
-          <li style={`--sv: ${s.color}`}>
+          <li>
             <a href={`${base}/works/tag/${s.slug}/`}>
-              <span class="sv-title"><span class="sv-dot" aria-hidden="true"></span>{s.name}</span>
+              <span class="sv-title">{s.name}</span>
               <span class="sv-desc">{s.desc}</span>
-              <span class="sv-arrow" aria-hidden="true">→</span>
             </a>
           </li>
         ))}
@@ -104,7 +103,7 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
 
     <!-- 制作実績(まだ空。作品mdを置くとここに並ぶ) -->
     <section class="block" id="records">
-      <h3>制作実績<span class="en">SELECTED WORKS</span></h3>
+      <h3>制作実績</h3>
       {records.length > 0 ? (
         <div class="grid">
           {records.map((w) => <WorkCard work={w} />)}
@@ -116,7 +115,7 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
 
     <!-- その他のつくりもの -->
     <section class="block" id="others">
-      <h3>その他のつくりもの<span class="en">OTHERS</span></h3>
+      <h3>その他のつくりもの</h3>
       <div class="grid">
         {misc.map((w) => <WorkCard work={w} />)}
       </div>
@@ -124,303 +123,35 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
 
     <!-- 依頼CTA -->
     <a class="cta" href={`${base}/contact/`}>
-      <span class="cta-label">CONTACT</span>
-      <span class="cta-body">お仕事のご依頼・ご相談はこちら</span>
-      <span class="cta-arrow">→</span>
+      <span style="display:inline-block">お仕事のご依頼・</span><span style="display:inline-block">ご相談はこちら</span>
     </a>
   </main>
 </Base>
 
+
 <style>
-  /* プロフィール帯 */
-  .profile {
-    display: flex;
-    align-items: center;
-    gap: 1.6rem;
-    max-width: 760px;
-    margin: 0 auto 3.4rem;
-    border: 1px solid var(--line);
-    padding: 1.5rem 1.7rem;
-  }
-  .pf-icon {
-    flex: none;
-    width: 150px;
-    height: 150px;
-  }
-  .pf-name {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.8rem;
-    font-family: var(--font-en);
-    font-size: 1.05rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-  }
-  /* 読み仮名: 名前のすぐ隣に和文で置く(指名検索の受け皿) */
-  .pf-reading {
-    font-family: var(--font-jp);
-    font-size: 0.74rem;
-    letter-spacing: 0.14em;
-    color: color-mix(in srgb, var(--gold) 80%, transparent);
-  }
-  .pf-roles {
-    font-weight: 300;
-    font-size: 0.66rem;
-    letter-spacing: 0.22em;
-    color: var(--text-weak);
-  }
-  .pf-catch {
-    margin-top: 0.9rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    line-height: 1.5;
-  }
-  .pf-bio {
-    margin-top: 0.6rem;
-    font-size: 0.85rem;
-    line-height: 1.85;
-    color: var(--text-weak);
-  }
-  .pf-bio span {
-    display: block;
-  }
-  .pf-link {
-    margin-top: 0.6rem;
-    font-size: 0.78rem;
-  }
-  .pf-link a {
-    color: var(--text-weak);
-    border-bottom: 1px solid var(--line);
-    transition: color 0.3s, border-color 0.3s;
-  }
-  .pf-link a:hover {
-    color: var(--text);
-    border-color: var(--text);
-  }
-
-  /* セクション共通見出し */
-  .block {
-    margin-bottom: 3.4rem;
-  }
-  .block h3 {
-    display: flex;
-    align-items: baseline;
-    gap: 0.8rem;
-    font-size: 0.95rem;
-    letter-spacing: 0.14em;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 0.45rem;
-    margin-bottom: 1.4rem;
-  }
-  .block h3 .en {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.66rem;
-    letter-spacing: 0.26em;
-    color: var(--text-weak);
-  }
-
-  /* なにをしているのか: 3本柱(画像は空フレーム) */
-  .pillars {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-  }
-  .pillar-frame {
-    display: block;
-    aspect-ratio: 16 / 9;
-    border: 1px solid var(--line);
-    background: var(--bg-soft);
-    overflow: hidden;
-  }
-  .pillar-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .pillar-name {
-    margin-top: 0.7rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .pillar-desc {
-    margin-top: 0.35rem;
-    font-size: 0.78rem;
-    line-height: 1.8;
-    color: var(--text-weak);
-  }
-
-  /* しごとについて */
-  .sv-lead {
-    margin: -0.6rem 0 1.1rem;
-    font-size: 0.82rem;
-    color: var(--text-weak);
-  }
-  .sv-lead a {
-    color: var(--text);
-    border-bottom: 1px solid var(--line);
-    transition: border-color 0.3s;
-  }
-  .sv-lead a:hover {
-    border-color: var(--text);
-  }
-  .services {
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-  }
-  .services li {
-    border: 1px solid color-mix(in srgb, var(--sv) 32%, transparent);
-    background: color-mix(in srgb, var(--sv) 7%, transparent);
-    transition: border-color 0.3s, box-shadow 0.3s;
-  }
-  .services li:hover {
-    border-color: color-mix(in srgb, var(--sv) 70%, transparent);
-    box-shadow: 0 0 26px color-mix(in srgb, var(--sv) 20%, transparent);
-  }
-  .services a {
-    position: relative;
-    display: block;
-    padding: 0.9rem 2.2rem 0.9rem 1.1rem;
-  }
-  .services a:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 2px;
-  }
-  .sv-title {
-    display: flex;
-    align-items: center;
-    gap: 0.55em;
-    font-size: 0.88rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-  .sv-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--sv);
-    flex: none;
-  }
-  .sv-desc {
-    display: block;
-    margin-top: 0.25rem;
-    font-size: 0.76rem;
-    color: var(--text-weak);
-  }
-  .sv-arrow {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    translate: 0 -50%;
-    font-size: 0.85rem;
-    color: color-mix(in srgb, var(--sv) 70%, white);
-    transition: transform 0.3s ease;
-  }
-  .services li:hover .sv-arrow {
-    transform: translateX(4px);
-  }
-
-  .empty {
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    color: var(--text-weak);
-    border: 1px dashed var(--line);
-    padding: 1.4rem 1.2rem;
-    text-align: center;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 34px 30px;
-  }
-
-  /* 依頼CTA(HOMEのCONTACT帯と同じ一列レイアウト・lagoon配色) */
-  .cta {
-    display: flex;
-    align-items: center;
-    gap: 1.4rem;
-    max-width: 760px;
-    margin: 4.5rem auto 0;
-    padding: 1.5rem 1.7rem;
-    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
-    /* 待機中からしっかり発光(外側の広がり+枠に沿った内側の光) */
-    box-shadow:
-      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
-      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
-    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
-      background 0.4s ease;
-  }
-  .cta:hover {
-    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
-    border-color: var(--cta-blue);
-    box-shadow:
-      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
-      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
-    transform: translateY(-4px);
-  }
-  .cta-label {
-    font-family: var(--font-en);
-    font-weight: 500;
-    font-size: 0.82rem;
-    letter-spacing: 0.3em;
-    color: var(--cta-warm);
-    white-space: nowrap;
-  }
-  .cta-body {
-    flex: 1;
-    font-size: 1.08rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .cta-arrow {
-    color: var(--cta-warm);
-    transition: transform 0.3s ease;
-  }
-  .cta:hover .cta-arrow {
-    transform: translateX(8px);
-  }
-  @media (max-width: 560px) {
-    .cta {
-      flex-wrap: wrap;
-      gap: 0.6rem 1rem;
-    }
-  }
-
-  @media (max-width: 900px) {
-    .pillars,
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (max-width: 640px) {
-    .profile {
-      flex-direction: column;
-      text-align: center;
-      gap: 1rem;
-    }
-    .pf-name {
-      justify-content: center;
-    }
-  }
-  @media (max-width: 560px) {
-    .pillars,
-    .grid {
-      grid-template-columns: 1fr;
-      gap: 34px;
-    }
-    .services {
-      grid-template-columns: 1fr;
-    }
-    .cta {
-      flex-wrap: wrap;
-      gap: 0.6rem 1rem;
-    }
-  }
+.profile { display: flex; align-items: start; gap: 2rem; max-width: 52rem; }
+  .pf-icon { width: 150px; height: 150px; flex: none; }
+  .pf-name { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 1rem; font-family: var(--font-en); font-size: 1.5rem; }
+  .pf-reading { font-family: var(--font-jp); font-size: 0.85rem; color: var(--pencil); }
+  .pf-roles { flex-basis: 100%; font-size: 1rem; color: var(--pencil); }
+  .pf-catch { font-family: 'Shippori Mincho', serif; font-size: 1.3rem; margin-top: 1.3rem; }
+  .pf-bio { margin-top: 0.8rem; font-size: 0.92rem; }
+  .pf-bio span { display: block; }
+  .pf-link { margin-top: 1rem; font-size: 0.88rem; }
+  .pillars { display: grid; grid-template-columns: 7fr 4fr; gap: 2.4rem clamp(2rem, 5vw, 4.4rem); align-items: start; }
+  .pillar:nth-child(2) { margin-top: 5rem; }
+  .pillar:nth-child(n+3) { grid-column: 2; }
+  .pillar-frame { display: block; }
+  .pillar-frame img { width: 100%; height: auto; margin-bottom: 0.6rem; }
+  .pillar-name, .sv-title { font-family: 'Shippori Mincho', serif; font-size: 1.2rem; font-weight: 500; }
+  .pillar-desc, .sv-desc { color: var(--pencil); font-size: 0.9rem; margin-top: 0.35rem; }
+  .sv-lead { color: var(--pencil); }
+  .services { list-style: none; max-width: 48rem; margin-top: 2rem; }
+  .services li + li { margin-top: 2.2rem; }
+  .services a { display: block; text-decoration: none; }
+  .sv-title { text-decoration: underline 1px var(--pencil); text-underline-offset: 0.35em; }
+  .services a:hover .sv-title { text-decoration-color: var(--ink); }
+  .sv-desc { display: block; max-width: 38em; }
+  @media (max-width: 760px) { .profile { flex-direction: column; } .pillars { grid-template-columns: 1fr; } .pillar:nth-child(2) { margin-top: 2rem; max-width: 85%; } .pillar:nth-child(n+3) { grid-column: 1; margin-top: 1rem; } }
 </style>

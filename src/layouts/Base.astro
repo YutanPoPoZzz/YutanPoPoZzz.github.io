@@ -1,13 +1,15 @@
 ---
+// 書体: 見出し=明朝(Shippori Mincho)、本文=Zen Kaku Gothic New、欧文=EB Garamond(ローマン体)
 import '@fontsource/zen-kaku-gothic-new/400.css';
 import '@fontsource/zen-kaku-gothic-new/500.css';
 import '@fontsource/zen-kaku-gothic-new/700.css';
-import '@fontsource/space-grotesk/300.css';
-import '@fontsource/space-grotesk/400.css';
-import '@fontsource/space-grotesk/500.css';
+import '@fontsource/shippori-mincho/500.css';
+import '@fontsource/eb-garamond/400.css';
+import '@fontsource/eb-garamond/500.css';
 
 import { awards } from '../data/profile';
 import { services } from '../data/services';
+import { chapters } from '../data/chapters';
 
 interface Props {
   title?: string;
@@ -123,19 +125,9 @@ const jsonLd = {
   ],
 };
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-// 和文が主・英字が従(blockttlと同じ見せ方)。和文は各ページの見出しに合わせる
-const nav = [
-  { jp: 'ホーム', en: 'HOME', href: `${base}/` },
-  { jp: 'ギャラリー', en: 'GALLERY', href: `${base}/gallery/` },
-  { jp: 'ポートフォリオ', en: 'WORKS', href: `${base}/works/` },
-  { jp: 'イベント運営', en: 'EVENTS', href: `${base}/events/` },
-  { jp: 'じぶんのこと', en: 'ABOUT', href: `${base}/about/` },
-  // 「知る→頼む→問い合わせる」の順に並べる
-  { jp: 'バーチャルフォトとは', en: 'VIRTUAL PHOTO', href: `${base}/virtual-photographer/` },
-  { jp: '撮影依頼ガイド', en: 'PHOTOGRAPHY', href: `${base}/photography/` },
-  { jp: 'お問い合わせ', en: 'CONTACT', href: `${base}/contact/` },
-];
-// 現在地タブの判定(HOMEは完全一致、他は配下ページも含む前方一致)
+// 目次 = 章立て(src/data/chapters.ts が正)。HOMEの目次と同じ番号を使う
+const nav = chapters.map((c) => ({ n: c.n, jp: c.jp, href: `${base}${c.path}` }));
+// 現在地の判定(HOMEは完全一致、他は配下ページも含む前方一致)
 const path = Astro.url.pathname;
 const isActive = (href: string) =>
   href === `${base}/` ? path === `${base}/` : path.startsWith(href);
@@ -203,47 +195,42 @@ const isActive = (href: string) =>
           background: none !important;
           border-left: none !important;
           box-shadow: none !important;
-          border-bottom: 1px solid var(--line);
         }
-        .global-nav ul { display: flex; flex-wrap: wrap; gap: 0 0.4rem; padding: 0.6rem 1.2rem; }
+        .global-nav ol { display: flex; flex-wrap: wrap; gap: 0 0.4rem; padding: 0.6rem 1.2rem; }
         .global-nav li + li { margin-top: 0; }
       </style>
     </noscript>
   </head>
   <body>
-    <!-- 背景: 暖色の光溜まり + ヘアライン方眼(地の深青グラデはbodyに) -->
-    <div class="bg-layer bg-glow" aria-hidden="true"></div>
-    <div class="bg-layer bg-grid" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
-
+    {/* 柱(ランニングヘッド): 写真集の上端にある一行。左に書名、右に目次 */}
     <header class="site-header" data-header>
       <div class="header-in">
         <a class="logo" href={`${base}/`} aria-label={`${siteName} ホームへ`}>
-          <img class="logo-mark" src={`${base}/icon.png`} alt={siteName} width="68" height="68" />
-          <span class="logo-sub"><span>Virtual Photographer</span><span>Visual Creator</span></span>
+          <img class="logo-mark" src={`${base}/icon.png`} alt="" width="34" height="34" />
+          <span class="logo-name">{siteName}</span>
+          <span class="logo-sub">写真集</span>
         </a>
         <button
           class="nav-toggle"
           type="button"
           aria-expanded="false"
           aria-controls="global-nav"
-          aria-label="メニューを開く"
           data-nav-toggle
         >
-          <span class="bars" aria-hidden="true"></span>
+          目次
         </button>
       </div>
     </header>
 
-    {/* ドロワーは header の外に出す。header は backdrop-filter を持つので、
-        中に置くと position:fixed の基準がheaderになってしまう */}
+    {/* 目次は header の外に置く(position:fixed の基準をずらさないため) */}
     <div class="nav-scrim" data-nav-scrim aria-hidden="true"></div>
     {/* リンクは常にHTMLに出したままにして、開閉はvisibilityで切り替える(クローラは全項目を読める) */}
-    <nav class="global-nav" id="global-nav" aria-label="メインメニュー">
-      <button class="nav-close" type="button" aria-label="メニューを閉じる" data-nav-close>
-        <span class="x" aria-hidden="true"></span>
-      </button>
-      <ul>
+    <nav class="global-nav" id="global-nav" aria-label="目次">
+      <div class="nav-head">
+        <p class="nav-title">目次</p>
+        <button class="nav-close" type="button" data-nav-close>閉じる</button>
+      </div>
+      <ol>
         {nav.map((item) => (
           <li>
             <a
@@ -251,14 +238,12 @@ const isActive = (href: string) =>
               class:list={[{ active: isActive(item.href) }]}
               aria-current={isActive(item.href) ? 'page' : undefined}
             >
-              <span class="lbl">
-                <span class="jp">{item.jp}</span>
-                <span class="en">{item.en}</span>
-              </span>
+              <span class="n" aria-hidden="true">{item.n}</span>
+              <span class="jp">{item.jp}</span>
             </a>
           </li>
         ))}
-      </ul>
+      </ol>
     </nav>
 
     <slot />
@@ -273,7 +258,7 @@ const isActive = (href: string) =>
       </div>
     </footer>
     <script>
-      // 右ドロワーの開閉。開いている状態は <html> の data-nav-open だけで表し、
+      // 目次の開閉。開いている状態は <html> の data-nav-open だけで表し、
       // 見た目(CSS)・背後のスクロール止め・aria-expanded をそこから引く。
       const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
       const closeBtn = document.querySelector<HTMLButtonElement>('[data-nav-close]');
@@ -287,7 +272,6 @@ const isActive = (href: string) =>
         const setOpen = (open: boolean) => {
           root.toggleAttribute('data-nav-open', open);
           toggle.setAttribute('aria-expanded', String(open));
-          // 開いている間はドロワーの中だけを触れるようにする
           if (open) closeBtn.focus();
           else toggle.focus();
         };
@@ -312,17 +296,18 @@ const isActive = (href: string) =>
 
 <style is:global>
   :root {
-    --bg: #0a0a0c;
-    --bg-soft: #101014;
-    --text: rgba(255, 255, 255, 0.92);
-    --text-weak: rgba(255, 255, 255, 0.45);
-    --line: rgba(255, 255, 255, 0.14);
-    --gold: #d9b36c; /* ナビhover等のハイライト金 */
-    /* CONTACT系CTA専用(minima lagoonの青×暖金。他では使わない) */
-    --cta-blue: #4da6ff;
-    --cta-warm: #ffcf99;
+    /* 黒い台紙の写真集。色はこの4つ＋朱だけ */
+    --board: #141210; /* 台紙(つや消しの温かい黒) */
+    --board-2: #1b1916; /* 一段沈んだ面(写真の下敷き・入力欄など) */
+    --ink: #ebe5d9; /* 紙白 */
+    --pencil: #a59e92; /* 鉛。補足・キャプション */
+    --rule: #3a352f; /* 罫 */
+    --shu: #dc5638; /* 朱。検印(受付状況)と依頼の導線だけ。地とのコントラスト 4.83:1 */
+
     --font-jp: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
-    --font-en: 'Space Grotesk', var(--font-jp);
+    --font-mincho: 'EB Garamond', 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    --font-en: 'EB Garamond', var(--font-jp);
+
   }
   * {
     margin: 0;
@@ -331,19 +316,66 @@ const isActive = (href: string) =>
   }
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
+    scrollbar-color: var(--rule) var(--board);
   }
   body {
     font-family: var(--font-jp);
     font-size: 16px;
-    color: var(--text);
-    background: var(--bg);
-    line-height: 1.8;
-    letter-spacing: 0.05em;
+    color: var(--ink);
+    background: var(--board);
+    line-height: 1.85;
+    letter-spacing: 0.03em;
     -webkit-font-smoothing: antialiased;
+    text-spacing-trim: trim-start;
+    text-autospace: normal;
+    font-kerning: normal;
+    /* 和文を文節で折り返す(「記/録」のような語の途中割れを防ぐ。未対応ブラウザは通常の折り返し) */
+    word-break: auto-phrase;
+    /* 口絵の全面写真(100vw)でスクロールバー幅ぶん横にはみ出すのを切る(clipなのでstickyは壊れない) */
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--ink);
+    color: var(--board);
+  }
+  /* 明朝の見出しは仮名を詰める(既定の全角送りだと仮名がぱらついて「字間を広げた見出し」に見える) */
+  h1,
+  h2,
+  h3,
+  dt,
+  .logo-sub,
+  .nav-toggle,
+  .nav-close,
+  .global-nav .jp {
+    font-feature-settings: 'palt';
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  time,
+  input,
+  textarea {
+    text-autospace: no-autospace;
   }
   a {
     color: inherit;
     text-decoration: none;
+  }
+  /* 依頼の導線は語句ごとに inline-block の span で包んでいる(語の途中で折り返さないため)。
+     text-decoration は inline-block の中へは伝わらないので、span 側にも下線を引き継がせる */
+  .colo-cta span,
+  a.cta span,
+  .channels a span {
+    text-decoration: inherit;
+    text-underline-offset: inherit;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 4px;
   }
   img {
     max-width: 100%;
@@ -362,292 +394,148 @@ const isActive = (href: string) =>
     }
   }
 
-  /* ===== 背景レイヤー ===== */
-  body {
-    background: linear-gradient(to bottom, #0a0a0c 0%, #0a0b11 55%, #0a0d15 100%);
-    background-attachment: fixed;
-  }
-  .bg-layer {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-  /* 暗室の光溜まり(暖色寄り) */
-  .bg-glow {
-    background:
-      radial-gradient(
-        60% 45% at 50% 12%,
-        rgba(255, 207, 153, 0.09) 0%,
-        rgba(255, 198, 140, 0.035) 40%,
-        transparent 72%
-      );
-  }
-  /* ヘアライングリッド(方眼) */
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-    background-size: 88px 88px;
-    /* 中央だけ見せて端は溶かす */
-    mask-image: radial-gradient(80% 70% at 50% 30%, #000 25%, transparent 85%);
-  }
-  /* ===== ここまで背景レイヤー ===== */
-
-  /* minimaの画材: グレイン */
-  .grain {
-    position: fixed;
-    inset: 0;
-    z-index: 999;
-    pointer-events: none;
-    opacity: 0.045;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  /* header: ロゴ左 / ナビ右。スクロールしても常に表示 */
+  /* ===== 柱 ===== */
   .site-header {
     position: sticky;
     top: 0;
     z-index: 500;
-    background: rgba(10, 10, 12, 0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--line);
+    background: var(--board);
   }
   .header-in {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 1.2rem;
-    height: 100px;
+    padding: 0 clamp(1rem, 3vw, 2.4rem);
+    height: 58px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
   .logo {
     display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
+    align-items: center;
+    gap: 0.75rem;
   }
   .logo-mark {
-    align-self: center;
-    width: 68px;
-    height: 68px;
+    width: 34px;
+    height: 34px;
     flex: none;
+  }
+  .logo-name {
+    font-family: var(--font-en);
+    font-size: 1.12rem;
+    letter-spacing: 0.04em;
   }
   .logo-sub {
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.62rem;
-    line-height: 1.55;
-    letter-spacing: 0.22em;
-    color: var(--text-weak);
-    white-space: nowrap;
+    font-family: var(--font-mincho);
+    font-size: 0.82rem;
+    color: var(--pencil);
+    letter-spacing: 0.04em;
   }
-  /* ===== ハンバーガーボタン ===== */
-  .nav-toggle {
-    flex: none;
-    width: 46px;
-    height: 46px;
-    display: grid;
-    place-items: center;
+  .nav-toggle,
+  .nav-close {
     background: none;
-    border: 1px solid transparent;
-    color: color-mix(in srgb, var(--gold) 78%, transparent);
+    border: none;
+    color: var(--ink);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0;
     cursor: pointer;
-    transition: color 0.3s;
+    text-decoration: underline 1px transparent;
+    text-underline-offset: 0.4em;
+    transition: text-decoration-color 0.25s;
   }
-  .nav-toggle:hover {
-    color: var(--gold);
-  }
-  .nav-toggle:focus-visible,
-  .logo:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 4px;
-  }
-  /* 3本線。開いているあいだは×へ組み替える */
-  .bars,
-  .bars::before,
-  .bars::after {
-    display: block;
-    width: 26px;
-    height: 1.5px;
-    background: currentColor;
-    transition: transform 0.32s ease, opacity 0.18s ease, background 0.18s ease;
-  }
-  .bars {
-    position: relative;
-  }
-  .bars::before,
-  .bars::after {
-    content: '';
-    position: absolute;
-    left: 0;
-  }
-  .bars::before {
-    top: -8px;
-  }
-  .bars::after {
-    top: 8px;
-  }
-  :root[data-nav-open] .bars {
-    background: transparent;
-  }
-  :root[data-nav-open] .bars::before {
-    transform: translateY(8px) rotate(45deg);
-  }
-  :root[data-nav-open] .bars::after {
-    transform: translateY(-8px) rotate(-45deg);
+  .nav-toggle:hover,
+  .nav-close:hover {
+    text-decoration-color: var(--ink);
   }
 
-  /* ===== 右から出るドロワー ===== */
+  /* ===== 目次(右からのパネル) ===== */
   .nav-scrim {
     position: fixed;
     inset: 0;
     z-index: 900;
-    background: rgba(4, 4, 6, 0.62);
-    backdrop-filter: blur(3px);
+    background: rgba(8, 7, 6, 0.7);
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.32s ease, visibility 0s linear 0.32s;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
   }
   :root[data-nav-open] .nav-scrim {
     visibility: visible;
     opacity: 1;
-    transition: opacity 0.32s ease, visibility 0s;
+    transition: opacity 0.3s ease, visibility 0s;
   }
-
   .global-nav {
     position: fixed;
     top: 0;
     right: 0;
     z-index: 910;
-    width: min(340px, 84vw);
+    width: min(30rem, 100vw);
     height: 100dvh;
     display: flex;
     flex-direction: column;
-    background: rgba(10, 10, 12, 0.98);
-    backdrop-filter: blur(14px);
-    border-left: 1px solid color-mix(in srgb, var(--gold) 26%, transparent);
-    box-shadow: -30px 0 60px rgba(0, 0, 0, 0.5);
+    background: var(--board);
+    padding: 0 clamp(1.4rem, 4vw, 2.6rem);
     transform: translateX(100%);
     visibility: hidden;
-    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.36s;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.42s;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
   :root[data-nav-open] .global-nav {
     transform: none;
     visibility: visible;
-    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s;
   }
-  /* 開いている間は背後を動かさない */
   :root[data-nav-open] {
     overflow: hidden;
   }
-
-  .nav-close {
-    align-self: flex-end;
+  .nav-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 58px;
     flex: none;
-    width: 46px;
-    height: 46px;
-    margin: 1.1rem 1rem 0 0;
-    display: grid;
-    place-items: center;
-    background: none;
-    border: 1px solid transparent;
-    color: color-mix(in srgb, var(--gold) 78%, transparent);
-    cursor: pointer;
-    transition: color 0.3s;
   }
-  .nav-close:hover {
-    color: var(--gold);
+  .nav-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.95rem;
+    color: var(--pencil);
   }
-  .nav-close:focus-visible,
-  .global-nav a:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 4px;
-  }
-  .x {
-    position: relative;
-    display: block;
-    width: 22px;
-    height: 1.5px;
-    background: transparent;
-  }
-  .x::before,
-  .x::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: currentColor;
-  }
-  .x::before {
-    transform: rotate(45deg);
-  }
-  .x::after {
-    transform: rotate(-45deg);
-  }
-
-  .global-nav ul {
+  .global-nav ol {
     list-style: none;
-    padding: 0.8rem 1.5rem 2.4rem;
-  }
-  .global-nav li + li {
-    margin-top: 0.2rem;
+    margin-top: 2.2rem;
+    padding-bottom: 3rem;
   }
   .global-nav a {
-    position: relative;
-    display: block;
-    padding: 0.7rem 0.9rem;
-    color: color-mix(in srgb, var(--gold) 78%, transparent);
-    transition: color 0.3s, text-shadow 0.3s;
-  }
-  /* 和文が主・英字が従(blockttlと同じ組み方) */
-  .global-nav .lbl {
-    position: relative;
-    z-index: 1;
-    display: flex;
+    display: grid;
+    grid-template-columns: 2.6rem auto;
     align-items: baseline;
-    gap: 0.15rem 0.7rem;
-    /* 長い項目は英字を次の行へ落とす(英字自体が途中で割れるのを防ぐ) */
-    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.75rem 0;
+  }
+  /* 奥付(お問い合わせ)だけ、ひと呼吸あけて離す */
+  .global-nav li:last-child {
+    margin-top: 1.4rem;
+  }
+  .global-nav .n {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--pencil);
   }
   .global-nav .jp {
-    font-size: 0.98rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    /* 「撮影依頼ガイド」等が語の途中で割れないように */
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
     word-break: keep-all;
-    white-space: nowrap;
   }
-  .global-nav .en {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.6rem;
-    letter-spacing: 0.24em;
-    color: var(--text-weak);
-    white-space: nowrap;
-    transition: color 0.3s;
+  .global-nav a:hover .jp {
+    text-decoration: underline 1px;
+    text-underline-offset: 0.35em;
   }
-  .global-nav a:hover {
-    color: var(--gold);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 45%, transparent);
+  /* 現在地: 頁の角を折るように、ノンブル欄に朱の点 */
+  .global-nav a.active .n {
+    color: var(--shu);
   }
-  .global-nav a:hover .en {
-    color: color-mix(in srgb, var(--gold) 55%, transparent);
-  }
-  /* 現在地: 「/」の実測傾斜(垂直から18°)に合わせた平行四辺形の金塗り */
-  .global-nav a.active {
-    color: var(--gold);
-  }
-  .global-nav a.active::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: color-mix(in srgb, var(--gold) 20%, transparent);
-    transform: skewX(-18deg);
+  .global-nav li:last-child .jp {
+    color: var(--ink);
   }
   @media (prefers-reduced-motion: reduce) {
     .global-nav,
@@ -656,83 +544,70 @@ const isActive = (href: string) =>
     }
   }
   @media (max-width: 640px) {
-    .header-in {
-      height: 76px;
-    }
-    .logo-mark {
-      width: 48px;
-      height: 48px;
-    }
     .logo-sub {
       display: none;
     }
   }
 
-  /* blockttl: セクション見出し(和文+英字サブ) */
+  /* blockttl: 章見出し。左寄せの明朝。英字の小ラベルは出さない */
   .blockttl {
-    text-align: center;
-    margin: 4.5rem 0 2.6rem;
+    margin: 5rem 0 2.2rem;
   }
-  .blockttl h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-indent: 0.28em;
-  }
-  .blockttl .sub {
-    display: block;
-    margin-top: 0.3rem;
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.78rem;
-    letter-spacing: 0.3em;
-    text-indent: 0.3em;
-    color: var(--text-weak);
+  .blockttl :is(h1, h2) {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
   }
 
   .container {
-    max-width: 1080px;
+    max-width: 1180px;
     margin: 0 auto;
-    padding: 0 1.2rem;
+    padding: 0 clamp(1rem, 3vw, 2.4rem);
   }
 
-  /* footer */
+  /* 巻末 */
   .site-footer {
-    margin-top: 7rem;
-    border-top: 1px solid var(--line);
-    background: var(--bg-soft);
+    margin-top: 10rem;
   }
   .footer-inner {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 3.2rem 1.2rem;
-    text-align: center;
+    padding: 2.4rem clamp(1rem, 3vw, 2.4rem) 3rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.4rem 2rem;
+    align-items: baseline;
   }
   .footer-logo {
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    text-indent: 0.3em;
+    font-family: var(--font-en);
+    font-size: 1.05rem;
   }
   .footer-role {
-    margin-top: 0.3rem;
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
-    color: var(--text-weak);
+    font-size: 0.8rem;
+    color: var(--pencil);
   }
-  /* 一言文章がフッターの主役 */
   .footer-note {
-    margin-top: 1.4rem;
+    grid-column: 1 / 3;
+    font-family: var(--font-mincho);
     font-size: 0.95rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    color: var(--text);
+    letter-spacing: 0.04em;
   }
   .copyright {
-    margin-top: 1.8rem;
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: end;
     font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.68rem;
-    letter-spacing: 0.24em;
-    color: var(--text-weak);
+    font-size: 0.85rem;
+    color: var(--pencil);
+  }
+  @media (max-width: 640px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+    .footer-note,
+    .copyright {
+      grid-column: 1;
+      grid-row: auto;
+    }
   }
 </style>

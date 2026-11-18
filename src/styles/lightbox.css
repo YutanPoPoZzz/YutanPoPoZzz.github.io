@@ -1,0 +1,24 @@
+/* 背景色は指定の rgba(20,18,16,.96) と同値。色の正本は --board。 */
+.lightbox {
+  --lightbox-board: color-mix(in srgb, var(--board) 96%, transparent);
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  background: var(--lightbox-board);
+  cursor: zoom-out;
+}
+.lightbox[hidden] { display: none; }
+.lightbox figure { max-width: 100%; text-align: left; }
+.lightbox img { max-width: 92vw; max-height: 76vh; width: auto; height: auto; cursor: zoom-in; }
+.lightbox.zoomed { align-items: safe center; justify-content: safe center; overflow: auto; padding: 0; }
+.lightbox.zoomed figure { max-width: none; }
+.lightbox.zoomed img { max-width: none; max-height: none; cursor: zoom-out; }
+.lightbox.zoomed figcaption { display: none; }
+.lightbox figcaption { margin-top: 0.6rem; font-size: 0.82rem; line-height: 1.6; color: var(--pencil); }
+.lightbox .lb-title { font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: 0.92rem; color: var(--ink); margin-right: 1em; }
+.lightbox .lb-caption:empty { display: none; }
+.lightbox .lb-note { display: block; margin-top: 0.55rem; font-size: 0.75rem; }

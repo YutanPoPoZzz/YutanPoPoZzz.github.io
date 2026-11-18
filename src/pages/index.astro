@@ -1,800 +1,771 @@
 ﻿---
 import { getCollection } from 'astro:content';
+import AwardPhoto from '../components/AwardPhoto.astro';
 import Base from '../layouts/Base.astro';
-import { availability, awards } from '../data/profile';
+import { availability } from '../data/profile';
 import { events } from '../data/events';
-import { photoAspect } from '../lib/photo-aspect';
-import { webpSrcset } from '../lib/img';
+import { webpSrcset, imgSize } from '../lib/img';
 import { workCategories } from '../data/work-categories';
+import { chapters, chapterOf } from '../data/chapters';
 
+// HOME = 写真集の表紙・目次・口絵・各章の抜粋・奥付。
+// 罫線・大きな章番号・字間を広げた見出しは使わない(区切りは余白と写真の大きさの差で作る)
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const photos = (await getCollection('photos')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
+const works = await getCollection('works');
+const publicWorks = works.filter((w) => !w.id.startsWith('minima-'));
 
-// EVENTSダイジェスト: Roof Top Junctionをメイン、右側は参加中の2イベントを要約カードで
+const catJp: Record<string, string> = {
+  portrait: 'ポートレート',
+  commercial: '宣材・商品',
+  event: 'イベント',
+  photocontest: 'フォトコンテスト',
+};
+type Photo = (typeof photos)[number];
+const ar = (p: Photo) => p.data.aspect ?? 0.75;
+const year = (p: Photo) => p.data.date.getFullYear();
+// 題から「第4回YMフォトコン優秀賞‗『いつか』」のような前置きを外して、作品名だけを出す
+const titleOf = (p: Photo) => p.data.title.match(/『(.+?)』/)?.[1] ?? p.data.title;
+// HOMEは抜粋なので、説明文は最初の1文だけ(全文は各ページ)
+const firstSentence = (s: string) => (s.match(/^.*?。/)?.[0] ?? s);
+
+// 表紙: 黒地にネオンの線が走る明暗差の強い横長の1枚。消えていたら最新の横長写真へ
+// (作品撮り 05 は画像自体に黒帯が焼き込まれているので表紙には使わない)
+const cover =
+  photos.find((p) => p.data.thumb.includes('g-event-b82c99a9')) ??
+  photos.find((p) => ar(p) > 1.3) ??
+  photos[0];
+
+// 口絵(3見開き): 新しい順に「全面1枚 → 対向する縦2枚 → 余白に1枚」を拾う
+const pool = photos.filter((p) => p !== cover);
+const take = (pred: (p: Photo) => boolean) => {
+  const i = pool.findIndex(pred);
+  return i < 0 ? undefined : pool.splice(i, 1)[0];
+};
+const spreadWide = take((p) => ar(p) > 1.3);
+const spreadPair = [take((p) => ar(p) < 0.9), take((p) => ar(p) < 0.9)].filter(
+  (p): p is Photo => Boolean(p)
+);
+const spreadQuiet = take(() => true);
+
+// 目次の行: 章立ては chapters.ts が正。件数はデータから数える
+const tocCount: Record<string, string | undefined> = {
+  '/gallery/': `${photos.length}点`,
+  '/works/': `${publicWorks.length}件`,
+  '/events/': `${events.length}件`,
+  '/contact/': availability.open ? availability.short : undefined,
+};
+const toc = chapters.filter((c) => c.path !== '/');
+
+// EVENTS抜粋: Roof Top Junction を主に、運営・スタッフ参加の2件を添える
 const mainEvent = events.find((e) => e.name === 'Roof Top Junction') ?? events[0];
 const subEvents = events.filter(
   (e) => e !== mainEvent && (e.status === 'organizer' || e.status === 'staff')
 );
-// HOME用の一行紹介(詳細はEVENTSページに任せて、ここでは雰囲気だけ伝える)
-const evTagline: Record<string, string> = {
-  'Gallery & fan cafe Kittens':
-    'アバター「Undone Kittens」をテーマにした、ギャラリー併設のファンメイドカフェ',
-  'VRC貴族部 Eleganttique':
-    '「エレガント」をテーマに、礼節と美意識を大切にする会員制コミュニティ',
-};
-const mainRoleNote =
-  '主催として、企画からチームマネジメント、広報・ポスター制作、会場ワールドの整備までを担当しています。';
-// タイトル末尾の賞グレードをバッジとして分離する(ABOUTと同じ見せ方)
-const splitGrade = (t: string) => {
-  const m = t.match(/^(.*?)\s*(最優秀賞|優秀賞|入賞|審査員賞)$/);
-  return m ? { base: m[1], grade: m[2] } : { base: t, grade: null };
-};
-// 本棚カルーセル: 中央の1枚は元比率で表示するためアスペクト比を持たせる
-const shelfItems = [];
-for (const p of photos.slice(0, 12)) {
-  shelfItems.push({ p, aspect: p.data.aspect ?? (await photoAspect(p.data.thumb)) });
-}
+const evRole: Record<string, string> = { organizer: '運営', staff: 'スタッフ' };
+const ch = (p: string) => chapterOf(p)!;
+const [catMain, catSub, ...catRest] = workCategories;
 ---
 
 <Base>
-  <main class="container">
-    <section class="intro">
-      {/* h1に読み仮名と和文の肩書きを持たせる(指名検索・職種検索の受け皿)。見た目の主役は名前のまま */}
-      <h1 class="intro-name">
-        YutanpopoZzz<span class="intro-role-jp">ゆたんぽぽ ／ バーチャルフォトグラファー</span>
+  {/* ===== 表紙 ===== */}
+  <section class="cover">
+    <figure class="cover-photo">
+      <picture>
+        {webpSrcset(cover.data.thumb, base) && (
+          <source
+            type="image/webp"
+            srcset={webpSrcset(cover.data.thumb, base)}
+            sizes="(max-width: 760px) 100vw, 82vw"
+          />
+        )}
+        <img src={`${base}${cover.data.thumb}`} alt={cover.data.title} fetchpriority="high" />
+      </picture>
+      <figcaption>{titleOf(cover)}　{year(cover)}</figcaption>
+    </figure>
+    <div class="spine">
+      <p class="cover-copy">
+        バーチャルの中に存在する<br />文化や感情を、写真と言葉で<br />外の世界へ運ぶ。
+      </p>
+      {/* h1に読み仮名と和文の肩書きを持たせる(指名検索・職種検索の受け皿) */}
+      <h1 class="cover-title">
+        <span class="t-name">YutanpopoZzz</span>
+        <span class="t-kana">ゆたんぽぽ</span>
+        <span class="t-role">バーチャルフォトグラファー</span>
       </h1>
-      <p class="intro-role">Virtual Photographer / Visual Creator</p>
-      <p class="intro-copy">バーチャルの中に存在する文化や感情を、写真と言葉で外の世界へ運ぶ。</p>
-    </section>
+    </div>
+  </section>
 
-    <!-- GALLERY ダイジェスト -->
-    <section class="digest">
-      <div class="blockttl">
-        <h2><a href={`${base}/gallery/`}>ギャラリー</a></h2>
-        <span class="sub">GALLERY</span>
-      </div>
-      <!-- 本棚カルーセル: 写真が本のように奥へ刺さり、真ん中の1枚が抜き出されて正面を向く -->
-      <div class="shelf" data-shelf>
-        {shelfItems.map(({ p, aspect }) => (
-          <a class="shelf-item" href={`${base}/gallery/`} style={`--ar: ${aspect.toFixed(4)}`}>
+  <main class="book">
+    {/* ===== 目次(章番号はここにだけ置く) ===== */}
+    <nav class="toc" aria-label="このサイトの目次">
+      <h2 class="toc-ttl">目次</h2>
+      <ol>
+        {toc.map((c) => (
+          <li class:list={[{ last: c.path === '/contact/' }]}>
+            <a href={`${base}${c.path}`}>
+              <span class="toc-n">{c.n}</span>
+              <span class="toc-t">{c.jp}</span>
+              <span class="toc-c">{tocCount[c.path] ?? ''}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    {/* ===== 口絵(ギャラリー) ===== */}
+    <section class="chapter ch-gallery" aria-labelledby="ch-gallery">
+      <h2 id="ch-gallery" class="chap-ttl">
+        <a href={`${base}/gallery/`}>{ch('/gallery/').jp}</a>
+      </h2>
+
+      {spreadWide && (
+        <figure class="spread spread-wide">
+          <a href={`${base}/gallery/`}>
             <picture>
-              {webpSrcset(p.data.thumb, base) && (
-                <source
-                  type="image/webp"
-                  srcset={webpSrcset(p.data.thumb, base)}
-                  sizes="(max-width: 640px) 80vw, 640px"
-                />
+              {webpSrcset(spreadWide.data.thumb, base) && (
+                <source type="image/webp" srcset={webpSrcset(spreadWide.data.thumb, base)} sizes="100vw" />
               )}
-              <img src={`${base}${p.data.thumb}`} alt={p.data.title} loading="lazy" decoding="async" />
+              <img src={`${base}${spreadWide.data.thumb}`} alt={spreadWide.data.title} {...imgSize(spreadWide.data.thumb)} loading="lazy" decoding="async" />
             </picture>
           </a>
-        ))}
-        <button class="shelf-nav prev" type="button" aria-label="前の写真">‹</button>
-        <button class="shelf-nav next" type="button" aria-label="次の写真">›</button>
+          <figcaption><b>{titleOf(spreadWide)}</b>{catJp[spreadWide.data.category]}　{year(spreadWide)}</figcaption>
+        </figure>
+      )}
+
+      {spreadPair.length === 2 && (
+        <div class="spread spread-pair">
+          {spreadPair.map((p) => (
+            <figure class="page">
+              <a href={`${base}/gallery/`}>
+                <picture>
+                  {webpSrcset(p.data.thumb, base) && (
+                    <source type="image/webp" srcset={webpSrcset(p.data.thumb, base)} sizes="(max-width: 760px) 82vw, 460px" />
+                  )}
+                  <img src={`${base}${p.data.thumb}`} alt={p.data.title} loading="lazy" decoding="async" style={`aspect-ratio:${ar(p)}`} />
+                </picture>
+              </a>
+              <figcaption><b>{titleOf(p)}</b>{catJp[p.data.category]}　{year(p)}</figcaption>
+            </figure>
+          ))}
+        </div>
+      )}
+
+      <div class="spread spread-quiet">
+        {spreadQuiet && (
+          <figure class="quiet-photo">
+            <a href={`${base}/gallery/`}>
+              <picture>
+                {webpSrcset(spreadQuiet.data.thumb, base) && (
+                  <source type="image/webp" srcset={webpSrcset(spreadQuiet.data.thumb, base)} sizes="(max-width: 760px) 70vw, 300px" />
+                )}
+                <img src={`${base}${spreadQuiet.data.thumb}`} alt={spreadQuiet.data.title} loading="lazy" decoding="async" style={`aspect-ratio:${ar(spreadQuiet)}`} />
+              </picture>
+            </a>
+            <figcaption><b>{titleOf(spreadQuiet)}</b>{catJp[spreadQuiet.data.category]}　{year(spreadQuiet)}</figcaption>
+          </figure>
+        )}
+        <a class="big-link" href={`${base}/gallery/`}>写真 {photos.length}点をすべて見る</a>
       </div>
-      <p class="more"><a href={`${base}/gallery/`}>写真をぜんぶ見る →</a></p>
     </section>
 
-    <!-- WORKS ダイジェスト -->
-    <section class="digest">
-      <div class="blockttl">
-        <h2><a href={`${base}/works/`}>ポートフォリオ</a></h2>
-        <span class="sub">WORKS</span>
-      </div>
-      <div class="w-grid">
-        {workCategories.map((cat) => (
-          <a class="wc-card" href={`${base}/works/#${cat.slug}`}>
-            <span class="wc-frame" aria-hidden="true">
-              {cat.thumb ? (
-                <picture>
-                  {webpSrcset(cat.thumb, base) && (
-                    <source
-                      type="image/webp"
-                      srcset={webpSrcset(cat.thumb, base)}
-                      sizes="(max-width: 560px) 92vw, (max-width: 900px) 45vw, 340px"
-                    />
-                  )}
-                  <img src={`${base}${cat.thumb}`} alt="" loading="lazy" decoding="async" />
-                </picture>
-              ) : (
-                <span class="wc-en">{cat.en}</span>
-              )}
-            </span>
-            <span class="wc-name">{cat.jp}</span>
-            <span class="wc-desc">{cat.desc}</span>
+    {/* ===== ポートフォリオ ===== */}
+    <section class="chapter ch-works" aria-labelledby="ch-works">
+      <h2 id="ch-works" class="chap-ttl">
+        <a href={`${base}/works/`}>{ch('/works/').jp}</a>
+      </h2>
+      <div class="works-plates">
+        {[catMain, catSub].filter(Boolean).map((cat, i) => (
+          <a class:list={['plate', i === 0 ? 'plate-main' : 'plate-sub']} href={`${base}/works/#${cat.slug}`}>
+            {cat.thumb && (
+              <picture>
+                {webpSrcset(cat.thumb, base) && (
+                  <source type="image/webp" srcset={webpSrcset(cat.thumb, base)} sizes={i === 0 ? '(max-width: 760px) 94vw, 680px' : '(max-width: 760px) 80vw, 400px'} />
+                )}
+                <img src={`${base}${cat.thumb}`} alt="" {...imgSize(cat.thumb)} loading="lazy" decoding="async" />
+              </picture>
+            )}
+            <span class="plate-name">{cat.jp}</span>
+            <span class="plate-desc">{firstSentence(cat.desc)}</span>
+          </a>
+        ))}
+        {catRest.map((cat) => (
+          <a class="plate plate-text" href={`${base}/works/#${cat.slug}`}>
+            <span class="plate-name">{cat.jp}</span>
+            <span class="plate-desc">{firstSentence(cat.desc)}</span>
           </a>
         ))}
       </div>
-      <p class="more"><a href={`${base}/works/`}>制作物をすべて見る →</a></p>
-      <p class="more"><a href={`${base}/photography/`}>撮影の依頼について（内容・流れ・よくある質問）→</a></p>
+      <p class="links">
+        <a href={`${base}/works/`}>制作物をすべて見る</a>
+        <a href={`${base}/photography/`}>撮影の依頼について</a>
+      </p>
     </section>
 
-    <!-- EVENTS ダイジェスト -->
-    <section class="digest">
-      <div class="blockttl">
-        <h2><a href={`${base}/events/`}>イベント運営</a></h2>
-        <span class="sub">EVENTS</span>
-      </div>
-      <div class="ev-split">
-        <a class="ev-main" href={`${base}${mainEvent.page ?? '/events/'}`} style={`--ev: ${mainEvent.color}`}>
-          {mainEvent.image && (
-            <span class="ev-main-img">
-              <picture>
-                {webpSrcset(mainEvent.image, base) && (
-                  <source
-                    type="image/webp"
-                    srcset={webpSrcset(mainEvent.image, base)}
-                    sizes="(max-width: 900px) 92vw, 560px"
-                  />
-                )}
-                <img
-                  src={`${base}${mainEvent.image}`}
-                  alt={`${mainEvent.name} キービジュアル`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-            </span>
-          )}
-          <span class="ev-main-head">
-            <span class="ev-main-name">{mainEvent.name}</span>
-            <span class="ev-genre">{mainEvent.genre}</span>
-          </span>
-          <span class="ev-main-desc">{mainEvent.summary[0]}</span>
-          <span class="ev-main-role">{mainRoleNote}</span>
-        </a>
-        <div class="ev-side">
-          {subEvents.map((ev) => (
-            <a class="ev-sub" href={`${base}/events/`} style={`--ev: ${ev.color}`}>
+    {/* ===== イベント運営 ===== */}
+    <section class="chapter ch-events" aria-labelledby="ch-events">
+      <h2 id="ch-events" class="chap-ttl">
+        <a href={`${base}/events/`}>{ch('/events/').jp}</a>
+      </h2>
+      <a class="ev-main" href={`${base}${mainEvent.page ?? '/events/'}`}>
+        {mainEvent.image && (
+          <picture>
+            {webpSrcset(mainEvent.image, base) && (
+              <source type="image/webp" srcset={webpSrcset(mainEvent.image, base)} sizes="(max-width: 1240px) 94vw, 1180px" />
+            )}
+            <img class="ev-img" src={`${base}${mainEvent.image}`} alt={`${mainEvent.name} キービジュアル`} {...imgSize(mainEvent.image)} loading="lazy" decoding="async" />
+          </picture>
+        )}
+        <span class="ev-text">
+          <span class="ev-name">{mainEvent.name}<span class="ev-role">主催</span></span>
+          <span class="ev-desc">{firstSentence(mainEvent.summary[0])}</span>
+        </span>
+      </a>
+      <ul class="ev-subs">
+        {subEvents.map((ev) => (
+          <li>
+            <a href={`${base}/events/`}>
               <span class="ev-sub-name">{ev.name}</span>
-              <span class="ev-sub-genre">
-                <span class="ev-dot" aria-hidden="true"></span>
-                {ev.genre}
-              </span>
-              <span class="ev-sub-line">{evTagline[ev.name]}</span>
+              <span class="ev-sub-role">{evRole[ev.status] ?? ''}</span>
             </a>
-          ))}
-        </div>
-      </div>
-      <p class="more"><a href={`${base}/events/`}>イベント運営の実績をくわしく →</a></p>
-    </section>
-
-    <!-- ABOUT ダイジェスト(受賞歴) -->
-    <section class="digest">
-      <div class="blockttl">
-        <h2><a href={`${base}/about/`}>受賞歴</a></h2>
-        <span class="sub">ABOUT</span>
-      </div>
-      <ul class="award-list">
-        {awards.map((a) => {
-          const g = splitGrade(a.title);
-          return (
-            <li>
-              <span class="year">{a.year}</span>
-              <span class="ttl">
-                {a.href ? <a href={`${base}${a.href}`}>{g.base}</a> : g.base}
-              </span>
-              {g.grade && (
-                <span class:list={['grade', { top: g.grade === '最優秀賞' }]}>{g.grade}</span>
-              )}
-              {a.note && <span class="note">{a.note}</span>}
-            </li>
-          );
-        })}
+          </li>
+        ))}
       </ul>
-      <p class="more"><a href={`${base}/about/`}>プロフィールと実績の全量 →</a></p>
+      <p class="links"><a href={`${base}/events/`}>イベント運営の実績をくわしく</a></p>
     </section>
 
-    <!-- CONTACT 帯 -->
-    <a class="contact-band" href={`${base}/contact/`}>
-      <span class="cb-head">
-        <span class="cb-label">CONTACT</span>
-        {availability.open && <span class="cb-status">{availability.short}</span>}
-      </span>
-      {/* 語の途中で折り返さないよう、意味の切れ目ごとに nowrap で包む */}
-      <span class="cb-body"
-        ><span class="nb">撮影・ビジュアル制作の</span><span class="nb">ご依頼、</span><span class="nb"
-          >ご相談だけでも歓迎です</span
-        ></span
-      >
-      <span class="cb-arrow">→</span>
-    </a>
+    {/* ===== 受賞歴 ===== */}
+    <section class="chapter ch-about" aria-labelledby="ch-about">
+      <h2 id="ch-about" class="chap-ttl">
+        <a href={`${base}/about/`}>受賞歴</a>
+      </h2>
+      <AwardPhoto size="large" />
+    </section>
+
+    {/* ===== 奥付 = 依頼の入口 ===== */}
+    <section class="colophon" aria-labelledby="ch-colophon">
+      <h2 id="ch-colophon" class="colo-ttl">奥付</h2>
+      <dl class="colo-list">
+        <div><dt>写真・文</dt><dd>YutanpopoZzz（ゆたんぽぽ）</dd></div>
+        <div><dt>活動</dt><dd>VRChatを中心に、撮影・ビジュアル制作・イベント運営</dd></div>
+        <div><dt>連絡先</dt><dd><a href="https://x.com/YutanpopoZzz" rel="me noopener" target="_blank">X @YutanpopoZzz</a>／お問い合わせページのメール</dd></div>
+        <div>
+          <dt>ご依頼</dt>
+          <dd>
+            {availability.open ? `${availability.text}（${availability.asOf}時点）` : '現在はご依頼をお休みしています'}
+          </dd>
+        </div>
+      </dl>
+      {availability.open && (
+        <span class="seal" aria-hidden="true">{availability.short}</span>
+      )}
+      <a class="colo-cta" href={`${base}/contact/`}>
+        <span>撮影・ビジュアル制作のご依頼、</span><span>ご相談だけでも歓迎です</span>
+      </a>
+    </section>
   </main>
 </Base>
 
-<script>
-  // 本棚カルーセル: オフセットに応じて各写真を円弧状に3D配置し、中央だけ正面へ抜き出す
-  const shelf = document.querySelector<HTMLElement>('[data-shelf]');
-  if (shelf) {
-    const items = Array.from(shelf.querySelectorAll<HTMLElement>('.shelf-item'));
-    const n = items.length;
-    let cur = 0;
-
-    const VISIBLE = 5; // 中央の左右に見せる冊数
-    const frontWidth = (i: number) => {
-      // CSSの .is-front サイズ計算と同じ式(高さ×元比率、上限vw)
-      const ar = parseFloat(items[i].style.getPropertyValue('--ar')) || 0.75;
-      const mobile = window.innerWidth <= 640;
-      return Math.min((mobile ? 225 : 330) * ar, (mobile ? 0.88 : 0.62) * window.innerWidth);
-    };
-    const apply = () => {
-      // コンテナ幅いっぱいに本を広げる(端の本が見切れない範囲で等間隔)。
-      // 中央が横長のときは覆われないよう左右の本を外側へ押し出す
-      const W = shelf.clientWidth;
-      const maxX = Math.max(220, W / 2 - 120);
-      // 0.6 = 半分×translateZ(190)の投影拡大(約1.19倍)ぶん
-      const baseX = Math.max(Math.min(190, maxX * 0.4), frontWidth(cur) * 0.6 + 70);
-      const step = Math.max(36, (Math.max(maxX, baseX + 80) - baseX) / (VISIBLE - 1));
-      items.forEach((el, i) => {
-        let d = (((i - cur) % n) + n) % n;
-        if (d > n / 2) d -= n;
-        const s = Math.sign(d);
-        const ad = Math.abs(d);
-        if (d === 0) {
-          el.style.transform = 'translate(-50%, -50%) translateZ(190px)';
-          el.style.zIndex = '100';
-          el.style.opacity = '1';
-        } else {
-          const x = s * (baseX + (ad - 1) * step);
-          const tz = -50 - ad * 50;
-          el.style.transform = `translate(-50%, -50%) translateX(${x}px) translateZ(${tz}px) rotateY(${-s * 72}deg)`;
-          el.style.zIndex = String(50 - ad);
-          el.style.opacity = ad > VISIBLE ? '0' : '1';
-        }
-        el.classList.toggle('is-front', d === 0);
-        el.tabIndex = d === 0 ? 0 : -1;
-      });
-    };
-    window.addEventListener('resize', apply);
-
-    items.forEach((el, i) => {
-      el.addEventListener('click', (e) => {
-        if (!el.classList.contains('is-front')) {
-          e.preventDefault(); // 脇の本はまず手前に抜き出す
-          cur = i;
-          apply();
-        }
-      });
-    });
-
-    const go = (dir: number) => {
-      cur = (cur + dir + n) % n;
-      apply();
-    };
-    shelf.querySelector('.shelf-nav.prev')?.addEventListener('click', () => go(-1));
-    shelf.querySelector('.shelf-nav.next')?.addEventListener('click', () => go(1));
-
-    let timer: ReturnType<typeof setInterval> | undefined;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const start = () => {
-      if (reduced || timer) return;
-      timer = setInterval(() => {
-        cur = (cur + 1) % n;
-        apply();
-      }, 3400);
-    };
-    const stop = () => {
-      if (timer) clearInterval(timer);
-      timer = undefined;
-    };
-    shelf.addEventListener('mouseenter', stop);
-    shelf.addEventListener('mouseleave', start);
-    apply();
-    start();
-  }
-</script>
-
 <style>
-  .intro {
-    text-align: center;
-    padding: 3.4rem 0 1.4rem;
+  /* ===== 表紙 ===== */
+  .cover {
+    display: grid;
+    grid-template-columns: 1fr clamp(13rem, 18vw, 17rem);
+    gap: clamp(1.2rem, 2.4vw, 2.4rem);
+    height: calc(100svh - 58px);
+    min-height: 34rem;
+    padding: clamp(1rem, 3vw, 2.4rem) clamp(1rem, 3vw, 2.4rem) 3.4rem;
   }
-  .intro-name {
-    font-family: var(--font-en);
-    font-size: 1.7rem;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-  }
-  /* 和文肩書き: h1の中だが視覚的には英字ロールの上に置く小さな一行 */
-  .intro-role-jp {
-    display: block;
-    margin-top: 0.5rem;
-    font-family: var(--font-jp);
-    font-size: 0.74rem;
-    font-weight: 500;
-    letter-spacing: 0.24em;
-    text-indent: 0.24em;
-    color: color-mix(in srgb, var(--gold) 80%, transparent);
-  }
-  .intro-role {
-    margin-top: 0.35rem;
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.72rem;
-    letter-spacing: 0.3em;
-    color: var(--text-weak);
-  }
-  .intro-copy {
-    margin-top: 0.9rem;
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    color: var(--text-weak);
-  }
-
-  .digest {
-    margin-bottom: 1.2rem;
-  }
-  /* 大見出しは該当ページへのリンク(hoverで金) */
-  .blockttl h2 a {
-    color: inherit;
-    transition: color 0.3s, text-shadow 0.3s;
-  }
-  .blockttl h2 a:hover {
-    color: var(--gold);
-    text-shadow: 0 0 16px color-mix(in srgb, var(--gold) 40%, transparent);
-  }
-  .more {
-    margin-top: 1.6rem;
-    text-align: center;
-  }
-  .more a {
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    color: var(--text-weak);
-    transition: color 0.3s;
-  }
-  .more a:hover {
-    color: var(--text);
-  }
-
-  /* GALLERY: 本棚カルーセル(3D) */
-  .shelf {
+  .cover-photo {
     position: relative;
-    height: 400px;
-    perspective: 1200px;
-    overflow: hidden;
+    min-height: 0;
   }
-  .shelf-item {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 200px;
-    height: 267px;
-    border: 1px solid var(--line);
-    background: var(--bg-soft);
-    transition: transform 0.7s ease, opacity 0.5s ease, box-shadow 0.4s ease,
-      width 0.7s ease, height 0.7s ease;
-    will-change: transform;
-  }
-  .shelf-item img {
+  .cover-photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    backface-visibility: hidden;
-    /* 棚に刺さっている本は暗く沈める */
-    filter: brightness(0.4);
-    transition: filter 0.5s ease;
   }
-  .shelf-item.is-front {
-    /* 抜き出した1枚は元の比率で気持ち大きめに */
-    height: 330px;
-    width: min(calc(330px * var(--ar, 0.75)), 62vw);
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-  }
-  .shelf-item.is-front img {
-    filter: brightness(1);
-  }
-  .shelf-nav {
+  .cover-photo figcaption {
     position: absolute;
-    top: 50%;
-    translate: 0 -50%;
-    z-index: 200;
-    width: 40px;
-    height: 56px;
-    font-family: var(--font-en);
-    font-size: 1.4rem;
-    line-height: 1;
-    color: var(--text-weak);
-    background: rgba(10, 10, 12, 0.55);
-    border: 1px solid var(--line);
-    cursor: pointer;
-    transition: color 0.3s, border-color 0.3s;
+    left: 0;
+    bottom: -2rem;
   }
-  .shelf-nav:hover {
-    color: var(--text);
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  .shelf-nav:focus-visible {
-    outline: 1px solid var(--text);
-    outline-offset: 2px;
-  }
-  .shelf-nav.prev {
-    left: 6px;
-  }
-  .shelf-nav.next {
-    right: 6px;
-  }
-  @media (max-width: 640px) {
-    .shelf {
-      height: 300px;
-    }
-    .shelf-item {
-      width: 140px;
-      height: 187px;
-    }
-    .shelf-item.is-front {
-      height: 225px;
-      width: min(calc(225px * var(--ar, 0.75)), 88vw);
-    }
-  }
-
-  /* WORKS: 3本柱のカテゴリカード(作品画像はまだないので空フレーム) */
-  .w-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 34px 30px;
-  }
-  .wc-card {
-    display: block;
-  }
-  .wc-frame {
+  /* 縦組みの帯。flexの column は縦組みでは「右→左」に並ぶ: 右端にコピー、左端に署名 */
+  .spine {
+    writing-mode: vertical-rl;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    aspect-ratio: 16 / 9;
-    border: 1px solid var(--line);
-    background: var(--bg-soft);
-    overflow: hidden;
-    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
   }
-  .wc-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
+  .cover-copy {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(1.15rem, 0.8rem + 0.8vw, 1.55rem);
+    font-weight: 500;
+    line-height: 1.95;
+    letter-spacing: 0.1em;
   }
-  .wc-card:hover .wc-frame img {
-    transform: scale(1.03);
+  .cover-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-self: flex-end;
+    gap: 0.5rem;
+    font-weight: 400;
   }
-  .wc-en {
+  .t-name {
     font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.68rem;
-    letter-spacing: 0.3em;
-    color: var(--text-weak);
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
   }
-  .wc-name {
-    display: block;
-    margin-top: 0.7rem;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    transition: color 0.3s;
-  }
-  .wc-desc {
-    display: block;
-    margin-top: 0.35rem;
-    font-size: 0.76rem;
-    line-height: 1.75;
-    color: var(--text-weak);
-  }
-  .wc-card:hover .wc-frame {
-    border-color: color-mix(in srgb, var(--gold) 55%, transparent);
-    box-shadow: 0 0 30px color-mix(in srgb, var(--gold) 16%, transparent);
-  }
-  .wc-card:hover .wc-name {
-    color: color-mix(in srgb, var(--gold) 65%, white);
+  .t-kana,
+  .t-role {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    color: var(--pencil);
   }
 
-  /* EVENTS: 左=Roof Top Junctionメイン、右=他イベントのサブリスト */
-  .ev-split {
+  .book {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 3vw, 2.4rem);
+  }
+
+  /* ===== 目次 ===== */
+  .toc {
+    max-width: 34rem;
+    margin: 8rem 0 0 auto;
+    margin-right: clamp(0rem, 8vw, 7rem);
+  }
+  .toc-ttl {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--pencil);
+    margin-bottom: 1.6rem;
+  }
+  .toc ol {
+    list-style: none;
+  }
+  .toc a {
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 2.2rem;
-    align-items: start;
+    grid-template-columns: 2.8rem 1fr auto;
+    align-items: baseline;
+    column-gap: 0.8rem;
+    padding: 0.55rem 0;
   }
-  .ev-main {
-    display: block;
-    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
-    background: color-mix(in srgb, var(--ev) 10%, transparent);
-    padding: 1.2rem;
-    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  .toc li.last {
+    margin-top: 1.4rem;
   }
-  .ev-main:hover {
-    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
-    box-shadow: 0 0 38px color-mix(in srgb, var(--ev) 25%, transparent);
+  .toc-n {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 0.9rem;
+    color: var(--pencil);
   }
-  .ev-main-img {
-    display: block;
-    border: 1px solid var(--line);
-    margin-bottom: 1rem;
-    overflow: hidden;
+  .toc-t {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+    letter-spacing: 0.04em;
   }
-  .ev-main-img img {
+  .toc a:hover .toc-t {
+    text-decoration: underline 1px;
+    text-underline-offset: 0.35em;
+  }
+  .toc-c {
+    font-size: 0.86rem;
+    color: var(--pencil);
+    font-variant-numeric: tabular-nums;
+  }
+  .toc li.last .toc-c {
+    color: var(--shu);
+  }
+
+  /* ===== 章: 見出しは小さく、中身のすぐ上に添えるだけ。間隔は章ごとに変える ===== */
+  .ch-gallery {
+    margin-top: 9rem;
+  }
+  .ch-works {
+    margin-top: 13rem;
+  }
+  .ch-events {
+    margin-top: 10rem;
+  }
+  .ch-about {
+    margin-top: 15rem;
+    max-width: 46rem;
+  }
+  .chap-ttl {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.1rem;
+  }
+  .chap-ttl a {
+    text-decoration: underline 1px transparent;
+    text-underline-offset: 0.35em;
+    transition: text-decoration-color 0.25s;
+  }
+  .chap-ttl a:hover {
+    text-decoration-color: var(--ink);
+  }
+
+  figcaption {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--pencil);
+    line-height: 1.6;
+  }
+  figcaption b {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    color: var(--ink);
+    margin-right: 1em;
+    font-size: 0.92rem;
+  }
+
+  /* 口絵: 全面(画面の端から端まで) → 対向の縦2枚(高さをずらす) → 余白に1枚 */
+  .spread-wide {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+  .spread-wide img {
     width: 100%;
     height: auto;
+    max-height: 92svh;
+    object-fit: cover;
+  }
+  .spread-wide figcaption {
+    padding: 0 clamp(1rem, 3vw, 2.4rem);
+  }
+  .spread-pair {
+    margin-top: 6rem;
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: clamp(2rem, 7vw, 7rem);
+    align-items: start;
+  }
+  .spread-pair .page:last-child {
+    margin-top: 9rem;
+  }
+  .spread-pair img {
+    width: 100%;
+    height: auto;
+    max-height: 86svh;
+    object-fit: cover;
+  }
+  .spread-quiet {
+    margin-top: 9rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2rem;
+  }
+  .quiet-photo {
+    width: min(17rem, 60vw);
+    margin-left: 18%;
+  }
+  .quiet-photo img {
+    width: 100%;
+    height: auto;
+  }
+  .big-link {
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.8rem);
+    letter-spacing: 0.04em;
+    text-decoration: underline 1px;
+    text-underline-offset: 0.4em;
+    margin-bottom: 2.2rem;
+  }
+  .spread a img,
+  .plate img,
+  .ev-main img {
+    transition: opacity 0.35s;
+  }
+  .spread a:hover img,
+  .plate:hover img,
+  .ev-main:hover img {
+    opacity: 0.86;
+  }
+
+  /* ポートフォリオ: 代表画像を大小2枚、画像のない分野は文字だけ */
+  .works-plates {
+    display: grid;
+    grid-template-columns: 7fr 4fr;
+    gap: 2.4rem clamp(2rem, 5vw, 4.4rem);
+    align-items: start;
+  }
+  .plate {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .plate img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 0.6rem;
+  }
+  .plate-sub {
+    margin-top: 5rem;
+  }
+  .plate-text {
+    grid-column: 2;
+    margin-top: -1rem;
+  }
+  .plate-name {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.2rem;
+  }
+  .plate-desc {
+    font-size: 0.88rem;
+    color: var(--pencil);
+  }
+  .plate:hover .plate-name {
+    text-decoration: underline 1px;
+    text-underline-offset: 0.35em;
+  }
+
+  .links {
+    margin-top: 2.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 2.4rem;
+  }
+  .links a {
+    font-size: 0.92rem;
+    text-decoration: underline 1px var(--pencil);
+    text-underline-offset: 0.4em;
+    transition: text-decoration-color 0.25s;
+  }
+  .links a:hover {
+    text-decoration-color: var(--ink);
+  }
+
+  /* イベント運営: キービジュアルを大きく、名前は画像の下に大きく */
+  .ev-main {
     display: block;
-    transition: transform 0.4s ease;
   }
-  .ev-main:hover .ev-main-img img {
-    transform: scale(1.02);
+  .ev-img {
+    width: 100%;
+    height: auto;
   }
-  .ev-main-head {
+  .ev-text {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.4rem 3rem;
+    align-items: baseline;
+    margin-top: 1.4rem;
+  }
+  .ev-name {
+    font-family: var(--font-en);
+    font-size: clamp(2rem, 1.4rem + 2vw, 3.2rem);
+    line-height: 1.1;
+  }
+  .ev-role {
+    margin-left: 0.8rem;
+    font-family: var(--font-jp);
+    font-size: 0.85rem;
+    color: var(--pencil);
+    vertical-align: middle;
+  }
+  .ev-desc {
+    font-size: 0.92rem;
+    color: var(--pencil);
+    max-width: 30rem;
+    justify-self: end;
+  }
+  .ev-main:hover .ev-name {
+    text-decoration: underline 1px;
+    text-underline-offset: 0.15em;
+  }
+  .ev-subs {
+    list-style: none;
+    margin-top: 2.6rem;
+  }
+  .ev-subs a {
     display: flex;
     align-items: baseline;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-  }
-  .ev-main-name {
-    font-size: 1.35rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .ev-main-desc {
-    display: block;
-    margin-top: 0.7rem;
-    font-size: 0.82rem;
-    line-height: 1.75;
-    color: var(--text);
-  }
-  .ev-main-role {
-    display: block;
-    margin-top: 0.8rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid color-mix(in srgb, var(--ev) 25%, transparent);
-    font-size: 0.8rem;
-    line-height: 1.75;
-    color: color-mix(in srgb, var(--ev) 30%, white);
-  }
-  /* 右側: 参加中2イベントのコンパクトカード(画像なし・色地・一行紹介) */
-  .ev-side {
-    display: flex;
-    flex-direction: column;
     gap: 1rem;
-  }
-  .ev-sub {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding: 1rem 1.2rem;
-    border: 1px solid color-mix(in srgb, var(--ev) 30%, transparent);
-    background: color-mix(in srgb, var(--ev) 10%, transparent);
-    transition: border-color 0.4s ease, box-shadow 0.4s ease;
-  }
-  .ev-sub:hover {
-    border-color: color-mix(in srgb, var(--ev) 70%, transparent);
-    box-shadow: 0 0 32px color-mix(in srgb, var(--ev) 25%, transparent);
+    padding: 0.35rem 0;
   }
   .ev-sub-name {
-    font-size: 1.08rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    line-height: 1.5;
+    font-size: 1.05rem;
   }
-  .ev-sub-genre {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
-    color: var(--text-weak);
-  }
-  .ev-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--ev);
-    flex: none;
-  }
-  .ev-sub-line {
-    font-size: 0.76rem;
-    line-height: 1.7;
-    color: var(--text-weak);
-  }
-  .ev-genre {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    color: var(--text-weak);
-    white-space: nowrap;
-  }
-
-  /* ABOUT: 受賞歴リスト */
-  .award-list {
-    list-style: none;
-    max-width: 760px;
-    margin: 0 auto;
-  }
-  .award-list li {
-    display: flex;
-    align-items: baseline;
-    gap: 1.1rem;
-    padding: 0.7rem 0.2rem;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.88rem;
-  }
-  .award-list li:first-child {
-    border-top: 1px solid var(--line);
-  }
-  .award-list .year {
-    font-family: var(--font-en);
-    font-weight: 300;
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    color: color-mix(in srgb, var(--gold) 62%, transparent);
-    min-width: 6.2em;
-    font-variant-numeric: tabular-nums;
-    flex: none;
-  }
-  .award-list .grade {
-    flex: none;
-    font-size: 0.66rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    color: var(--gold);
-    border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
-    padding: 0.05rem 0.55rem;
-    white-space: nowrap;
-  }
-  .award-list .grade.top {
-    background: var(--gold);
-    border-color: var(--gold);
-    color: var(--bg);
-    font-weight: 700;
-  }
-  .award-list .ttl {
-    font-weight: 500;
-    word-break: keep-all;
-    overflow-wrap: anywhere;
-  }
-  .award-list .ttl a {
-    border-bottom: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
-    transition: color 0.3s, border-color 0.3s, text-shadow 0.3s;
-  }
-  .award-list .ttl a:hover {
-    color: var(--gold);
-    border-color: var(--gold);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--gold) 40%, transparent);
-  }
-  .award-list .note {
-    font-size: 0.72rem;
-    color: var(--text-weak);
-    margin-left: auto;
-    text-align: right;
-    flex: none;
-  }
-  @media (max-width: 560px) {
-    .award-list li {
-      flex-wrap: wrap;
-    }
-    .award-list .note {
-      /* flex-basis:100% に flex:none のままだと左マージン分だけ行からはみ出す */
-      flex: 1 1 100%;
-      min-width: 0;
-      margin-left: calc(6.2em + 1.1rem);
-      text-align: left;
-    }
-  }
-
-  /* CONTACT帯: 一列レイアウト。lagoon配色(青の地×暖金の差し色)で目立たせる */
-  .contact-band {
-    display: flex;
-    align-items: center;
-    gap: 1.4rem;
-    max-width: 760px;
-    margin: 4.5rem auto 0;
-    padding: 1.5rem 1.7rem;
-    background: color-mix(in srgb, var(--cta-blue) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--cta-blue) 60%, transparent);
-    /* 待機中からしっかり発光(外側の広がり+枠に沿った内側の光) */
-    box-shadow:
-      0 0 46px color-mix(in srgb, var(--cta-blue) 30%, transparent),
-      inset 0 0 26px color-mix(in srgb, var(--cta-blue) 14%, transparent);
-    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease,
-      background 0.4s ease;
-  }
-  .contact-band:hover {
-    background: color-mix(in srgb, var(--cta-blue) 20%, transparent);
-    border-color: var(--cta-blue);
-    box-shadow:
-      0 12px 60px color-mix(in srgb, var(--cta-blue) 50%, transparent),
-      inset 0 0 32px color-mix(in srgb, var(--cta-blue) 20%, transparent);
-    transform: translateY(-4px);
-  }
-  .cb-label {
-    font-family: var(--font-en);
-    font-weight: 500;
+  .ev-sub-role {
     font-size: 0.82rem;
-    letter-spacing: 0.3em;
-    color: var(--cta-warm);
-    white-space: nowrap;
+    color: var(--pencil);
   }
-  .cb-body {
-    flex: 1;
-    font-size: 1.08rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-  .cb-body .nb {
-    white-space: nowrap;
-  }
-  /* 受付中バッジ: 本文の幅を削らないようCONTACTラベルの下に積む(状況はCONTACTページが正) */
-  .cb-head {
-    flex: none;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  .cb-status {
-    padding: 0.24rem 0.66rem;
-    border: 1px solid color-mix(in srgb, var(--cta-warm) 55%, transparent);
-    color: var(--cta-warm);
-    font-size: 0.78rem;
-    letter-spacing: 0.12em;
-    white-space: nowrap;
-  }
-  .cb-arrow {
-    color: var(--cta-warm);
-    transition: transform 0.3s ease;
-  }
-  .contact-band:hover .cb-arrow {
-    transform: translateX(8px);
-  }
-  @media (max-width: 560px) {
-    .contact-band {
-      flex-wrap: wrap;
-      gap: 0.6rem 1rem;
-    }
-    /* 狭い画面ではラベル+バッジを1行目に流し、本文は横幅いっぱいで読ませる */
-    .cb-head {
-      flex-direction: row;
-      align-items: center;
-      gap: 0.8rem;
-      width: 100%;
-    }
-    .cb-status {
-      font-size: 0.82rem;
-    }
-    .cb-body {
-      flex: 1 0 100%;
-      font-size: 1rem;
-    }
-    .cb-arrow {
-      margin-left: auto;
-    }
+  .ev-subs a:hover .ev-sub-name {
+    text-decoration: underline 1px;
+    text-underline-offset: 0.3em;
   }
 
+  /* 奥付: 本の最終頁。線はここの上下だけ。朱は検印と依頼の導線だけ */
+  .colophon {
+    position: relative;
+    max-width: 40rem;
+    margin: 16rem 0 0 auto;
+    padding: 2.4rem clamp(1.2rem, 4vw, 3rem) 2.8rem;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+  }
+  .colo-ttl {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-bottom: 1.6rem;
+  }
+  .colo-list div {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    font-size: 0.95rem;
+  }
+  .colo-list dt {
+    color: var(--pencil);
+    font-family: 'Shippori Mincho', serif;
+  }
+  .colo-list a {
+    text-decoration: underline 1px var(--pencil);
+    text-underline-offset: 0.35em;
+  }
+  .seal {
+    position: absolute;
+    top: 2.2rem;
+    right: clamp(1.2rem, 4vw, 3rem);
+    writing-mode: vertical-rl;
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: 0.1em;
+    color: var(--shu);
+    border: 2px solid var(--shu);
+    padding: 0.5rem 0.3rem;
+    transform: rotate(-3deg);
+  }
+  .colo-cta {
+    display: inline-block;
+    margin-top: 2rem;
+    font-family: 'Shippori Mincho', serif;
+    font-size: clamp(1.2rem, 1rem + 0.9vw, 1.65rem);
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    text-decoration: underline 2px var(--shu);
+    text-underline-offset: 0.45em;
+    transition: color 0.25s;
+  }
+  .colo-cta span {
+    display: inline-block;
+  }
+  .colo-cta:hover {
+    color: var(--shu);
+  }
+
+  /* ===== 狭い画面 ===== */
   @media (max-width: 900px) {
-    .w-grid {
-      grid-template-columns: repeat(2, 1fr);
+    .works-plates {
+      grid-template-columns: 1fr 1fr;
     }
-    .ev-split {
+    .ev-text {
       grid-template-columns: 1fr;
-      gap: 1.4rem;
+    }
+    .ev-desc {
+      justify-self: start;
     }
   }
-  @media (max-width: 560px) {
-    .g-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+  @media (max-width: 640px) {
+    /* 表紙: 写真＋縦組みのコピーを上段に、署名は下段に横組みで */
+    .cover {
+      grid-template-columns: 1fr 4.4rem;
+      grid-template-areas: 'photo copy' 'title title';
+      gap: 1rem;
+      height: auto;
+      min-height: 0;
+      padding-bottom: 1rem;
     }
-    .w-grid {
-      grid-template-columns: 1fr;
-      gap: 40px;
+    .cover-photo {
+      grid-area: photo;
     }
-    .ev-scale {
-      display: none;
+    .cover-photo img {
+      height: 62svh;
     }
-    .intro-name {
-      font-size: 1.35rem;
+    .cover-photo figcaption {
+      position: static;
     }
-    .contact-band {
+    .spine {
+      display: contents;
+    }
+    .cover-copy {
+      grid-area: copy;
+      font-size: 1.02rem;
+      letter-spacing: 0.06em;
+    }
+    .cover-title {
+      grid-area: title;
+      writing-mode: horizontal-tb;
       flex-wrap: wrap;
-      gap: 0.6rem 1rem;
+      align-items: baseline;
+      gap: 0.3rem 0.9rem;
+      margin: 0.6rem 0 0;
+    }
+    .toc {
+      margin: 5rem 0 0;
+    }
+    .ch-gallery {
+      margin-top: 6rem;
+    }
+    .ch-works {
+      margin-top: 8rem;
+    }
+    .ch-events {
+      margin-top: 7rem;
+    }
+    .ch-about {
+      margin-top: 9rem;
+    }
+    /* 見開きは縦に積み、2枚目を右へずらして対向の名残を残す */
+    .spread-pair {
+      grid-template-columns: 1fr;
+      gap: 3.4rem;
+      margin-top: 4rem;
+    }
+    .spread-pair .page {
+      width: 82%;
+    }
+    .spread-pair .page:last-child {
+      justify-self: end;
+      margin-top: 0;
+    }
+    .spread-quiet {
+      grid-template-columns: 1fr;
+      margin-top: 5rem;
+    }
+    .quiet-photo {
+      margin-left: 0;
+    }
+    .works-plates {
+      grid-template-columns: 1fr;
+    }
+    .plate-sub {
+      margin-top: 0;
+      width: 80%;
+      justify-self: end;
+    }
+    .plate-text {
+      grid-column: 1;
+      margin-top: 0;
+    }
+    .colophon {
+      margin-top: 10rem;
+    }
+    /* 奥付: 狭い画面では項目名を上、値を下に積む(固定列だと長い欧文がはみ出しうる) */
+    .colo-list div {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
     }
   }
 </style>
