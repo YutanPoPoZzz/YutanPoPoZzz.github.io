@@ -15,17 +15,13 @@ const photos = (await getCollection('photos')).sort(
 const works = await getCollection('works');
 const publicWorks = works.filter((w) => !w.id.startsWith('minima-'));
 
-type Photo = (typeof photos)[number];
-const ar = (p: Photo) => p.data.aspect ?? 0.75;
-// 題から「第4回YMフォトコン優秀賞‗『いつか』」のような前置きを外して、作品名だけを出す
-const titleOf = (p: Photo) => p.data.title.match(/『(.+?)』/)?.[1] ?? p.data.title;
-
-// 表紙: 黒地にネオンの線が走る明暗差の強い横長の1枚。消えていたら最新の横長写真へ
-// (作品撮り 05 は画像自体に黒帯が焼き込まれているので表紙には使わない)
-const cover =
-  photos.find((p) => p.data.thumb.includes('g-event-b82c99a9')) ??
-  photos.find((p) => ar(p) > 1.3) ??
-  photos[0];
+// 表紙の写真(本人指定・2026-11-18)。ギャラリーの写真とは別に public/cover/ に置く。
+// 差し替えるときは public/cover/ に入れて gen-webp を回し、ここのパスと比率を直す
+const cover = {
+  src: '/cover/top-2026-10-30.jpg',
+  alt: '窓辺に座る、黒い猫耳のアバターのモノクロのポートレート',
+  aspect: 9 / 16,
+};
 
 // 目次: 章立ては chapters.ts が正。件数はデータから数える
 const tocCount: Record<string, string | undefined> = {
@@ -39,25 +35,24 @@ const toc = chapters.filter((c) => c.path !== '/');
 
 <Base>
   <main class="cover">
-    <figure class="cover-photo">
+    <figure class="cover-photo" style={`aspect-ratio:${cover.aspect}`}>
       <a href={`${base}/gallery/`}>
         <picture>
-          {webpSrcset(cover.data.thumb, base) && (
+          {webpSrcset(cover.src, base) && (
             <source
               type="image/webp"
-              srcset={webpSrcset(cover.data.thumb, base)}
-              sizes="(max-width: 760px) 100vw, 64vw"
+              srcset={webpSrcset(cover.src, base)}
+              sizes="(max-width: 640px) 60vw, 50svh"
             />
           )}
           <img
-            src={`${base}${cover.data.thumb}`}
-            alt={cover.data.title}
-            {...imgSize(cover.data.thumb)}
+            src={`${base}${cover.src}`}
+            alt={cover.alt}
+            {...imgSize(cover.src)}
             fetchpriority="high"
           />
         </picture>
       </a>
-      <figcaption>{titleOf(cover)}　{cover.data.date.getFullYear()}</figcaption>
     </figure>
 
     <div class="spine">
@@ -95,18 +90,28 @@ const toc = chapters.filter((c) => c.path !== '/');
     display: none;
   }
 
-  /* ===== 表紙＋目次: 写真 / 縦組みの帯 / 目次 の3列 ===== */
+  /* ===== 表紙＋目次: 縦長の写真を画面の高さいっぱいに立て、その脇に縦組みの帯、
+     右下に目次。写真と帯は左に寄せ、真ん中は余白として空けておく ===== */
   .cover {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto clamp(15rem, 20vw, 19rem);
+    grid-template-columns: auto auto minmax(0, 1fr) clamp(15rem, 20vw, 19rem);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: 'photo spine . toc';
     gap: clamp(1.2rem, 2.6vw, 3rem);
     height: calc(100svh - 58px);
     min-height: 32rem;
-    padding: clamp(0.8rem, 2vw, 1.8rem) clamp(1rem, 3vw, 2.4rem) 2.8rem;
+    padding: clamp(0.8rem, 2vw, 1.8rem) clamp(1rem, 3vw, 2.4rem) clamp(1rem, 2.4vw, 2rem);
   }
   .cover-photo {
-    position: relative;
+    grid-area: photo;
+    height: 100%;
     min-height: 0;
+  }
+  .spine {
+    grid-area: spine;
+  }
+  .toc {
+    grid-area: toc;
   }
   .cover-photo a,
   .cover-photo picture {
@@ -219,22 +224,15 @@ const toc = chapters.filter((c) => c.path !== '/');
   /* ===== 中くらいの画面: 目次を写真の下へ ===== */
   @media (max-width: 1080px) {
     .cover {
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-rows: minmax(0, 1fr) auto;
-      grid-template-areas: 'photo spine' 'toc spine';
+      grid-template-columns: auto auto minmax(0, 1fr);
+      grid-template-rows: auto auto;
+      grid-template-areas: 'photo spine .' 'toc toc toc';
       row-gap: 3rem;
       height: auto;
       min-height: calc(100svh - 58px);
     }
     .cover-photo {
-      grid-area: photo;
-      height: 58svh;
-    }
-    .spine {
-      grid-area: spine;
-    }
-    .toc {
-      grid-area: toc;
+      height: 64svh;
     }
     .toc ol {
       columns: 2;
@@ -250,18 +248,21 @@ const toc = chapters.filter((c) => c.path !== '/');
 
   /* ===== スマホ: 写真＋縦組みのコピー → 署名 → 目次 ===== */
   @media (max-width: 640px) {
+    /* 写真の幅 = 画面幅からコピーの列(5.4rem)を引いた残り。高さは比率から出す(コピーと重ねない) */
     .cover {
-      grid-template-columns: 1fr 4.2rem;
+      grid-template-columns: minmax(0, 1fr) 5.4rem;
+      grid-template-rows: auto;
       grid-template-areas: 'photo copy' 'title title' 'toc toc';
+      column-gap: 0.8rem;
       row-gap: 1.6rem;
       padding-bottom: 2rem;
     }
     .cover-photo {
-      height: 54svh;
+      width: 100%;
+      height: auto;
     }
-    .cover-photo figcaption {
-      position: static;
-      margin-top: 0.5rem;
+    .cover-copy {
+      justify-self: end;
     }
     .spine {
       display: contents;
