@@ -1387,21 +1387,21 @@
       ]
     ]
   },
-  "/cover/top-2026-10-30.jpg": {
-    "width": 1152,
+  "/cover/top-2026-10-30-3x5.jpg": {
+    "width": 1229,
     "height": 2048,
     "variants": [
       [
         640,
-        "/cover/top-2026-10-30-w640.webp"
+        "/cover/top-2026-10-30-3x5-w640.webp"
       ],
       [
         1024,
-        "/cover/top-2026-10-30-w1024.webp"
+        "/cover/top-2026-10-30-3x5-w1024.webp"
       ],
       [
-        1152,
-        "/cover/top-2026-10-30-w1152.webp"
+        1229,
+        "/cover/top-2026-10-30-3x5-w1229.webp"
       ]
     ]
   }

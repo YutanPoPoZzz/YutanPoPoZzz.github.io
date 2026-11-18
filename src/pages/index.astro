@@ -17,10 +17,11 @@ const publicWorks = works.filter((w) => !w.id.startsWith('minima-'));
 
 // 表紙の写真(本人指定・2026-11-18)。ギャラリーの写真とは別に public/cover/ に置く。
 // 差し替えるときは public/cover/ に入れて gen-webp を回し、ここのパスと比率を直す
+// (原本は 9:16 の縦長。表紙では 3:5 に切り出して、チェーンの下のたるみと留め具で終わるようにしている)
 const cover = {
-  src: '/cover/top-2026-10-30.jpg',
+  src: '/cover/top-2026-10-30-3x5.jpg',
   alt: '窓辺に座る、黒い猫耳のアバターのモノクロのポートレート',
-  aspect: 9 / 16,
+  aspect: 3 / 5,
 };
 
 // 目次: 章立ては chapters.ts が正。件数はデータから数える
@@ -42,7 +43,7 @@ const toc = chapters.filter((c) => c.path !== '/');
             <source
               type="image/webp"
               srcset={webpSrcset(cover.src, base)}
-              sizes="(max-width: 640px) 60vw, 50svh"
+              sizes="(max-width: 640px) 75vw, 60svh"
             />
           )}
           <img
@@ -90,7 +91,7 @@ const toc = chapters.filter((c) => c.path !== '/');
     display: none;
   }
 
-  /* ===== 表紙＋目次: 縦長の写真を画面の高さいっぱいに立て、その脇に縦組みの帯、
+  /* ===== 表紙＋目次: 縦長(3:5)の写真を画面の高さいっぱいに立て、その脇に縦組みの帯、
      右下に目次。写真と帯は左に寄せ、真ん中は余白として空けておく ===== */
   .cover {
     display: grid;
