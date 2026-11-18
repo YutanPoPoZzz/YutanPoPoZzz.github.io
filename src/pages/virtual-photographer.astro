@@ -11,10 +11,14 @@ import '../styles/book.css';
 // Flickr 公式ブログ(2022-09)はいずれも「ゲームや仮想空間の中で撮る写真(インゲームフォト)」としている。
 // VRChat に限る言葉ではないので、一般の定義と、本人の活動範囲(VRChat)を書き分ける。
 // 「VRフォトグラファー」を定義した一次資料は無いので、意味の違いは断定しない。
+import { getCollection } from 'astro:content';
 import AwardPhoto from '../components/AwardPhoto.astro';
 import Base from '../layouts/Base.astro';
+import { imgSize, webpSrcset } from '../lib/img';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+// 話の切れ目に置く写真。人物を特定する話には添えない
+const interlude = (await getCollection('photos')).find((p) => p.data.thumb.includes('g-portrait-fb64b7c6'));
 const siteUrl = Astro.site!.href.replace(/\/$/, '');
 const updated = new Date().toISOString().slice(0, 10);
 
@@ -78,33 +82,65 @@ const pageJsonLd = [
 
     {/* Answer-First: 冒頭で一般の定義を言い切り、次の段落で本人の位置を書く */}
     <section class="lead-block">
-      <p class="lead">
-        バーチャルフォトグラファーは、ゲームや仮想空間の中で写真を撮る人のことです。
+      <p class="lead">バーチャルフォトグラファーは、ゲームや仮想空間の中で写真を撮る人のことです。</p>
+      <p>
         英語では Virtual Photography と呼ばれていて、ゲームのフォトモードやスクリーンショットで撮った写真もここに入ります。
       </p>
       <p>
-        私（<a href={`${base}/about/`}>YutanpopoZzz／ゆたんぽぽ</a>）がこの肩書きを使うときは、
-        その中でも VRChat を舞台に、アバターを着た人を撮っていることを指しています。
-        「スクショと何が違うの？」と聞かれることもあるんですが、構図と光を決めて、
-        被写体と同じ空間に立って撮っているので、私はこれを写真として撮っています。
+        私（<a href={`${base}/about/`}>YutanpopoZzz／ゆたんぽぽ</a>）がこの肩書きを使うときは、その中でも VRChat を舞台に、アバターを着た人を撮っていることを指しています。
       </p>
+    </section>
+
+    <section class="scene scene-question">
+      <h2>「スクショと何が違うの？」</h2>
       <p>
-        VRフォトグラファーの中では珍しく、他人を撮るのがメインです。
-        VTuberさんのポートレートやイベントの記録、告知ポスターまで撮っています。
-        一方で、自分がモデルになって撮るのも得意で、アバターや衣装の宣材写真は、
-        ポーズも表情も自分で作って一人で仕上げられます。
+        と聞かれることもあるんですが、構図と光を決めて、被写体と同じ空間に立って撮っているので、私はこれを写真として撮っています。
       </p>
+    </section>
+
+    {interlude && (
+      <figure class="interlude">
+        <picture>
+          {webpSrcset(interlude.data.thumb, base) && (
+            <source
+              type="image/webp"
+              srcset={webpSrcset(interlude.data.thumb, base)}
+              sizes="(max-width: 1120px) 100vw, 1088px"
+            />
+          )}
+          <img
+            src={base + interlude.data.thumb}
+            alt="光が差す梁の上に、猫耳のシルエットが三人並んでいる写真"
+            {...imgSize(interlude.data.thumb)}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      </figure>
+    )}
+
+    <section class="scene both">
+      <div>
+        <h2>他人を撮るのがメイン</h2>
+        <p>
+          VRフォトグラファーの中では珍しいんですが、VTuberさんのポートレートやイベントの記録、告知ポスターまで撮っています。
+        </p>
+      </div>
+      <div>
+        <h2>自分でモデルもできます</h2>
+        <p>アバターや衣装の宣材写真は、ポーズも表情も自分で作って一人で仕上げられます。</p>
+      </div>
       <p class="more"><a href={`${base}/gallery/`}>撮った写真を見る</a></p>
     </section>
 
-    <section class="block">
+    <section class="scene scene-award">
       <AwardPhoto size="medium" />
       <p>
         2026年6月には、金沢21世紀美術館で開かれた「Virtual Photography Showcase 2026」に招待作家として参加しました。
       </p>
     </section>
 
-    <section class="block" id="faq">
+    <section class="scene scene-faq" id="faq">
       <h2>よくある質問</h2>
       <dl class="faq">
         {faqs.map((f) => (
@@ -127,9 +163,79 @@ const pageJsonLd = [
     max-width: calc(38em + 4.8rem);
   }
   .lead-block p + p {
-    margin-top: 1.4rem;
+    margin-top: 1.2rem;
   }
-  .lead {
-    line-height: 2;
+  .lead-block .lead {
+    max-width: none;
+    margin-bottom: 2.2rem;
+    font-family: var(--font-mincho);
+    font-size: clamp(1.25rem, 1.08rem + 0.8vw, 1.65rem);
+    font-weight: 500;
+    line-height: 1.85;
+  }
+  .vp h2 {
+    margin-bottom: 0.8rem;
+    font-size: clamp(1.3rem, 1.18rem + 0.5vw, 1.55rem);
+  }
+  /* 区切りは余白の差で作る。場所ごとに広さを変える */
+  .scene-question {
+    margin-top: 6.5rem;
+  }
+  /* この写真は黒いマット込みの画像。台紙の上で箱に見えるので、絵の部分だけを見せる */
+  .interlude {
+    --w: min(100vw - 2.4rem, 68rem);
+    width: var(--w);
+    margin: 7rem 0 0 calc(50% - var(--w) / 2);
+    aspect-ratio: 1771 / 995;
+    overflow: hidden;
+  }
+  .interlude img {
+    display: block;
+    width: 112.93%;
+    max-width: none;
+    height: auto;
+    margin: -3.67% 0 0 -7.453%;
+  }
+  .both {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.6rem 3rem;
+    margin-top: 7rem;
+  }
+  .both h2 {
+    font-size: clamp(1.2rem, 1.12rem + 0.3vw, 1.32rem);
+  }
+  .both .more {
+    grid-column: 1 / -1;
+    margin-top: 0.4rem;
+  }
+  .scene-award {
+    margin-top: 11rem;
+  }
+  .scene-faq {
+    margin-top: 8rem;
+  }
+  @media (max-width: 640px) {
+    .scene-question {
+      margin-top: 5rem;
+    }
+    .interlude {
+      --w: 100vw;
+      margin-top: 5rem;
+    }
+    .both {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      margin-top: 5rem;
+    }
+    .both .more {
+      margin-top: -1rem;
+    }
+    .scene-award {
+      margin-top: 7rem;
+    }
+    .scene-faq {
+      margin-top: 6rem;
+    }
   }
 </style>
