@@ -95,9 +95,10 @@ const toc = chapters.filter((c) => c.path !== '/');
      右下に目次。写真と帯は左に寄せ、真ん中は余白として空けておく ===== */
   .cover {
     display: grid;
-    grid-template-columns: auto auto minmax(0, 1fr) clamp(15rem, 20vw, 19rem);
+    /* 余った横幅は「左端」と「帯と目次のあいだ」に半分ずつ配る(右側だけが空かないように) */
+    grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) clamp(15rem, 20vw, 19rem);
     grid-template-rows: minmax(0, 1fr);
-    grid-template-areas: 'photo spine . toc';
+    grid-template-areas: '. photo spine . toc';
     gap: clamp(1.2rem, 2.6vw, 3rem);
     height: calc(100svh - 58px);
     min-height: 32rem;
