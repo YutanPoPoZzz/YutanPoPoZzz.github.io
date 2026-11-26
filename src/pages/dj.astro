@@ -1,0 +1,107 @@
+---
+import '../styles/book.css';
+import Base from '../layouts/Base.astro';
+import { hosted, guest, listen, type DjGig } from '../data/dj';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const sections: { id: string; jp: string; items: DjGig[] }[] = [
+  { id: 'hosted', jp: '主催したイベント', items: hosted },
+  { id: 'guest', jp: '出演したイベント', items: guest },
+];
+
+const fmt = (d: string) => d.replaceAll('-', '.');
+const isLatin = (s: string) => /^[\x00-\x7F×Ø]+$/.test(s);
+const tagUrl = (t: string) => `https://x.com/hashtag/${encodeURIComponent(t)}`;
+---
+
+<Base
+  title="DJ"
+  description="YutanpopoZzz のDJとしての記録。主催したイベントと、出演したイベントの一覧。"
+>
+  <main class="container book-page dj">
+    <div class="blockttl">
+      <h1>DJ</h1>
+    </div>
+    <p class="lead">VRChatのクラブイベントでDJをしています。</p>
+
+    {sections.map((s) => (
+      <section class="gigs" id={s.id} aria-labelledby={`${s.id}-h`}>
+        <h2 id={`${s.id}-h`}>{s.jp}</h2>
+        <ol>
+          {s.items.map((g) => (
+            <li>
+              <time datetime={g.date}>{fmt(g.date)}</time>
+              <span class="row">
+                <span class="name" lang={isLatin(g.name) ? 'en' : 'ja'}>{g.name}</span>
+                {g.tag && (
+                  <a class="tag" href={tagUrl(g.tag)} target="_blank" rel="noopener noreferrer">#{g.tag}</a>
+                )}
+              </span>
+            </li>
+          ))}
+        </ol>
+        {s.id === 'hosted' && (
+          <p class="more"><a href={`${base}/events/roof-top-junction/`}>Roof Top Junction について</a></p>
+        )}
+      </section>
+    ))}
+
+    <section class="listen" aria-labelledby="listen-h">
+      <h2 id="listen-h">録音</h2>
+      <ul>
+        {listen.map((l) => (
+          <li><a href={l.url} target="_blank" rel="noopener noreferrer" lang="en">{l.label}</a></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .lead { margin-bottom: 1rem; }
+  .gigs { margin-top: 7rem; }
+  .gigs + .gigs { margin-top: 10rem; }
+  .gigs ol { list-style: none; padding: 0; margin: 0; max-width: 46rem; }
+  .gigs li {
+    display: grid;
+    grid-template-columns: 6.6rem minmax(0, 1fr);
+    column-gap: 1.4rem;
+    align-items: baseline;
+    padding: 0.55rem 0;
+  }
+  .gigs time {
+    color: var(--pencil);
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .gigs .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.9em;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+  .gigs .name { min-width: 0; font-family: var(--font-en); font-size: 1.04rem; }
+  .gigs .tag {
+    max-width: 100%;
+    color: var(--pencil);
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+    /* タグのアンダースコアが下線に埋もれないよう、ここだけ下線を下げる */
+    text-underline-offset: 0.6em;
+  }
+  .gigs .more { margin-top: 2rem; }
+  .listen { margin-top: 12rem; }
+  .listen ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.6rem 2.6rem; }
+  .listen a {
+    font-family: var(--font-en);
+    font-size: clamp(1.2rem, 1rem + 0.9vw, 1.65rem);
+    line-height: 2;
+  }
+  @media (max-width: 560px) {
+    .gigs li { grid-template-columns: 5.4rem minmax(0, 1fr); column-gap: 0.9rem; }
+  }
+</style>

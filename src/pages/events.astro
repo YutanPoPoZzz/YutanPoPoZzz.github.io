@@ -204,6 +204,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
         ))}
       </section>
     ))}
+    <p class="dj-link"><a href={`${base}/dj/`}>DJとして主催・出演したイベントの一覧</a></p>
   </main>
 </Base>
 
@@ -236,6 +237,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
   @media (max-width: 560px) { .meta > div { grid-template-columns: 1fr; gap: 0.2rem; } }
 
   .lead { margin-bottom: 1rem; }
+  .dj-link { margin-top: 9rem; }
   .group { margin-top: 10rem; }
   .group:nth-of-type(2n) { margin-top: 8rem; }
   .event + .event { margin-top: 6rem; }

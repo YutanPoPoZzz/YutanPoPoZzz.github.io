@@ -106,6 +106,7 @@ const pageJsonLd = [
     ))}
     </div>
     <p class="events-link"><a href={`${base}/events/`}>イベント運営の実績をくわしく見る</a></p>
+    <p class="dj-link"><a href={`${base}/dj/`}>DJとして主催・出演したイベントの一覧</a></p>
     <p class="disclaimer">※ 実績の詳細名・クライアント名は順次追記します</p>
   </main>
 </Base>
@@ -129,6 +130,7 @@ const pageJsonLd = [
   .ach-awards { grid-column: 1 / -1; max-width: 48rem; }
   @media (min-width: 900px) { .achievements { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .events-link { margin-top: 3rem; }
+  .dj-link { margin-top: 0.8rem; }
   .disclaimer { margin-top: 1rem; color: var(--pencil); font-size: 0.82rem; }
   @media (max-width: 760px) { .body-wrap { grid-template-columns: 1fr; } .me { width: 85%; max-width: 28rem; } }
 </style>
