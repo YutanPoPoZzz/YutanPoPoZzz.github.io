@@ -32,6 +32,7 @@ export const awards: Achievement[] = [
 
 export const clientWorks: Achievement[] = [
   { year: '2025.12', title: 'HARE — アイテム撮影', note: 'アンドエスティ メタバース' },
+  { year: '2026.01', title: 'DDD AllNight — イベント撮影', note: 'ClubDDD' },
   { year: '2026', title: 'アバター・衣装ブランド複数社の商品撮影' },
 ];
 
