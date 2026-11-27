@@ -1179,6 +1179,38 @@
       ]
     ]
   },
+  "/works/pr-brochimanac-kaleidoscope-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-brochimanac-kaleidoscope-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-brochimanac-kaleidoscope-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-brochimanac-kaleidoscope-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-brochimanac-kaleidoscope-full.jpg": {
+    "width": 800,
+    "height": 1127,
+    "variants": [
+      [
+        640,
+        "/works/pr-brochimanac-kaleidoscope-full-w640.webp"
+      ],
+      [
+        800,
+        "/works/pr-brochimanac-kaleidoscope-full-w800.webp"
+      ]
+    ]
+  },
   "/works/pr-daft-blacksmit-card.jpg": {
     "width": 1200,
     "height": 675,
