@@ -1,13 +1,17 @@
 ---
 title: 'ANGE'
 summary: 'ANGEの衣装を、Xの紹介投稿用に撮影しました。'
-date: 2025-11-29
+date: 2025-11-30
 category: '商品・プロモーション撮影'
 group: 'pr'
 thumb: '/works/pr-ange-card.jpg'
 client: 'ANGE'
 role: '撮影'
 posts:
+  - date: 2025-11-30
+    url: 'https://x.com/YutanpopoZzz/status/1995052656768028891'
+    images:
+      - '/pr/ange/1995052656768028891-1.jpg'
   - date: 2025-11-29
     url: 'https://x.com/YutanpopoZzz/status/1994603621737185686'
     images:

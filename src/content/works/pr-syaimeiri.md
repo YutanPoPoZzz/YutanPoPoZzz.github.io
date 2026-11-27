@@ -24,4 +24,8 @@ posts:
     url: 'https://x.com/YutanpopoZzz/status/1967710016716095808'
     images:
       - '/pr/syaimeiri/1967710016716095808-1.jpg'
+  - date: 2025-05-29
+    url: 'https://x.com/YutanpopoZzz/status/1928050753832431747'
+    images:
+      - '/pr/syaimeiri/1928050753832431747-1.jpg'
 ---
