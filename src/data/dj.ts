@@ -7,21 +7,23 @@ export type DjGig = {
   name: string;
   /** イベントのハッシュタグ(# なし)。無い回は省く */
   tag?: string;
+  /** 回を重ねるシリーズ名。同じ名前の回は一覧で1行にまとめ、各回は畳んで見せる */
+  series?: string;
 };
 
 /** 自分が主催したイベント */
 export const hosted: DjGig[] = [
-  { date: '2026-11-13', name: 'Roof Top Junction lounge', tag: 'RoofTopJunction' },
-  { date: '2026-10-31', name: 'Roof Top Junction vol.9', tag: 'RoofTopJunction' },
+  { date: '2026-11-13', name: 'Roof Top Junction lounge', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2026-10-31', name: 'Roof Top Junction vol.9', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
   { date: '2026-10-22', name: 'WHITEOUT', tag: 'WHITEOUT_VRC' },
-  { date: '2026-08-13', name: 'Roof Top Junction vol.8', tag: 'RoofTopJunction' },
-  { date: '2026-07-25', name: 'Roof Top Junction vol.7 1/2junctionコラボ回', tag: 'RoofTopJunction' },
-  { date: '2026-06-06', name: 'Roof Top Junction vol.6', tag: 'RoofTopJunction' },
-  { date: '2026-03-07', name: 'Roof Top Junction vol.5', tag: 'RoofTopJunction' },
-  { date: '2025-12-20', name: 'Roof Top Junction vol.4', tag: 'RoofTopJunction' },
-  { date: '2025-08-09', name: 'Roof Top Junction vol.3', tag: 'RoofTopJunction' },
-  { date: '2025-05-17', name: 'Roof Top Junction vol.2', tag: 'RoofTopJunction' },
-  { date: '2025-03-08', name: 'Roof Top Junction vol.1', tag: 'RoofTopJunction' },
+  { date: '2026-08-13', name: 'Roof Top Junction vol.8', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2026-07-25', name: 'Roof Top Junction vol.7 1/2junctionコラボ回', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2026-06-06', name: 'Roof Top Junction vol.6', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2026-03-07', name: 'Roof Top Junction vol.5', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2025-12-20', name: 'Roof Top Junction vol.4', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2025-08-09', name: 'Roof Top Junction vol.3', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2025-05-17', name: 'Roof Top Junction vol.2', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
+  { date: '2025-03-08', name: 'Roof Top Junction vol.1', tag: 'RoofTopJunction', series: 'Roof Top Junction' },
 ];
 
 /** ほかの方のイベントへの出演 */

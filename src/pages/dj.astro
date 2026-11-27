@@ -5,12 +5,30 @@ import { hosted, guest, listen, type DjGig } from '../data/dj';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-const sections: { id: string; jp: string; items: DjGig[] }[] = [
-  { id: 'hosted', jp: '主催したイベント', items: hosted },
-  { id: 'guest', jp: '出演したイベント', items: guest },
+// 同じシリーズの回は1行にまとめる。行の位置はシリーズの最新回で決まる(一覧は新しい順)
+type Row =
+  | { kind: 'one'; gig: DjGig }
+  | { kind: 'series'; name: string; tag?: string; first: string; items: DjGig[] };
+const toRows = (items: DjGig[]): Row[] => {
+  const rows: Row[] = [];
+  for (const g of items) {
+    if (!g.series) { rows.push({ kind: 'one', gig: g }); continue; }
+    const s = rows.find((r) => r.kind === 'series' && r.name === g.series);
+    if (s && s.kind === 'series') { s.items.push(g); s.first = g.date < s.first ? g.date : s.first; }
+    else rows.push({ kind: 'series', name: g.series, tag: g.tag, first: g.date, items: [g] });
+  }
+  return rows;
+};
+const seriesPage: Record<string, string> = { 'Roof Top Junction': '/events/roof-top-junction/' };
+
+const sections: { id: string; jp: string; rows: Row[] }[] = [
+  { id: 'hosted', jp: '主催したイベント', rows: toRows(hosted) },
+  { id: 'guest', jp: '出演したイベント', rows: toRows(guest) },
 ];
 
 const fmt = (d: string) => d.replaceAll('-', '.');
+const fmtMonth = (d: string) => d.slice(0, 7).replace('-', '.');
+const episode = (g: DjGig) => (g.series && g.name.startsWith(`${g.series} `) ? g.name.slice(g.series.length + 1) : g.name);
 const isLatin = (s: string) => /^[\x00-\x7F×Ø]+$/.test(s);
 const tagUrl = (t: string) => `https://x.com/hashtag/${encodeURIComponent(t)}`;
 ---
@@ -29,21 +47,43 @@ const tagUrl = (t: string) => `https://x.com/hashtag/${encodeURIComponent(t)}`;
       <section class="gigs" id={s.id} aria-labelledby={`${s.id}-h`}>
         <h2 id={`${s.id}-h`}>{s.jp}</h2>
         <ol>
-          {s.items.map((g) => (
+          {s.rows.map((r) => r.kind === 'one' ? (
             <li>
-              <time datetime={g.date}>{fmt(g.date)}</time>
+              <time datetime={r.gig.date}>{fmt(r.gig.date)}</time>
               <span class="row">
-                <span class="name" lang={isLatin(g.name) ? 'en' : 'ja'}>{g.name}</span>
-                {g.tag && (
-                  <a class="tag" href={tagUrl(g.tag)} target="_blank" rel="noopener noreferrer">#{g.tag}</a>
+                <span class="name" lang={isLatin(r.gig.name) ? 'en' : 'ja'}>{r.gig.name}</span>
+                {r.gig.tag && (
+                  <a class="tag" href={tagUrl(r.gig.tag)} target="_blank" rel="noopener noreferrer">#{r.gig.tag}</a>
                 )}
               </span>
             </li>
+          ) : (
+            <li class="series">
+              <span class="since"><time datetime={r.first.slice(0, 7)}>{fmtMonth(r.first)}</time>〜</span>
+              <div class="series-body">
+                <span class="row">
+                  <span class="name" lang={isLatin(r.name) ? 'en' : 'ja'}>
+                    {seriesPage[r.name] ? <a href={`${base}${seriesPage[r.name]}`}>{r.name}</a> : r.name}
+                  </span>
+                  {r.tag && (
+                    <a class="tag" href={tagUrl(r.tag)} target="_blank" rel="noopener noreferrer">#{r.tag}</a>
+                  )}
+                </span>
+                <details class="fold">
+                  <summary>全{r.items.length}回を見る</summary>
+                  <ol class="episodes">
+                    {r.items.map((g) => (
+                      <li>
+                        <time datetime={g.date}>{fmt(g.date)}</time>
+                        <span class="ep" lang={isLatin(episode(g)) ? 'en' : 'ja'}>{episode(g)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              </div>
+            </li>
           ))}
         </ol>
-        {s.id === 'hosted' && (
-          <p class="more"><a href={`${base}/events/roof-top-junction/`}>Roof Top Junction について</a></p>
-        )}
       </section>
     ))}
 
@@ -93,7 +133,17 @@ const tagUrl = (t: string) => `https://x.com/hashtag/${encodeURIComponent(t)}`;
     /* タグのアンダースコアが下線に埋もれないよう、ここだけ下線を下げる */
     text-underline-offset: 0.6em;
   }
-  .gigs .more { margin-top: 2rem; }
+  .gigs .since {
+    color: var(--pencil);
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .gigs .series-body { min-width: 0; }
+  .gigs .series details.fold { margin-top: 0.5rem; }
+  .gigs .episodes { margin-top: 1rem; }
+  .gigs .episodes li { grid-template-columns: 6.2rem minmax(0, 1fr); column-gap: 1rem; padding: 0.3rem 0; }
+  .gigs .episodes .ep { font-family: var(--font-en); font-size: 0.96rem; overflow-wrap: break-word; }
   .listen { margin-top: 12rem; }
   .listen ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.6rem 2.6rem; }
   .listen a {
@@ -103,5 +153,8 @@ const tagUrl = (t: string) => `https://x.com/hashtag/${encodeURIComponent(t)}`;
   }
   @media (max-width: 560px) {
     .gigs li { grid-template-columns: 5.4rem minmax(0, 1fr); column-gap: 0.9rem; }
+    /* 各回の一覧は日付の列の下まで広げる(狭い右の列に押し込むと名前が細切れになる) */
+    .gigs .episodes { margin-left: -6.3rem; }
+    .gigs .episodes li { grid-template-columns: 5.4rem minmax(0, 1fr); column-gap: 0.9rem; }
   }
 </style>
