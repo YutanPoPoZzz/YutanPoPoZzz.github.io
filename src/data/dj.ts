@@ -34,6 +34,7 @@ export const guest: DjGig[] = [
   { date: '2026-09-22', name: 'UnderfLow Vol.3', tag: 'UnderfLow' },
   { date: '2026-09-19', name: 'HighVolume.Exhibition#2', tag: 'HIGHVL' },
   { date: '2026-07-17', name: 'CLOSER://NULL', tag: 'Club_CLOSER' },
+  { date: '2026-06-27', name: 'VR PHOTO PRINT CLUB リアルミートアップイベント 懇親会' },
   { date: '2026-06-12', name: 'KujiAvatarMidnightClub', tag: 'KujiAvatarMidnightClub' },
   { date: '2026-05-15', name: 'LEAK PerformanceTest' },
   { date: '2026-04-01', name: 'KAMC Specialイベント #5', tag: 'KujiAvatarMidnightClub' },
