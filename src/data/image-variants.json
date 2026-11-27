@@ -1035,24 +1035,6 @@
       ]
     ]
   },
-  "/events/whiteout.jpg": {
-    "width": 1600,
-    "height": 900,
-    "variants": [
-      [
-        640,
-        "/events/whiteout-w640.webp"
-      ],
-      [
-        1024,
-        "/events/whiteout-w1024.webp"
-      ],
-      [
-        1600,
-        "/events/whiteout-w1600.webp"
-      ]
-    ]
-  },
   "/works/focus-decay-card.jpg": {
     "width": 1200,
     "height": 675,
@@ -1744,6 +1726,42 @@
       [
         1000,
         "/works/vrcdj-workshop-full-w1000.webp"
+      ]
+    ]
+  },
+  "/works/whiteout-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/whiteout-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/whiteout-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/whiteout-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/whiteout-full.jpg": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      [
+        640,
+        "/works/whiteout-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/whiteout-full-w1024.webp"
+      ],
+      [
+        1600,
+        "/works/whiteout-full-w1600.webp"
       ]
     ]
   },

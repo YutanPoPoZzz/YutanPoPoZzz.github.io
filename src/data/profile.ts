@@ -50,7 +50,7 @@ export const exhibitions: Achievement[] = [
     year: '2026.10',
     title: '写真展『WHITEOUT』主催',
     note: '作家30名超・33作品。会場のワールドも制作',
-    href: '/events/#whiteout',
+    href: '/works/whiteout/',
   },
   {
     year: '2026.06',

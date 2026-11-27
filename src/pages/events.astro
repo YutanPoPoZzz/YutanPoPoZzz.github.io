@@ -33,7 +33,7 @@ const supporting = groups.flatMap((g) => g.items).filter((ev) => ev.status !== '
       <section class="group">
         <h3>{g.jp}</h3>
         {g.items.map((ev) => (
-          <article id={ev.anchor} class:list={['event',{ supporting: ev.status !== 'host', 'has-image': !!ev.image, reverse: supporting.indexOf(ev) % 2 === 1 }]}>
+          <article class:list={['event', { supporting: ev.status !== 'host', 'has-image': !!ev.image, reverse: supporting.indexOf(ev) % 2 === 1 }]}>
             <div class="event-copy">
             <header>
               <h4 lang={/^[\x00-\x7F]+$/.test(ev.name) ? 'en' : 'ja'}>

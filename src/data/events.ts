@@ -27,8 +27,6 @@ export type EventEntry = {
   credits?: { role: string; name: string; url?: string }[];
   /** 個別紹介ページがある場合のパス */
   page?: string;
-  /** ページ内リンクの行き先(ABOUTの実績から飛ぶ) */
-  anchor?: string;
 };
 
 export const events: EventEntry[] = [
@@ -54,26 +52,6 @@ export const events: EventEntry[] = [
     ],
     credits: [
       { role: 'ロゴデザイン', name: 'promnco', url: 'https://x.com/promnco1220' },
-    ],
-  },
-  {
-    name: 'WHITEOUT',
-    genre: '写真展＋DJイベント',
-    status: 'host',
-    color: '#e6e8ec',
-    image: '/events/whiteout.jpg',
-    anchor: 'whiteout',
-    summary: [
-      '濃霧の森を歩きながら写真を見る写真展です。30名を超える作家の作品33点を霧の中に1点ずつ置き、会場のワールドも自分で作りました。',
-      '先が見えない霧は、1つ1つの写真と向き合ってもらうための制約として設計しています。その制約から外れたい人のための逃げ道と、最後まで歩いた人だけが見られるエンディングも用意しました。',
-      '公開前夜の10月22日には、同じワールドの上空でアンビエントのDJイベントを開催。日付が変わると会場が消えて、展示が始まる仕掛けです。',
-    ],
-    roles: 'イベント主催、企画、会場ワールド制作',
-    tasks: '展示空間の設計、出展作品の取りまとめ、DJイベントの運営、告知',
-    scale: ['出展 33作品（作家30名超）', 'DJ 3名'],
-    links: [
-      { label: 'VRChatワールド', url: 'https://vrchat.com/home/world/wrld_493544b9-8ec3-45fd-97bd-593272e9214e/info' },
-      { label: '告知（X）', url: 'https://x.com/YutanpopoZzz/status/2109766064192049434' },
     ],
   },
   {
