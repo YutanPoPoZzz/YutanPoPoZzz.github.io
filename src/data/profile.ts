@@ -33,7 +33,12 @@ export const awards: Achievement[] = [
 export const clientWorks: Achievement[] = [
   { year: '2025.12', title: 'HARE — アイテム撮影', note: 'アンドエスティ メタバース' },
   { year: '2026.01', title: 'DDD AllNight — イベント撮影', note: 'ClubDDD' },
-  { year: '2026', title: 'アバター・衣装ブランド複数社の商品撮影' },
+  {
+    year: '2026',
+    title: 'アバター・衣装・靴ブランドの商品撮影',
+    note: 'DIANA・大丸松坂屋アバター・Outlander_Campers・Daft_BlackSmit ほか',
+    href: '/works/tag/product/',
+  },
 ];
 
 export const sponsors: Achievement[] = [

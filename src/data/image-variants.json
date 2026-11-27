@@ -1179,6 +1179,218 @@
       ]
     ]
   },
+  "/works/pr-daft-blacksmit-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-daft-blacksmit-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-daft-blacksmit-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-daft-blacksmit-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-daft-blacksmit-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/pr-daft-blacksmit-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-daft-blacksmit-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/pr-daft-blacksmit-full-w1050.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-kizunaai-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-kizunaai-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-diana-kizunaai-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-diana-kizunaai-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-kizunaai-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-kizunaai-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-diana-kizunaai-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/pr-diana-kizunaai-full-w1050.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-lucypop-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-lucypop-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-diana-lucypop-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-diana-lucypop-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-lucypop-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-lucypop-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-diana-lucypop-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/pr-diana-lucypop-full-w1050.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-sanrio-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-sanrio-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-diana-sanrio-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-diana-sanrio-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-diana-sanrio-full.jpg": {
+    "width": 768,
+    "height": 1024,
+    "variants": [
+      [
+        640,
+        "/works/pr-diana-sanrio-full-w640.webp"
+      ],
+      [
+        768,
+        "/works/pr-diana-sanrio-full-w768.webp"
+      ]
+    ]
+  },
+  "/works/pr-lucile-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-lucile-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-lucile-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-lucile-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-lucile-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/pr-lucile-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-lucile-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/pr-lucile-full-w1050.webp"
+      ]
+    ]
+  },
+  "/works/pr-outlander-quasanez-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-outlander-quasanez-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-outlander-quasanez-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-outlander-quasanez-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-outlander-quasanez-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/pr-outlander-quasanez-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-outlander-quasanez-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/pr-outlander-quasanez-full-w1050.webp"
+      ]
+    ]
+  },
   "/works/rtj-posters-card.jpg": {
     "width": 1200,
     "height": 675,
