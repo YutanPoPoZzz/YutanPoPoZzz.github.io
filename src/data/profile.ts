@@ -6,7 +6,7 @@
  */
 export const availability = {
   open: true,
-  asOf: '2026年8月',
+  asOf: '2026年11月',
   text: 'ご依頼を受け付けています',
   /** HOMEのCONTACT帯に出す短縮表記 */
   short: '受付中',
@@ -47,15 +47,28 @@ export const sponsors: Achievement[] = [
 
 export const exhibitions: Achievement[] = [
   {
+    year: '2026.10',
+    title: '写真展『WHITEOUT』主催',
+    note: '作家30名超・33作品。会場のワールドも制作',
+    href: '/events/#whiteout',
+  },
+  {
     year: '2026.06',
     title: 'Virtual Photography Showcase 2026 招待作家',
     note: '金沢21世紀美術館',
     href: '/works/vps-2026/',
   },
+  { year: '2026.05', title: 'リアル写真の合同展『Real Ⅱ』出展' },
 ];
 
 export const activities: Achievement[] = [
   { year: '2025.03〜', title: 'DJイベント「Roof Top Junction」主催', note: '企画・会場ワールド制作・ポスター・運営・撮影', href: '/events/roof-top-junction/' },
-  { year: '2025.10〜', title: 'VRChat写真教室' },
+  { year: '2025.10〜', title: 'VRChat写真教室', note: 'Gallery & fan cafe Kittens の写真教室で講師。講評つきの5日間、2026.02 に第2期' },
+  {
+    year: '2026.11',
+    title: '「#VRCPhoto豆知識」',
+    note: '撮影・ポージング・編集で考えていることをXにまとめた投稿',
+    href: 'https://x.com/YutanpopoZzz/status/2118251884989612291',
+  },
   { year: '—', title: '撮影講習', note: '2回実施' },
 ];

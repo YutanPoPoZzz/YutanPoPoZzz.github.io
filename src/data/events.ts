@@ -6,7 +6,7 @@ export type EventLink = { label: string; url: string };
  * イベント規模の注記。グループ人数や来場者数は時期で増減するので、
  * 数字がいつ時点のものかを添える。サイト更新(号令メンテ)で数字を直したらここも直す。
  */
-export const scaleNote = 'イベント規模の数字は2026年8月時点の目安です。時期によって変動します。';
+export const scaleNote = 'グループ人数・来場者数は2026年8月時点の目安です。時期によって変動します。';
 
 export type EventEntry = {
   name: string;
@@ -27,6 +27,8 @@ export type EventEntry = {
   credits?: { role: string; name: string; url?: string }[];
   /** 個別紹介ページがある場合のパス */
   page?: string;
+  /** ページ内リンクの行き先(ABOUTの実績から飛ぶ) */
+  anchor?: string;
 };
 
 export const events: EventEntry[] = [
@@ -41,15 +43,37 @@ export const events: EventEntry[] = [
       '"初心者でも音楽を楽しめる場づくり" を軸にした音楽イベント。ライト層の来場者はもちろん、毎回初心者の出演者も迎え入れ、「はじめの一歩」を踏み出しやすい空気感を大切にしています。',
       '屋上という開放的なロケーションを会場にすることで、従来のDJイベントにありがちなアングラ感を排し、誰でも立ち寄れる雰囲気に。大衆向けの親しみやすさと、DJカルチャーの伝統への敬意——その2つの価値観を両立させながら、誰にとっても開かれた音楽体験を提供します。',
       'このイベントを通じて、より多くの人がVRChat内で聴く音楽の魅力に触れ、次のイベントへと踏み出すきっかけになることを願っています。',
+      '2026年には、クルーのうち5人が1曲ずつ持ち寄った初めてのアルバム『Gather on the rooftop』を制作しました。レコードにプレスしてVirtual Photography Showcase 2026で展示し、10月からはBandcampでも販売しています。',
     ],
     roles: 'イベント主催、チームマネジメント、広報・ポスター制作、営業',
     tasks: 'チームリーダー、広告戦略の策定、出演者コーディネート、ビジュアル制作、ワールド整備',
     scale: ['グループ人数 500人以上', '来場者 200人/1回', 'インスタンス上限 80人', '平均滞在人数 65人'],
     links: [
       { label: 'VRChatグループ', url: 'https://vrc.group/RTJUNC.3229' },
+      { label: 'アルバム（Bandcamp）', url: 'https://rooftopjunction.bandcamp.com/album/gather-on-the-rooftop' },
     ],
     credits: [
       { role: 'ロゴデザイン', name: 'promnco', url: 'https://x.com/promnco1220' },
+    ],
+  },
+  {
+    name: 'WHITEOUT',
+    genre: '写真展＋DJイベント',
+    status: 'host',
+    color: '#e6e8ec',
+    image: '/events/whiteout.jpg',
+    anchor: 'whiteout',
+    summary: [
+      '濃霧の森を歩きながら写真を見る写真展です。30名を超える作家の作品33点を霧の中に1点ずつ置き、会場のワールドも自分で作りました。',
+      '先が見えない霧は、1つ1つの写真と向き合ってもらうための制約として設計しています。その制約から外れたい人のための逃げ道と、最後まで歩いた人だけが見られるエンディングも用意しました。',
+      '公開前夜の10月22日には、同じワールドの上空でアンビエントのDJイベントを開催。日付が変わると会場が消えて、展示が始まる仕掛けです。',
+    ],
+    roles: 'イベント主催、企画、会場ワールド制作',
+    tasks: '展示空間の設計、出展作品の取りまとめ、DJイベントの運営、告知',
+    scale: ['出展 33作品（作家30名超）', 'DJ 3名'],
+    links: [
+      { label: 'VRChatワールド', url: 'https://vrchat.com/home/world/wrld_493544b9-8ec3-45fd-97bd-593272e9214e/info' },
+      { label: '告知（X）', url: 'https://x.com/YutanpopoZzz/status/2109766064192049434' },
     ],
   },
   {

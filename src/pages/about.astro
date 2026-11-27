@@ -92,7 +92,13 @@ const pageJsonLd = [
               <tr>
                 <td class="year">{a.year}</td>
                 <td class="ttl">
-                  {a.href ? <a href={`${base}${a.href}`}>{g.base}</a> : g.base}
+                  {a.href ? (
+                    a.href.startsWith('http') ? (
+                      <a href={a.href} target="_blank" rel="noopener noreferrer">{g.base}</a>
+                    ) : (
+                      <a href={`${base}${a.href}`}>{g.base}</a>
+                    )
+                  ) : g.base}
                 {g.grade && (
                   <span class="grade">{g.grade}</span>
                 )}
