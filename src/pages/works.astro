@@ -8,6 +8,7 @@ import { workCategories } from '../data/work-categories';
 import { services } from '../data/services';
 import { webpSrcset } from '../lib/img';
 import { periodOf } from '../lib/period';
+import { photoAspect } from '../lib/photo-aspect';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const works = (await getCollection('works')).sort(
@@ -31,6 +32,18 @@ const prBrands = otherWorks
     return { w, count: dates.length, span: label, last };
   })
   .sort((a, b) => b.last.getTime() - a.last.getTime());
+// ブランドの紹介撮影の看板写真(本人指定 2026-11-27)。写真の下にブランド名を添え、ブランドのページへ
+// 投稿写真(幅750)では大きく出すと粗いため、原本から幅1200で書き出した看板用を使う
+const prFeatureSpec = [
+  { id: 'pr-diana', src: '/pr/feature/diana-1897044383792554357.jpg' },
+  { id: 'pr-evostria', src: '/pr/feature/evostria-2090197123681685582.jpg' },
+];
+const prFeatures = await Promise.all(
+  prFeatureSpec
+    .map(({ id, src }) => ({ w: otherWorks.find((w) => w.id === id), src }))
+    .filter((f): f is { w: (typeof works)[number]; src: string } => !!f.w)
+    .map(async ({ w, src }) => ({ w, src, aspect: await photoAspect(src) }))
+);
 const otherRecords = otherWorks.filter((w) => w.data.group === 'other');
 // その他: 自作ツール(新しい順)+minimaシリーズ
 const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard] : [])];
@@ -129,6 +142,25 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
       <section class="block" id="pr">
         <h3>ブランドの紹介撮影</h3>
         <p class="pr-lead">アバター・衣装・靴のブランドの新作を、Xの紹介投稿用に撮った写真です。</p>
+        {prFeatures.length > 0 && (
+          <div class="pr-feature">
+            {prFeatures.map(({ w, src, aspect }) => (
+              <figure>
+                <a href={`${base}/works/${w.id}/`} tabindex="-1" aria-hidden="true">
+                  <img
+                    src={`${base}${src}`}
+                    alt={`${w.data.title}の紹介写真`}
+                    width="1000"
+                    height={Math.round(1000 / aspect)}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+                <figcaption><a href={`${base}/works/${w.id}/`}>{w.data.title}</a></figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
         <ul class="pr-brands">
           {prBrands.map(({ w, count, span }) => (
             <li>
@@ -191,6 +223,12 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
   .services a:hover .sv-title { text-decoration-color: var(--ink); }
   .sv-desc { display: block; max-width: 38em; }
   .pr-lead { color: var(--pencil); }
+  /* 看板写真: 活動3本柱と同じく大小の差をつけ、右を少し下げる。スマホでも2列のまま */
+  .pr-feature { display: grid; grid-template-columns: 6fr 5fr; gap: clamp(1rem, 4vw, 3.4rem); align-items: start; max-width: 56rem; margin-top: 2.6rem; }
+  .pr-feature figure { margin: 0; }
+  .pr-feature figure:nth-child(2) { margin-top: clamp(2rem, 8vw, 6rem); }
+  .pr-feature img { display: block; width: 100%; height: auto; }
+  .pr-feature figcaption { margin-top: 0.6rem; font-family: var(--font-mincho); font-weight: 500; font-size: 1.05rem; }
   /* 左から右へ読んだときに新しい順になるよう、段組みでなくグリッドで並べる */
   .pr-brands { list-style: none; padding: 0; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); column-gap: 4rem; max-width: 48rem; }
   .pr-brands li { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.9em; padding: 0.45rem 0; }
