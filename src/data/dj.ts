@@ -41,7 +41,6 @@ export const guest: DjGig[] = [
   { date: '2026-05-15', name: 'LEAK PerformanceTest' },
   { date: '2026-04-01', name: 'KAMC Specialイベント #5', tag: 'KujiAvatarMidnightClub' },
   { date: '2026-03-13', name: 'CLOSER://SYNC', tag: 'Club_CLOSER' },
-  { date: '2026-01-11', name: 'DDD AllNight', tag: 'ClubDDD' },
   { date: '2025-11-23', name: 'MARYCIA PLAYS MUSIC', tag: 'MaryciaPM' },
   { date: '2025-10-27', name: 'MondayOwls', tag: 'MondayOwls' },
   { date: '2025-10-04', name: '飲酒タンス' },
