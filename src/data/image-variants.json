@@ -1143,6 +1143,114 @@
       ]
     ]
   },
+  "/works/other-beams-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/other-beams-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-beams-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/other-beams-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/other-beams-full.jpg": {
+    "width": 1054,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/other-beams-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-beams-full-w1024.webp"
+      ],
+      [
+        1054,
+        "/works/other-beams-full-w1054.webp"
+      ]
+    ]
+  },
+  "/works/other-levy-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/other-levy-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-levy-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/other-levy-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/other-levy-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/other-levy-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-levy-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/other-levy-full-w1050.webp"
+      ]
+    ]
+  },
+  "/works/other-vrchat-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/other-vrchat-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-vrchat-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/other-vrchat-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/other-vrchat-full.jpg": {
+    "width": 1050,
+    "height": 1400,
+    "variants": [
+      [
+        640,
+        "/works/other-vrchat-full-w640.webp"
+      ],
+      [
+        1024,
+        "/works/other-vrchat-full-w1024.webp"
+      ],
+      [
+        1050,
+        "/works/other-vrchat-full-w1050.webp"
+      ]
+    ]
+  },
   "/works/photo-training-wheels-card.jpg": {
     "width": 1200,
     "height": 675,
@@ -1179,6 +1287,42 @@
       ]
     ]
   },
+  "/works/pr-ange-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-ange-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-ange-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-ange-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-blacksunsins-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-blacksunsins-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-blacksunsins-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-blacksunsins-card-w1200.webp"
+      ]
+    ]
+  },
   "/works/pr-brochimanac-kaleidoscope-card.jpg": {
     "width": 1200,
     "height": 675,
@@ -1211,215 +1355,255 @@
       ]
     ]
   },
-  "/works/pr-daft-blacksmit-card.jpg": {
+  "/works/pr-cleo-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-daft-blacksmit-card-w640.webp"
+        "/works/pr-cleo-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-daft-blacksmit-card-w1024.webp"
+        "/works/pr-cleo-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-daft-blacksmit-card-w1200.webp"
+        "/works/pr-cleo-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-daft-blacksmit-full.jpg": {
-    "width": 1050,
-    "height": 1400,
-    "variants": [
-      [
-        640,
-        "/works/pr-daft-blacksmit-full-w640.webp"
-      ],
-      [
-        1024,
-        "/works/pr-daft-blacksmit-full-w1024.webp"
-      ],
-      [
-        1050,
-        "/works/pr-daft-blacksmit-full-w1050.webp"
-      ]
-    ]
-  },
-  "/works/pr-diana-kizunaai-card.jpg": {
+  "/works/pr-daft-blacksmith-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-diana-kizunaai-card-w640.webp"
+        "/works/pr-daft-blacksmith-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-diana-kizunaai-card-w1024.webp"
+        "/works/pr-daft-blacksmith-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-diana-kizunaai-card-w1200.webp"
+        "/works/pr-daft-blacksmith-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-diana-kizunaai-full.jpg": {
-    "width": 1050,
-    "height": 1400,
-    "variants": [
-      [
-        640,
-        "/works/pr-diana-kizunaai-full-w640.webp"
-      ],
-      [
-        1024,
-        "/works/pr-diana-kizunaai-full-w1024.webp"
-      ],
-      [
-        1050,
-        "/works/pr-diana-kizunaai-full-w1050.webp"
-      ]
-    ]
-  },
-  "/works/pr-diana-lucypop-card.jpg": {
+  "/works/pr-daimaru-matsuzakaya-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-diana-lucypop-card-w640.webp"
+        "/works/pr-daimaru-matsuzakaya-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-diana-lucypop-card-w1024.webp"
+        "/works/pr-daimaru-matsuzakaya-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-diana-lucypop-card-w1200.webp"
+        "/works/pr-daimaru-matsuzakaya-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-diana-lucypop-full.jpg": {
-    "width": 1050,
-    "height": 1400,
-    "variants": [
-      [
-        640,
-        "/works/pr-diana-lucypop-full-w640.webp"
-      ],
-      [
-        1024,
-        "/works/pr-diana-lucypop-full-w1024.webp"
-      ],
-      [
-        1050,
-        "/works/pr-diana-lucypop-full-w1050.webp"
-      ]
-    ]
-  },
-  "/works/pr-diana-sanrio-card.jpg": {
+  "/works/pr-diana-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-diana-sanrio-card-w640.webp"
+        "/works/pr-diana-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-diana-sanrio-card-w1024.webp"
+        "/works/pr-diana-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-diana-sanrio-card-w1200.webp"
+        "/works/pr-diana-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-diana-sanrio-full.jpg": {
-    "width": 768,
-    "height": 1024,
-    "variants": [
-      [
-        640,
-        "/works/pr-diana-sanrio-full-w640.webp"
-      ],
-      [
-        768,
-        "/works/pr-diana-sanrio-full-w768.webp"
-      ]
-    ]
-  },
-  "/works/pr-lucile-card.jpg": {
+  "/works/pr-dragonsaga-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-lucile-card-w640.webp"
+        "/works/pr-dragonsaga-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-lucile-card-w1024.webp"
+        "/works/pr-dragonsaga-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-lucile-card-w1200.webp"
+        "/works/pr-dragonsaga-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-lucile-full.jpg": {
-    "width": 1050,
-    "height": 1400,
-    "variants": [
-      [
-        640,
-        "/works/pr-lucile-full-w640.webp"
-      ],
-      [
-        1024,
-        "/works/pr-lucile-full-w1024.webp"
-      ],
-      [
-        1050,
-        "/works/pr-lucile-full-w1050.webp"
-      ]
-    ]
-  },
-  "/works/pr-outlander-quasanez-card.jpg": {
+  "/works/pr-dwe-card.jpg": {
     "width": 1200,
     "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-outlander-quasanez-card-w640.webp"
+        "/works/pr-dwe-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-outlander-quasanez-card-w1024.webp"
+        "/works/pr-dwe-card-w1024.webp"
       ],
       [
         1200,
-        "/works/pr-outlander-quasanez-card-w1200.webp"
+        "/works/pr-dwe-card-w1200.webp"
       ]
     ]
   },
-  "/works/pr-outlander-quasanez-full.jpg": {
-    "width": 1050,
-    "height": 1400,
+  "/works/pr-evostria-card.jpg": {
+    "width": 1200,
+    "height": 675,
     "variants": [
       [
         640,
-        "/works/pr-outlander-quasanez-full-w640.webp"
+        "/works/pr-evostria-card-w640.webp"
       ],
       [
         1024,
-        "/works/pr-outlander-quasanez-full-w1024.webp"
+        "/works/pr-evostria-card-w1024.webp"
       ],
       [
-        1050,
-        "/works/pr-outlander-quasanez-full-w1050.webp"
+        1200,
+        "/works/pr-evostria-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-harmony-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-harmony-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-harmony-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-harmony-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-juice-cocoblanc-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-juice-cocoblanc-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-juice-cocoblanc-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-juice-cocoblanc-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-milkyhack-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-milkyhack-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-milkyhack-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-milkyhack-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-outlander-campers-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-outlander-campers-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-outlander-campers-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-outlander-campers-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-syaimeiri-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-syaimeiri-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-syaimeiri-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-syaimeiri-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-teddybear-house-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-teddybear-house-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-teddybear-house-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-teddybear-house-card-w1200.webp"
+      ]
+    ]
+  },
+  "/works/pr-yukincocco-card.jpg": {
+    "width": 1200,
+    "height": 675,
+    "variants": [
+      [
+        640,
+        "/works/pr-yukincocco-card-w640.webp"
+      ],
+      [
+        1024,
+        "/works/pr-yukincocco-card-w1024.webp"
+      ],
+      [
+        1200,
+        "/works/pr-yukincocco-card-w1200.webp"
       ]
     ]
   },

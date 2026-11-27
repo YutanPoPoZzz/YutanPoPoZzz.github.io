@@ -36,8 +36,8 @@ export const clientWorks: Achievement[] = [
   {
     year: '2026',
     title: 'アバター・衣装・靴ブランドの商品撮影',
-    note: 'DIANA・大丸松坂屋アバター・Outlander_Campers・Daft_BlackSmit ほか',
-    href: '/works/tag/product/',
+    note: 'DIANA・大丸松坂屋アバター・Teddybear House・BlackSunsIns など16ブランド',
+    href: '/works/#pr',
   },
 ];
 

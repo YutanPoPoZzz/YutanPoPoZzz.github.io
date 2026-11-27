@@ -6,6 +6,9 @@ import Crumbs from '../../components/Crumbs.astro';
 import BackFab from '../../components/BackFab.astro';
 import { webpSrcset } from '../../lib/img';
 import { SHOW_MINIMA } from '../../data/minima-series-card';
+import { photoAspect } from '../../lib/photo-aspect';
+import { periodOf } from '../../lib/period';
+import PostMasonry from '../../components/PostMasonry.astro';
 
 export async function getStaticPaths() {
   const works = (await getCollection('works')).filter(
@@ -30,6 +33,22 @@ const d = work.data.date;
 const dateLabel = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
 const heroSrc = work.data.full ?? work.data.thumb;
 const heroSrcset = webpSrcset(heroSrc, base);
+const fmtDate = (x: Date) => `${x.getFullYear()}/${String(x.getMonth() + 1).padStart(2, '0')}/${String(x.getDate()).padStart(2, '0')}`;
+// ブランドのページ: 投稿ごとの写真を並べる。読み込み時のずれを防ぐため寸法を先に読む
+const posts = work.data.posts?.length
+  ? await Promise.all(
+      work.data.posts.map(async (p) => ({
+        url: p.url,
+        iso: p.date.toISOString(),
+        label: fmtDate(p.date),
+        images: await Promise.all(
+          p.images.map(async (src) => ({ src, aspect: await photoAspect(src) }))
+        ),
+      }))
+    )
+  : undefined;
+// ブランドのページは、最新日でなく投稿の期間を見出しに出す(WORKS の一覧と同じ書き方)
+const period = work.data.posts?.length ? periodOf(work.data.posts.map((p) => p.date)) : undefined;
 ---
 
 <Base title={work.data.title} description={work.data.summary}>
@@ -38,23 +57,29 @@ const heroSrcset = webpSrcset(heroSrc, base);
     <header class="article-head">
       <div class="meta">
         <span class="category">{work.data.category}</span>
-        <time datetime={d.toISOString()}>{dateLabel}</time>
+        {period ? (
+          <span>{period.label}</span>
+        ) : (
+          <time datetime={d.toISOString()}>{dateLabel}</time>
+        )}
         {work.data.status && <span class="status">{work.data.status}</span>}
       </div>
       <h1>{work.data.title}</h1>
-      <p class="lead lead-line">{work.data.summary}</p>
+      <p class:list={['lead', { 'lead-line': !posts }]}>{work.data.summary}</p>
     </header>
 
-    <figure class="hero-thumb">
-      <picture>
-        {heroSrcset && (
-          <source type="image/webp" srcset={heroSrcset} sizes="(max-width: 960px) 94vw, 884px" />
-        )}
-        <img src={`${base}${heroSrc}`} alt={work.data.title} decoding="async" />
-      </picture>
-    </figure>
+    {!posts && (
+      <figure class="hero-thumb">
+        <picture>
+          {heroSrcset && (
+            <source type="image/webp" srcset={heroSrcset} sizes="(max-width: 960px) 94vw, 884px" />
+          )}
+          <img src={`${base}${heroSrc}`} alt={work.data.title} decoding="async" />
+        </picture>
+      </figure>
+    )}
 
-    {(work.data.client || work.data.role) && (
+    {!posts && (work.data.client || work.data.role) && (
       <dl class="credit">
         {work.data.client && (
           <div>
@@ -79,6 +104,13 @@ const heroSrcset = webpSrcset(heroSrc, base);
           </a>
         ))}
       </div>
+    )}
+
+    {posts && (
+      <section class="posts" aria-label={`${work.data.title} の投稿`}>
+        <p class="posts-count">{posts.length}件の投稿。写真を押すと、その投稿が開きます。</p>
+        <PostMasonry posts={posts} title={work.data.title} />
+      </section>
     )}
 
     <div class="body">
@@ -114,6 +146,8 @@ const heroSrcset = webpSrcset(heroSrc, base);
   .credit > div { display: grid; grid-template-columns: 7em minmax(0,1fr); gap: 1rem; margin-top: 0.5rem; }
   .credit dt { color: var(--pencil); }
   .links { display: flex; flex-wrap: wrap; gap: 0.8rem 2rem; margin-top: 2rem; }
+  .posts { margin-top: 3rem; }
+  .posts-count { color: var(--pencil); font-size: 0.88rem; margin-bottom: 2.4rem; }
   .body { margin-top: 6rem; }
   .body :global(h2) { margin: 6rem 0 .8rem; font-family: 'Shippori Mincho', serif; font-weight: 500; font-size: clamp(1.3rem, 1.18rem + .5vw, 1.55rem); letter-spacing: 0.04em; }
   .body :global(h3) { margin: 3rem 0 1rem; }

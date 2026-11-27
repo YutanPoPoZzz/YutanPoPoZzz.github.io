@@ -7,6 +7,7 @@ import { minimaSeriesCard, SHOW_MINIMA } from '../data/minima-series-card';
 import { workCategories } from '../data/work-categories';
 import { services } from '../data/services';
 import { webpSrcset } from '../lib/img';
+import { periodOf } from '../lib/period';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const works = (await getCollection('works')).sort(
@@ -19,8 +20,18 @@ const otherWorks = works.filter((w) => !w.id.startsWith('minima-'));
 const MISC_CATEGORIES = ['VRChatギミック'];
 const isMisc = (w: (typeof works)[number]) => MISC_CATEGORIES.includes(w.data.category);
 
-// 制作実績: minimaと自作ツール以外のすべて(カテゴリはカードのチップに出る)
-const records = otherWorks.filter((w) => !isMisc(w));
+// 制作実績: minimaと自作ツール、ブランドのPR撮影、その他の実績以外のすべて
+const records = otherWorks.filter((w) => !isMisc(w) && !w.data.group);
+// ブランドのPR撮影: ブランドごとに1行。件数と期間を添え、最新の投稿が新しいブランドから並べる
+const prBrands = otherWorks
+  .filter((w) => w.data.group === 'pr' && (w.data.posts?.length ?? 0) > 0)
+  .map((w) => {
+    const dates = (w.data.posts ?? []).map((p) => p.date);
+    const { last, label } = periodOf(dates);
+    return { w, count: dates.length, span: label, last };
+  })
+  .sort((a, b) => b.last.getTime() - a.last.getTime());
+const otherRecords = otherWorks.filter((w) => w.data.group === 'other');
 // その他: 自作ツール(新しい順)+minimaシリーズ
 const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard] : [])];
 
@@ -113,6 +124,32 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
       )}
     </section>
 
+    <!-- ブランドの紹介撮影: ブランドごとのページへ -->
+    {prBrands.length > 0 && (
+      <section class="block" id="pr">
+        <h3>ブランドの紹介撮影</h3>
+        <p class="pr-lead">アバター・衣装・靴のブランドの新作を、Xの紹介投稿用に撮った写真です。</p>
+        <ul class="pr-brands">
+          {prBrands.map(({ w, count, span }) => (
+            <li>
+              <a href={`${base}/works/${w.id}/`}>{w.data.title}</a>
+              <span class="pr-meta">{count}件・{span}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- その他の実績 -->
+    {otherRecords.length > 0 && (
+      <section class="block" id="other-records">
+        <h3>その他の実績</h3>
+        <div class="grid">
+          {otherRecords.map((w) => <WorkCard work={w} />)}
+        </div>
+      </section>
+    )}
+
     <!-- その他のつくりもの -->
     <section class="block" id="others">
       <h3>その他のつくりもの</h3>
@@ -153,5 +190,11 @@ const misc = [...otherWorks.filter(isMisc), ...(SHOW_MINIMA ? [minimaSeriesCard]
   .sv-title { text-decoration: underline 1px var(--pencil); text-underline-offset: 0.35em; }
   .services a:hover .sv-title { text-decoration-color: var(--ink); }
   .sv-desc { display: block; max-width: 38em; }
+  .pr-lead { color: var(--pencil); }
+  /* 左から右へ読んだときに新しい順になるよう、段組みでなくグリッドで並べる */
+  .pr-brands { list-style: none; padding: 0; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); column-gap: 4rem; max-width: 48rem; }
+  .pr-brands li { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.9em; padding: 0.45rem 0; }
+  .pr-brands a { font-family: var(--font-mincho); font-weight: 500; font-size: 1.1rem; }
+  .pr-meta { color: var(--pencil); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
   @media (max-width: 760px) { .profile { flex-direction: column; } .pillars { grid-template-columns: 1fr; } .pillar:nth-child(2) { margin-top: 2rem; max-width: 85%; } .pillar:nth-child(n+3) { grid-column: 1; margin-top: 1rem; } }
 </style>

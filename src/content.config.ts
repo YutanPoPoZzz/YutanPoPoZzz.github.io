@@ -36,6 +36,19 @@ const works = defineCollection({
       .default([]),
     featured: z.boolean().default(false),
     status: z.string().optional(),
+    /** WORKS のどの段に並べるか。pr=ブランドのPR撮影、other=その他の実績。未設定は制作実績 */
+    group: z.enum(['pr', 'other']).optional(),
+    /** ブランドのページに並べる投稿(新しい順)。写真は投稿へのリンクになる */
+    posts: z
+      .array(
+        z.object({
+          date: z.coerce.date(),
+          url: z.string(),
+          images: z.array(z.string()).min(1),
+        })
+      )
+      .min(1)
+      .optional(),
   }),
 });
 
